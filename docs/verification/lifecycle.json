@@ -1,0 +1,11 @@
+{
+  "backend": "SQLite, explicitly test-only",
+  "clean_migrations": true,
+  "seed": true,
+  "edit_persisted_across_new_process_migrate_and_seed": true,
+  "repeat_seed": "Revision 2: already initialized; unchanged",
+  "json_roundtrip": true,
+  "database_backup_restored_into_new_file": true,
+  "restored_data_and_history_validation": true,
+  "PostgreSQL_pg_dump_restore": "NOT TESTED: no Docker, PostgreSQL binaries absent; local UID switching unavailable"
+}

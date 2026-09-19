@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="1240" viewBox="0 0 1220 1240">
+<rect width="1220" height="1240" fill="#f6f3e9"/>
+<style>text{font-family:DejaVu Sans,sans-serif;fill:#263d38}.title{font-size:20px;font-weight:bold}.field{font-size:15px}.edge{fill:none;stroke:#75867b;stroke-width:2}</style>
+<text x="30" y="38" class="title">Derry — database relationships</text>
+<text x="30" y="69" class="field">PK: primary key · FK: foreign key · ?: nullable · 1 → many (MapState: at most one)</text>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5L0 10" fill="none" stroke="#75867b"/></marker></defs>
+<polyline class="edge" points="310,205 440,205" marker-end="url(#arrow)"/>
+<polyline class="edge" points="170,290 170,390 1000,390" marker-end="url(#arrow)"/>
+<polyline class="edge" points="720,235 790,235 790,300 860,300" marker-end="url(#arrow)"/>
+<polyline class="edge" points="1000,160 1000,250" marker-end="url(#arrow)"/>
+<polyline class="edge" points="580,290 580,480" marker-end="url(#arrow)"/>
+<polyline class="edge" points="310,550 440,550" marker-end="url(#arrow)"/>
+<polyline class="edge" points="720,190 1190,190 1190,565 1140,565" marker-end="url(#arrow)"/>
+<polyline class="edge" points="310,830 440,830" marker-end="url(#arrow)"/>
+<g id="Geometry"><rect x="30" y="150" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="44" y="177" class="title">Geometry</text>
+<text x="44" y="203" class="field">PK key</text>
+<text x="44" y="226" class="field">shape · jsonb</text>
+</g>
+<g id="Feature"><rect x="440" y="150" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="454" y="177" class="title">Feature</text>
+<text x="454" y="203" class="field">PK key</text>
+<text x="454" y="226" class="field">FK geometry_id ?</text>
+<text x="454" y="249" class="field">name · short · kind</text>
+<text x="454" y="272" class="field">confidence · period · note</text>
+</g>
+<g id="Style"><rect x="860" y="20" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="874" y="47" class="title">Style</text>
+<text x="874" y="73" class="field">PK key</text>
+<text x="874" y="96" class="field">value · jsonb</text>
+</g>
+<g id="Component"><rect x="860" y="250" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="874" y="277" class="title">Component</text>
+<text x="874" y="303" class="field">PK key</text>
+<text x="874" y="326" class="field">FK feature_id ?</text>
+<text x="874" y="349" class="field">FK geometry_id ?</text>
+<text x="874" y="372" class="field">FK style_id · z · recipe</text>
+</g>
+<g id="Source"><rect x="30" y="480" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="44" y="507" class="title">Source</text>
+<text x="44" y="533" class="field">PK key</text>
+<text x="44" y="556" class="field">title · url · role</text>
+</g>
+<g id="Evidence"><rect x="440" y="480" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="454" y="507" class="title">Evidence</text>
+<text x="454" y="533" class="field">PK key</text>
+<text x="454" y="556" class="field">FK feature_id</text>
+<text x="454" y="579" class="field">FK source_id</text>
+<text x="454" y="602" class="field">paragraph · reference</text>
+</g>
+<g id="Label"><rect x="860" y="510" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="874" y="537" class="title">Label</text>
+<text x="874" y="563" class="field">PK key</text>
+<text x="874" y="586" class="field">FK feature_id ?</text>
+<text x="874" y="609" class="field">text · dx · dy · spec</text>
+</g>
+<g id="Revision"><rect x="30" y="760" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="44" y="787" class="title">Revision</text>
+<text x="44" y="813" class="field">PK id</text>
+<text x="44" y="836" class="field">created · author · reason</text>
+<text x="44" y="859" class="field">before · after · digest</text>
+</g>
+<g id="MapState"><rect x="440" y="760" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="454" y="787" class="title">MapState</text>
+<text x="454" y="813" class="field">PK id = 1</text>
+<text x="454" y="836" class="field">FK revision_id ?</text>
+<text x="454" y="859" class="field">initialized</text>
+</g>
+<g id="Setting"><rect x="860" y="760" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="874" y="787" class="title">Setting</text>
+<text x="874" y="813" class="field">PK key</text>
+<text x="874" y="836" class="field">value · jsonb</text>
+</g>
+<g id="MapView"><rect x="440" y="1000" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="454" y="1027" class="title">MapView</text>
+<text x="454" y="1053" class="field">PK key</text>
+<text x="454" y="1076" class="field">title · subtitle</text>
+<text x="454" y="1099" class="field">bounds · scale</text>
+</g>
+<text x="30" y="1195" class="field">Setting and MapView have no relational foreign keys; JSON references are validated by the application.</text>
+<text x="30" y="1222" class="field">Full field definitions: data_dictionary.md · Editable relationship source: er.mmd</text>
+</svg>

@@ -1,0 +1,11 @@
+.env
+.git
+.venv
+__pycache__
+*.pyc
+*.sqlite3
+var
+staticfiles
+backups
+node_modules
+docs/verification/screenshots

@@ -1,0 +1,23 @@
+{
+  "browser": "153.0.8010.47",
+  "reports": [
+    {
+      "viewport": "desktop",
+      "dimensions": {
+        "width": 1440,
+        "height": 1000
+      },
+      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog",
+      "errors": []
+    },
+    {
+      "viewport": "mobile",
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog",
+      "errors": []
+    }
+  ]
+}

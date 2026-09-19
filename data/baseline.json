@@ -1,0 +1,17 @@
+{
+  "site_count": 83,
+  "unplaced_count": 9,
+  "scene_elements": 3070,
+  "sites_sha256": "bad878d3633157cfa52f8247b413dd81bb0cad950edadb3f6b47f019b938f4bf",
+  "unplaced_sha256": "79d5cb271b39fb7ffd6ff93fa10e703ca5295a936cda789e3a18b9f5d35a0ddf",
+  "scene_sha256": "98a58ddd68bd70bc5a7e35f684f5f70e5c761261a037ecda6be2dff1838d6e87",
+  "labels_sha256": "91924dd86e2e0ccfe7aff3b932bab6af1841749cae2f3efcb9cacc29619b47b7",
+  "relief_sha256": "3c71badcb910505408f7ceab370bbaa4e62ad5e43ec909b22bfba4320a7cc741",
+  "inputs": {
+    "output/Derry_Source_Package.zip": "f7860fd93b0a7ec6d4e871cebb3c67c94eb0261e2d99209222c912ee183e1b3d",
+    "output/Derry_Interactive_Map.html": "9a23bb708dd8f3af5f6c66b517dc543063f112a23f5ee657fff293c63f24781b",
+    "output/maps/derry_data.json": "89523083c0caffbfb11506b1069ab42ca3cfc8ee97cdd9cf49c0ea9067102073",
+    "build/make_maps.py": "84d6f2060dc14092707b696f3429869bbf6dcc19eb95895aa948469bf969c48f",
+    "build/interactive_template.html": "09d8fa1dc50377cd5d68101b04dadf0d79b62399c9516ba6c76b5e67efcaaec5"
+  }
+}

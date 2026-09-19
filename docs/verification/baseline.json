@@ -1,0 +1,42 @@
+{
+  "site_count": {
+    "passed": true,
+    "actual": 83,
+    "expected": 83
+  },
+  "unplaced_count": {
+    "passed": true,
+    "actual": 9,
+    "expected": 9
+  },
+  "scene_elements": {
+    "passed": true,
+    "actual": 3070,
+    "expected": 3070
+  },
+  "sites_sha256": {
+    "passed": true,
+    "actual": "bad878d3633157cfa52f8247b413dd81bb0cad950edadb3f6b47f019b938f4bf",
+    "expected": "bad878d3633157cfa52f8247b413dd81bb0cad950edadb3f6b47f019b938f4bf"
+  },
+  "unplaced_sha256": {
+    "passed": true,
+    "actual": "79d5cb271b39fb7ffd6ff93fa10e703ca5295a936cda789e3a18b9f5d35a0ddf",
+    "expected": "79d5cb271b39fb7ffd6ff93fa10e703ca5295a936cda789e3a18b9f5d35a0ddf"
+  },
+  "scene_sha256": {
+    "passed": true,
+    "actual": "98a58ddd68bd70bc5a7e35f684f5f70e5c761261a037ecda6be2dff1838d6e87",
+    "expected": "98a58ddd68bd70bc5a7e35f684f5f70e5c761261a037ecda6be2dff1838d6e87"
+  },
+  "labels_sha256": {
+    "passed": true,
+    "actual": "91924dd86e2e0ccfe7aff3b932bab6af1841749cae2f3efcb9cacc29619b47b7",
+    "expected": "91924dd86e2e0ccfe7aff3b932bab6af1841749cae2f3efcb9cacc29619b47b7"
+  },
+  "relief_sha256": {
+    "passed": true,
+    "actual": "3c71badcb910505408f7ceab370bbaa4e62ad5e43ec909b22bfba4320a7cc741",
+    "expected": "3c71badcb910505408f7ceab370bbaa4e62ad5e43ec909b22bfba4320a7cc741"
+  }
+}

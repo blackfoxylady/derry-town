@@ -1,0 +1,8 @@
+{
+  "name": "derry-browser-checks",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Optional real-browser checks; no Node runtime needed to serve the map",
+  "scripts": {"test:browser": "node tests/browser.cjs"},
+  "devDependencies": {"playwright": "1.62.1"}
+}

@@ -1,0 +1,89 @@
+erDiagram
+    direction TB
+    Setting {
+        string key PK
+        json value
+    }
+    Geometry {
+        string key PK
+        json shape
+    }
+    Feature {
+        string key PK
+        string object_type
+        string name
+        string short
+        string kind
+        string confidence
+        number rank
+        string period
+        string note
+        string geometry_id FK
+        json metadata
+    }
+    Geometry |o--o{ Feature : "geometry_id"
+    Style {
+        string key PK
+        json value
+    }
+    Component {
+        string key PK
+        string feature_id FK
+        string geometry_id FK
+        string style_id FK
+        number z
+        json recipe
+    }
+    Feature |o--o{ Component : "feature_id"
+    Geometry |o--o{ Component : "geometry_id"
+    Style ||--o{ Component : "style_id"
+    Label {
+        string key PK
+        string feature_id FK
+        string text
+        number dx
+        number dy
+        json spec
+    }
+    Feature |o--o{ Label : "feature_id"
+    Source {
+        string key PK
+        string title
+        string kind
+        string url
+        string role
+        json metadata
+    }
+    Evidence {
+        string key PK
+        string feature_id FK
+        string source_id FK
+        number paragraph
+        string reference
+        string note
+        number order
+    }
+    Feature ||--o{ Evidence : "feature_id"
+    Source ||--o{ Evidence : "source_id"
+    MapView {
+        string key PK
+        string title
+        string subtitle
+        number scale
+        json bounds
+    }
+    Revision {
+        number id PK
+        datetime created
+        string author
+        string reason
+        json before
+        json after
+        string digest
+    }
+    MapState {
+        number id PK
+        boolean initialized
+        string revision_id FK
+    }
+    Revision |o--o| MapState : "revision_id"

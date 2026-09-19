@@ -1,0 +1,30 @@
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Found 11 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: staticfiles
+  Apply all migrations: atlas
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying atlas.0001_initial... OK
+  Applying atlas.0002_map_state... OK
+  Applying atlas.0003_alter_feature_name...test_add_delete_feature_and_sources (tests.test_atlas.AtlasTests.test_add_delete_feature_and_sources) ... ok
+test_atomic_patch_rejects_bad_second_operation (tests.test_atlas.AtlasTests.test_atomic_patch_rejects_bad_second_operation) ... ok
+test_dry_run_and_stale_revision (tests.test_atlas.AtlasTests.test_dry_run_and_stale_revision) ... ok
+test_edit_restart_and_seed_preserve_changes (tests.test_atlas.AtlasTests.test_edit_restart_and_seed_preserve_changes) ... ok
+test_explicit_short_label_and_exact_snapshot_restore (tests.test_atlas.AtlasTests.test_explicit_short_label_and_exact_snapshot_restore) ... ok
+test_export_import_history_and_rollback (tests.test_atlas.AtlasTests.test_export_import_history_and_rollback) ... ok
+test_fk_and_invalid_geometry_validation (tests.test_atlas.AtlasTests.test_fk_and_invalid_geometry_validation) ... ok
+test_linked_wings_and_markers_move_together (tests.test_atlas.AtlasTests.test_linked_wings_and_markers_move_together) ... ok
+test_original_identifiers_and_evidence (tests.test_atlas.AtlasTests.test_original_identifiers_and_evidence) ... ok
+test_read_api_cache_invalidation_and_no_public_writes (tests.test_atlas.AtlasTests.test_read_api_cache_invalidation_and_no_public_writes) ... ok
+test_terrain_is_derived_from_current_parameters (tests.test_atlas.AtlasTests.test_terrain_is_derived_from_current_parameters) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 28.221s
+
+OK
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+ OK
+System check identified no issues (0 silenced).

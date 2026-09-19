@@ -1,0 +1,10 @@
+[
+  {
+    "op": "update",
+    "table": "feature",
+    "key": "12",
+    "values": {
+      "note": "Developer example: the library placement has been reviewed against the novel."
+    }
+  }
+]

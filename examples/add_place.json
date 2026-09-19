@@ -1,0 +1,69 @@
+[
+  {
+    "op": "add",
+    "table": "geometry",
+    "key": "g:84",
+    "values": {
+      "shape": {
+        "type": "point",
+        "x": -1500,
+        "y": -500
+      }
+    }
+  },
+  {
+    "op": "add",
+    "table": "feature",
+    "key": "84",
+    "values": {
+      "object_type": "site",
+      "name": "Developer example — remove after testing",
+      "short": "Developer example",
+      "kind": "Historical",
+      "confidence": "C",
+      "period": "Example only",
+      "note": "Not an additional claim about the novel.",
+      "geometry_id": "g:84"
+    }
+  },
+  {
+    "op": "add",
+    "table": "geometry",
+    "key": "footprint:84",
+    "values": {
+      "shape": {
+        "type": "rect",
+        "x": 0,
+        "y": 0,
+        "w": 15,
+        "h": 10,
+        "angle": 0
+      }
+    }
+  },
+  {
+    "op": "add",
+    "table": "component",
+    "key": "c:example84",
+    "values": {
+      "feature_id": "84",
+      "geometry_id": "footprint:84",
+      "style_id": "s:3a2d399ded10e6",
+      "z": 4000,
+      "recipe": {
+        "relative": true
+      }
+    }
+  },
+  {
+    "op": "add",
+    "table": "evidence",
+    "key": "e:84:0",
+    "values": {
+      "feature_id": "84",
+      "source_id": "novel",
+      "reference": "Example only; replace with reviewed chapter reference",
+      "paragraph": null
+    }
+  }
+]

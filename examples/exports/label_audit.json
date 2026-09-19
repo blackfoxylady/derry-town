@@ -1,0 +1,597 @@
+[
+  {
+    "view": "city",
+    "id": 1,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 2,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 4,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 7,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 11,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 12,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 15,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 18,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 20,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 21,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 22,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 23,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 24,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 25,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 27,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 30,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 31,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 33,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 35,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 38,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 40,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 41,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 43,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 44,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 45,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 47,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 48,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 49,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 50,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 52,
+    "label": true
+  },
+  {
+    "view": "city",
+    "id": 55,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 1,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 2,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 4,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 7,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 11,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 12,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 15,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 18,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 20,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 21,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 22,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 23,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 24,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 25,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 27,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 31,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 35,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 55,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 3,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 5,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 6,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 14,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 17,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 19,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 26,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 28,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 32,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 53,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 54,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 56,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 57,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 58,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 59,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 60,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 61,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 65,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 68,
+    "label": true
+  },
+  {
+    "view": "central",
+    "id": 78,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 1,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 2,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 4,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 12,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 21,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 22,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 31,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 33,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 35,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 38,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 40,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 41,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 43,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 44,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 45,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 47,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 48,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 49,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 50,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 52,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 3,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 14,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 32,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 34,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 36,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 39,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 42,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 46,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 51,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 61,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 65,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 76,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 78,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 79,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 83,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 8,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 9,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 10,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 13,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 62,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 80,
+    "label": true
+  },
+  {
+    "view": "barrens",
+    "id": 82,
+    "label": true
+  },
+  {
+    "view": "camp",
+    "id": 41,
+    "label": true
+  },
+  {
+    "view": "camp",
+    "id": 43,
+    "label": true
+  },
+  {
+    "view": "camp",
+    "id": 44,
+    "label": true
+  },
+  {
+    "view": "camp",
+    "id": 45,
+    "label": true
+  },
+  {
+    "view": "camp",
+    "id": 47,
+    "label": true
+  },
+  {
+    "view": "camp",
+    "id": 52,
+    "label": true
+  },
+  {
+    "view": "camp",
+    "id": 42,
+    "label": true
+  },
+  {
+    "view": "camp",
+    "id": 46,
+    "label": true
+  }
+]

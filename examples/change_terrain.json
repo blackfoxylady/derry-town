@@ -1,0 +1,96 @@
+[
+  {
+    "op": "update",
+    "table": "settings",
+    "key": "terrain",
+    "values": {
+      "value": {
+        "extent": [
+          -6100,
+          -4300,
+          3580,
+          3400
+        ],
+        "grid": [
+          820,
+          652
+        ],
+        "output": [
+          1640,
+          1304
+        ],
+        "hills": [
+          [
+            -2060,
+            -1410,
+            41,
+            380,
+            480
+          ],
+          [
+            -1150,
+            -1470,
+            22,
+            630,
+            460
+          ],
+          [
+            -3030,
+            1210,
+            40,
+            730,
+            440
+          ],
+          [
+            1840,
+            -870,
+            31,
+            600,
+            600
+          ],
+          [
+            -3950,
+            -2910,
+            30,
+            600,
+            500
+          ]
+        ],
+        "contours": [
+          12,
+          108,
+          7
+        ],
+        "river_keys": [
+          "water:river",
+          "water:canal"
+        ],
+        "penobscot_key": "water:penobscot",
+        "parameters": {
+          "baseline": 13,
+          "west_slope": 0.0033,
+          "river_height": 42,
+          "river_sigma": 430,
+          "wave_height": 3,
+          "wave_x": 260,
+          "wave_y": 335,
+          "penobscot_depth": 15,
+          "penobscot_sigma": 270,
+          "shade_base": 0.8,
+          "shade_dx": -0.9,
+          "shade_dy": 1.0,
+          "shade_min": 0.69,
+          "shade_max": 0.89,
+          "rgb": [
+            245,
+            241,
+            226
+          ],
+          "tint_base": 0.93,
+          "tint_strength": 0.11,
+          "shade_span": 0.2
+        }
+      }
+    }
+  }
+]

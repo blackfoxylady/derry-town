@@ -1,0 +1,17 @@
+[
+  {
+    "op": "update",
+    "table": "geometry",
+    "key": "drawing:3015",
+    "values": {
+      "shape": {
+        "type": "rect",
+        "x": 0,
+        "y": 5,
+        "w": 66,
+        "h": 42,
+        "angle": 30
+      }
+    }
+  }
+]
