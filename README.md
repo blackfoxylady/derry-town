@@ -31,7 +31,8 @@ python3 scripts/configure.py --host 203.0.113.10 --bind 0.0.0.0
 | `config/` | Django settings, URL, WSGI |
 | `atlas/models.py`, `atlas/migrations/` | Модели и единственная основная цепочка миграций |
 | `atlas/dataset.py` | Формат данных, проверки, транзакции, версии |
-| `atlas/management/commands/atlas.py` | Команды разработчика |
+| `atlas/management/commands/` | Команды разработчика: `atlas` (карта), `photos` (фотографии) |
+| `atlas/photos.py` | Фотографии: валидация, файлы media, производные размеры |
 | `atlas/rendering.py`, `atlas/print_engine.py` | Рельеф, сцена, печатные PDF/SVG |
 | `atlas/templates/`, `atlas/static/` | HTML, CSS, JavaScript интерфейса |
 | `data/initial.json` | Однократный начальный снимок, не рабочая БД |
@@ -71,7 +72,7 @@ docker compose cp web:/app/var/exports ./exports
 
 ## Данные, обновления и резервные копии
 
-Именованный том `pgdata` хранит БД, том `artifacts` — воспроизводимый кеш и экспорты. Перезапуск, `docker compose down` и пересборка контейнера сохраняют данные. **`docker compose down -v` удаляет тома**, поэтому для обычной эксплуатации эту команду не используйте.
+Именованный том `pgdata` хранит БД, том `artifacts` — воспроизводимый кеш и экспорты, том `media` — файлы фотографий. Перезапуск, `docker compose down` и пересборка контейнера сохраняют данные. **`docker compose down -v` удаляет тома**, поэтому для обычной эксплуатации эту команду не используйте.
 
 ```sh
 sh scripts/backup.sh

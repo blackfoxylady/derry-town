@@ -1,5 +1,8 @@
-from django.http import JsonResponse, HttpResponse, HttpResponseNotModified
+from pathlib import Path
+from django.conf import settings
+from django.http import FileResponse, Http404, JsonResponse, HttpResponse, HttpResponseNotModified
 from django.shortcuts import render
+from django.utils._os import safe_join
 from django.views.decorators.http import require_safe
 from .models import MapState
 from .rendering import current_payload, RENDER_VERSION
@@ -26,6 +29,21 @@ def map_data(request):
         response = JsonResponse(payload, json_dumps_params={'ensure_ascii':False,'separators':(',',':')})
     response['ETag'] = etag
     response['Cache-Control'] = 'no-cache'
+    return response
+
+
+@require_safe
+def media(request, media_path):
+    """Раздача медиа (фотографий). Имена файлов содержат хеш содержимого,
+    поэтому ответ кешируется бессрочно; новые версии получают новые имена."""
+    try:
+        full = Path(safe_join(settings.MEDIA_ROOT, media_path))
+    except ValueError:
+        raise Http404
+    if not full.is_file():
+        raise Http404
+    response = FileResponse(open(full, 'rb'))
+    response['Cache-Control'] = 'public, max-age=31536000, immutable'
     return response
 
 

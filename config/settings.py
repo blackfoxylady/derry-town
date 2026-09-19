@@ -36,6 +36,9 @@ STORAGES = {'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'
  'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'}}
 WHITENOISE_USE_FINDERS = DEBUG
 ARTIFACT_ROOT = Path(os.environ.get('DERRY_ARTIFACT_ROOT', BASE_DIR / 'var'))
+# Медиа (фотографии) раздаёт собственный view: whitenoise обслуживает только статику.
+MEDIA_URL = '/media/'
+MEDIA_ROOT = Path(os.environ.get('DERRY_MEDIA_ROOT', BASE_DIR / 'media'))
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_SSL_REDIRECT = os.environ.get('DJANGO_SSL_REDIRECT', '0') == '1'

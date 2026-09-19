@@ -87,3 +87,37 @@ erDiagram
         string revision_id FK
     }
     Revision |o--o| MapState : "revision_id"
+    Character {
+        string slug PK
+        string name
+    }
+    Tag {
+        string slug PK
+    }
+    Photo {
+        number id PK
+        string sha256
+        string ext
+        string original_name
+        string caption
+        number year
+        string feature_key
+        number order
+        number width
+        number height
+        datetime created
+    }
+    Photo_characters {
+        number id PK
+        string photo_id FK
+        string character_id FK
+    }
+    Photo ||--o{ Photo_characters : "photo_id"
+    Character ||--o{ Photo_characters : "character_id"
+    Photo_tags {
+        number id PK
+        string photo_id FK
+        string tag_id FK
+    }
+    Photo ||--o{ Photo_tags : "photo_id"
+    Tag ||--o{ Photo_tags : "tag_id"

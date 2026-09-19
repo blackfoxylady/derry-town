@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends fonts-dejavu-co
 COPY requirements.lock ./
 RUN pip install --no-cache-dir --require-hashes -r requirements.lock
 COPY . .
-RUN mkdir -p /app/var /app/staticfiles && chown -R app:app /app/var /app/staticfiles \
+RUN mkdir -p /app/var /app/staticfiles /app/media && chown -R app:app /app/var /app/staticfiles /app/media \
     && chmod +x /app/scripts/entrypoint.sh
 USER app
 EXPOSE 8000

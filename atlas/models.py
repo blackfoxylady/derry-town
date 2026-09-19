@@ -107,3 +107,42 @@ class MapState(models.Model):
 
     class Meta:
         constraints = [models.CheckConstraint(condition=Q(id=1), name='singleton_map_state')]
+
+
+class Character(models.Model):
+    """Справочник персонажей для фотографий; пополняется командой photos."""
+    slug = models.CharField(max_length=100, primary_key=True)
+    name = models.CharField(max_length=150)
+
+
+class Tag(models.Model):
+    slug = models.CharField(max_length=100, primary_key=True)
+
+
+class Photo(models.Model):
+    """Фотографии — отдельный контур вне ревизий атласа.
+
+    Привязка к месту хранится строковым ключом, а не FK: commit() атласа
+    полностью заменяет строки feature (replace_tables), и FK-каскад стирал бы
+    привязки при каждой правке карты. Целостность ключа проверяют photos.py
+    при записи и `photos check` после правок атласа.
+    """
+    sha256 = models.CharField(max_length=64, unique=True)
+    ext = models.CharField(max_length=8)
+    original_name = models.CharField(max_length=255)
+    caption = models.TextField(blank=True)
+    year = models.PositiveSmallIntegerField(null=True, blank=True)
+    feature_key = models.CharField(max_length=100, blank=True, default='')
+    order = models.PositiveIntegerField(default=0)
+    width = models.PositiveIntegerField()
+    height = models.PositiveIntegerField()
+    created = models.DateTimeField(auto_now_add=True)
+    characters = models.ManyToManyField(Character, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
+
+    class Meta:
+        ordering = ['order', 'id']
+        constraints = [
+            models.CheckConstraint(condition=Q(year__isnull=True) | Q(year__gte=1850, year__lte=2100),
+                                   name='photo_year_range'),
+        ]

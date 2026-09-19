@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="1240" viewBox="0 0 1220 1240">
-<rect width="1220" height="1240" fill="#f6f3e9"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1220" height="1460" viewBox="0 0 1220 1460">
+<rect width="1220" height="1460" fill="#f6f3e9"/>
 <style>text{font-family:DejaVu Sans,sans-serif;fill:#263d38}.title{font-size:20px;font-weight:bold}.field{font-size:15px}.edge{fill:none;stroke:#75867b;stroke-width:2}</style>
 <text x="30" y="38" class="title">Derry — database relationships</text>
 <text x="30" y="69" class="field">PK: primary key · FK: foreign key · ?: nullable · 1 → many (MapState: at most one)</text>
@@ -12,6 +12,8 @@
 <polyline class="edge" points="310,550 440,550" marker-end="url(#arrow)"/>
 <polyline class="edge" points="720,190 1190,190 1190,565 1140,565" marker-end="url(#arrow)"/>
 <polyline class="edge" points="310,830 440,830" marker-end="url(#arrow)"/>
+<polyline class="edge" points="120,1140 120,1240" marker-end="url(#arrow)"/>
+<polyline class="edge" points="250,1140 250,1200 560,1200 560,1240" marker-end="url(#arrow)"/>
 <g id="Geometry"><rect x="30" y="150" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="44" y="177" class="title">Geometry</text>
 <text x="44" y="203" class="field">PK key</text>
 <text x="44" y="226" class="field">shape · jsonb</text>
@@ -66,6 +68,23 @@
 <text x="454" y="1076" class="field">title · subtitle</text>
 <text x="454" y="1099" class="field">bounds · scale</text>
 </g>
-<text x="30" y="1195" class="field">Setting and MapView have no relational foreign keys; JSON references are validated by the application.</text>
-<text x="30" y="1222" class="field">Full field definitions: data_dictionary.md · Editable relationship source: er.mmd</text>
+<g id="Photo"><rect x="30" y="1000" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="44" y="1027" class="title">Photo</text>
+<text x="44" y="1053" class="field">PK id</text>
+<text x="44" y="1076" class="field">sha256 · ext · caption</text>
+<text x="44" y="1099" class="field">feature_key (строка, не FK)</text>
+<text x="44" y="1122" class="field">year · order · width · height</text>
+</g>
+<g id="Character"><rect x="30" y="1240" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="44" y="1267" class="title">Character</text>
+<text x="44" y="1293" class="field">PK slug</text>
+<text x="44" y="1316" class="field">name</text>
+</g>
+<g id="Tag"><rect x="440" y="1240" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="454" y="1267" class="title">Tag</text>
+<text x="454" y="1293" class="field">PK slug</text>
+</g>
+<text x="30" y="1415" class="field">Setting and MapView have no relational foreign keys; JSON references are validated by the application.</text>
+<text x="30" y="1442" class="field">Full field definitions: data_dictionary.md · Editable relationship source: er.mmd</text>
+<text x="750" y="1295" class="field">Photo — Character and Photo — Tag are many-to-many</text>
+<text x="750" y="1322" class="field">(link tables photo_characters, photo_tags).</text>
+<text x="750" y="1349" class="field">photo.feature_key is an app-validated string, not an FK:</text>
+<text x="750" y="1376" class="field">atlas commits fully replace feature rows.</text>
 </svg>

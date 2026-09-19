@@ -19,6 +19,8 @@ with connection.schema_editor(collect_sql=True,atomic=False) as editor:
  for name in ORDER:editor.create_model(TABLES[name])
  editor.create_model(models.Revision)
  editor.create_model(models.MapState)
+ for extra in (models.Character,models.Tag,models.Photo,models.Photo.characters.through,models.Photo.tags.through):
+  editor.create_model(extra)
  sql=editor.collected_sql
 print('-- PostgreSQL 17 application schema; REVIEW ONLY, NOT an installation script.')
 print('-- Apply migrations with: python manage.py migrate --noinput')

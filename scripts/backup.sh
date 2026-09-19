@@ -12,3 +12,12 @@ test -s "$temp"
 mv "$temp" "$dest"
 sha256sum "$dest" > "$dest.sha256"
 echo "Backup: $dest"
+# Медиа (фотографии): дамп БД хранит записи, файлы уносим отдельным архивом.
+media="${dest%.dump}-media.tar.gz"
+mtemp="$media.partial"
+trap 'rm -f "$temp" "$mtemp"' EXIT HUP INT TERM
+docker compose exec -T web tar -C /app -czf - media > "$mtemp"
+test -s "$mtemp"
+mv "$mtemp" "$media"
+sha256sum "$media" > "$media.sha256"
+echo "Media backup: $media"

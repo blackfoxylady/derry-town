@@ -78,6 +78,34 @@ python manage.py atlas rollback 1 --author 'Developer' --reason 'Return to initi
 
 Полный дамп PostgreSQL отличается от JSON-экспорта: он содержит историю, состояние и таблицу миграций. Перед большой заменой полезно сделать `sh scripts/backup.sh`.
 
+## Фотографии
+
+Фотографии живут вне журнала ревизий атласа (см. architecture.md). Файлы в каталог media руками не кладутся: команда `photos` сохраняет оригинал, считает SHA-256 (повторная загрузка того же файла отклоняется), генерирует миниатюру и средний размер и создаёт запись в БД.
+
+Рабочий процесс: скопировать оригиналы на сервер (`scp`/`rsync` во временную папку, затем `docker compose cp` в контейнер) и добавить по одному:
+
+```sh
+docker compose cp photo.png web:/tmp/photo.png
+python manage.py photos add /tmp/photo.png \
+  --caption 'Derry Public Library: the stone adult building.' \
+  --feature 12 --year 1958 --character ben-hanscom --tag library
+```
+
+`--feature` — существующий ключ из таблицы feature; фото может быть и без места. `--year` проверяется по справочнику эпох романа (`ALLOWED_YEARS` в `atlas/photos.py`). Персонажи и теги — слаги (строчные буквы, цифры, дефисы); отсутствующие записи справочников создаются на лету, имя персонажа выводится из слага (`ben-hanscom` → `Ben Hanscom`).
+
+Партия из десятков фото — каталог с манифестом, применяется атомарно (все или ни одной):
+
+```sh
+docker compose cp ./photos-batch web:/tmp/photos-batch
+python manage.py photos import /tmp/photos-batch   # ищет manifest.json рядом с файлами
+```
+
+Манифест — JSON-список объектов: `file` (имя в каталоге), необязательные `caption`, `feature`, `year`, `characters`, `tags`, `order`.
+
+Просмотр и правка атрибутов (файлы не трогаются): `photos list`, `photos show 3`, `photos edit 3 --caption '...' --feature ''` (пустая строка отвязывает), `--tag`/`--character` заменяют весь набор, `--no-tags`/`--no-characters` очищают. `photos remove 3` удаляет запись вместе с файлами.
+
+После правок атласа, удаляющих места, выполните `photos check`: команда сообщит висячие привязки, отсутствующие и ничейные файлы.
+
 ## Обновление сайта и экспорта
 
 После commit обновите страницу сайта. Для предварительной сборки используйте `atlas rebuild`. PNG рельефа и векторная сцена вычисляются из одной версии. Затем `atlas render --output /app/var/exports` создаёт PDF/SVG актуальной карты; manifest.json содержит номер версии и хеш. Самостоятельное редактирование выгруженного SVG не возвращает изменения в БД.

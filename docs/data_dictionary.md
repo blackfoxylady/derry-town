@@ -136,6 +136,61 @@ SQL имена приведены для PostgreSQL. JSONField хранится 
 | `initialized` | boolean | нет | Seed был успешно применён; последующие запуски его пропускают. |
 | `revision_id` | FK → atlas_revision.id | да | Связь; on_delete=PROTECT. |
 
+## `atlas_character` — Character
+
+Справочник персонажей для фотографий; пополняется командой photos.
+
+| Поле | Тип | NULL | Назначение |
+|---|---|---|---|
+| `slug` | varchar(100) | нет | PK. Слаг: строчные латинские буквы, цифры, дефисы. |
+| `name` | varchar(150) | нет | Имя персонажа для показа. |
+
+## `atlas_tag` — Tag
+
+Свободные теги фотографий; создаются на лету при загрузке.
+
+| Поле | Тип | NULL | Назначение |
+|---|---|---|---|
+| `slug` | varchar(100) | нет | PK. Слаг: строчные латинские буквы, цифры, дефисы. |
+
+## `atlas_photo` — Photo
+
+Фотографии: отдельный контур вне ревизий атласа. Файлы в media по SHA-256, производные размеры thumb/medium.
+
+| Поле | Тип | NULL | Назначение |
+|---|---|---|---|
+| `id` | bigint identity | нет | PK. Числовой PK; у MapState всегда 1. |
+| `sha256` | varchar(64) | нет | SHA-256 содержимого оригинала; определяет имена файлов и защищает от дублей. |
+| `ext` | varchar(8) | нет | Расширение оригинала: png, jpg или webp. |
+| `original_name` | varchar(255) | нет | Имя загруженного файла, для справки. |
+| `caption` | text | нет | Подпись фотографии. |
+| `year` | smallint ≥ 0 | да | Год эпохи романа или null; справочник ALLOWED_YEARS в atlas/photos.py. |
+| `feature_key` | varchar(100) | нет | Строковый ключ Feature, намеренно без FK: commit атласа полностью заменяет строки feature, и каскад стирал бы привязки. Проверяется photos.py и `photos check`. |
+| `order` | integer ≥ 0 | нет | Порядок в галерее и карточке места. |
+| `width` | integer ≥ 0 | нет | Ширина оригинала в пикселях. |
+| `height` | integer ≥ 0 | нет | Высота оригинала в пикселях. |
+| `created` | timestamptz | нет | UTC время загрузки. |
+
+## `atlas_photo_characters` — Photo_characters
+
+Связь многие-ко-многим фото — персонаж.
+
+| Поле | Тип | NULL | Назначение |
+|---|---|---|---|
+| `id` | bigint identity | нет | PK. Числовой PK; у MapState всегда 1. |
+| `photo_id` | FK → atlas_photo.id | нет | Связь; on_delete=CASCADE. |
+| `character_id` | FK → atlas_character.slug | нет | Связь; on_delete=CASCADE. |
+
+## `atlas_photo_tags` — Photo_tags
+
+Связь многие-ко-многим фото — тег.
+
+| Поле | Тип | NULL | Назначение |
+|---|---|---|---|
+| `id` | bigint identity | нет | PK. Числовой PK; у MapState всегда 1. |
+| `photo_id` | FK → atlas_photo.id | нет | Связь; on_delete=CASCADE. |
+| `tag_id` | FK → atlas_tag.slug | нет | Связь; on_delete=CASCADE. |
+
 ## Ограничения
 
 - PK уникальны; FK не допускают висячих ссылок.
