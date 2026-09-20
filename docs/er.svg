@@ -42,7 +42,7 @@
 <text x="454" y="533" class="field">PK key</text>
 <text x="454" y="556" class="field">FK feature_id</text>
 <text x="454" y="579" class="field">FK source_id</text>
-<text x="454" y="602" class="field">paragraph · reference</text>
+<text x="454" y="602" class="field">reference · note</text>
 </g>
 <g id="Label"><rect x="860" y="510" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="874" y="537" class="title">Label</text>
 <text x="874" y="563" class="field">PK key</text>

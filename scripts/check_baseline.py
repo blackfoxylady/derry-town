@@ -24,7 +24,7 @@ def verify():
  expected=json.loads((settings.BASE_DIR/'data/baseline.json').read_text())
  sites=payload['data']['sites']
  for site in sites:
-  site['sources']=[{k:v for k,v in r.items() if k in ['reference','paragraph']} for r in site['sources']]
+  site['sources']=[{k:v for k,v in r.items() if k in ['reference']} for r in site['sources']]
  unplaced=[{k:v for k,v in r.items() if k!='sources'} for r in payload['data']['unplaced']]
  scene=[{k:v for k,v in s.items() if k not in ['feature_id','component_id']} for s in payload['base']]
  labels=[{k:v for k,v in s.items() if k not in ['web_offset','follow_name']} for s in payload['labels']]

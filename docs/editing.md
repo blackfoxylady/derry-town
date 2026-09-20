@@ -33,7 +33,7 @@ python manage.py atlas edit road:01 --geometry /app/var/kansas.json \
   --author 'Developer' --reason 'Adjust street bend'
 ```
 
-`sources.json` — массив объектов `source_id`, `reference`, необязательные `paragraph`, `note`. Он заменяет весь набор связей источников выбранного объекта. `source_id` должен существовать; новый источник добавляется вместе со ссылкой через `atlas apply`. Пример с сохранёнными исходными ссылками библиотеки — `examples/library_sources.json`.
+`sources.json` — массив объектов `source_id`, `reference`, необязательный `note`. Он заменяет весь набор связей источников выбранного объекта. `source_id` должен существовать; новый источник добавляется вместе со ссылкой через `atlas apply`. Пример с сохранёнными исходными ссылками библиотеки — `examples/library_sources.json`.
 
 Файл `kansas.json` — полный объект shape, например `{"type":"line","points":[...]}`. Получите существующую геометрию через `atlas show geometry g:road:01`, исправьте вершины и передайте только поле shape. Двойные штрихи дороги пересчитаются вместе. Соседние иллюстративные здания остаются самостоятельными фигурами.
 

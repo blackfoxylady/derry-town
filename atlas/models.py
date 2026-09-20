@@ -74,7 +74,6 @@ class Evidence(models.Model):
     key = models.CharField(max_length=100, primary_key=True)
     feature = models.ForeignKey(Feature, on_delete=models.CASCADE)
     source = models.ForeignKey(Source, on_delete=models.PROTECT)
-    paragraph = models.PositiveIntegerField(null=True, blank=True)
     reference = models.TextField()
     note = models.TextField(blank=True)
     order = models.PositiveIntegerField(default=0)

@@ -121,14 +121,13 @@ def compile_payload(doc, revision):
         if f['object_type'] not in ('site', 'unplaced'): continue
         refs = evidence.get(f['key'], [])
         common = {k:f[k] for k in ('name','period','note')}
-        common['sources'] = [{'reference':e['reference'],'paragraph':e['paragraph'],
-                              'source_id':e['source_id'],'note':e['note']} for e in refs]
+        common['sources'] = [{'reference':e['reference'],'source_id':e['source_id'],'note':e['note']} for e in refs]
         if f['object_type'] == 'site':
             s = geometry[f['geometry_id']]['shape']
             data['sites'].append(dict(id=int(f['key']),x=s['x'],y=s['y'],
                 **common, **{k:f[k] for k in ('short','kind','confidence','rank')}))
         else:
-            data['unplaced'].append(dict(id=f['key'],reference='; '.join(e['reference'] for e in refs),**common))
+            data['unplaced'].append(dict(id=f['key'],reference='; '.join(dict.fromkeys(e['reference'] for e in refs)),**common))
     data['sites'].sort(key=lambda s:s['id']); data['unplaced'].sort(key=lambda s:int(s['id'][1:]))
     data['web_sources'] = [dict(id=s['key'],**{k:s[k] for k in ('title','url','role')}) for s in tables['source'] if s['kind']=='web']
     labels = []

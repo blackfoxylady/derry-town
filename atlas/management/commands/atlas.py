@@ -139,6 +139,6 @@ class Command(BaseCommand):
             t['evidence'] = [r for r in t['evidence'] if r['feature_id'] != f['key']]
             for i, ref in enumerate(refs):
                 t['evidence'].append({'key': f'e:{f["key"]}:{i}', 'feature_id': f['key'],
-                    'source_id': ref['source_id'], 'paragraph': ref.get('paragraph'),
+                    'source_id': ref['source_id'],
                     'reference': ref['reference'], 'note': ref.get('note', ''), 'order': i})
         return doc

@@ -89,7 +89,7 @@ class AtlasTests(TestCase):
     def test_add_delete_feature_and_sources(self):
         changes=[{'op':'add','table':'geometry','key':'g:84','values':{'shape':{'type':'point','x':0,'y':0}}},
             {'op':'add','table':'feature','key':'84','values':{'object_type':'site','name':'Review example','short':'Example','kind':'Historical','confidence':'C','geometry_id':'g:84'}},
-            {'op':'add','table':'evidence','key':'e:84:0','values':{'feature_id':'84','source_id':'novel','reference':'Developer review','paragraph':None}}]
+            {'op':'add','table':'evidence','key':'e:84:0','values':{'feature_id':'84','source_id':'novel','reference':'Developer review'}}]
         ds.commit(lambda d:ds.patch(d,changes),'dev','add')
         self.assertTrue(Feature.objects.filter(pk='84').exists())
         self.cmd('delete','84','--author','dev','--reason','remove')
