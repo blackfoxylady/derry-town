@@ -276,6 +276,8 @@ def place_page(request, slug):
         'feature': feature, 'note': _feature_note(feature),
         'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
         'cards': [{'photo': p, 'thumb': _media_urls(p)['thumb'], 'caption': _caption(p)} for p in photos],
+        # Превью для соцсетей: первое фото места; без фото шаблон подставит общую карту.
+        'og_photo': _media_urls(photos[0])['medium'] if photos else '',
         'map_url': reverse('index') + '?place=' + feature.key,
         'gallery_url': _gallery_url(place=feature.key)})
     response['Cache-Control'] = 'no-cache'

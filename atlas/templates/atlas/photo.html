@@ -1,7 +1,10 @@
 {% extends 'atlas/gallery_base.html' %}
-{% load i18n %}
+{% load i18n atlas_tags %}
 {% block title %}{{ caption|default:photo.original_name|truncatechars:60 }}{% endblock %}
 {% block meta_description %}{{ caption|default:photo.original_name|truncatechars:160 }}{% endblock %}
+{% block og_title %}{{ caption|default:photo.original_name|truncatechars:60 }}{% endblock %}
+{% block og_description %}{{ caption|default:photo.original_name|truncatechars:160 }}{% endblock %}
+{% block og_image %}<meta property="og:image" content="{% absolute_url urls.medium %}"><meta property="og:image:alt" content="{{ caption|default:photo.original_name }}">{% endblock %}
 {% block content %}
 <p class="crumbs"><a href="{% url 'gallery' %}">← {% trans "All photographs" %}</a></p>
 <article class="photo">

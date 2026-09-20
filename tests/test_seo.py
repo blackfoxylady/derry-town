@@ -54,3 +54,28 @@ class SeoTests(TestCase):
         # Canonical галереи не тащит query-параметры фильтров.
         response = self.client.get('/photos/', {'place': '12'})
         self.assertContains(response, '<link rel="canonical" href="http://testserver/photos/">')
+
+    def test_pages_carry_open_graph_tags(self):
+        response = self.client.get('/')
+        self.assertContains(response, '<meta property="og:image" content="http://testserver/static/atlas/og-map.jpg">')
+        self.assertContains(response, '<meta property="og:url" content="http://testserver/">')
+        self.assertContains(response, '<meta property="og:locale" content="en_US">')
+        self.assertContains(response, '<meta name="twitter:card" content="summary_large_image">')
+        self.assertContains(self.client.get('/ru/'), '<meta property="og:locale" content="ru_RU">')
+        # Без фото страница места подставляет общую карту.
+        response = self.client.get('/places/12-derry-public-library/')
+        self.assertContains(response, '<meta property="og:title" content="Derry Public Library · Derry">')
+        self.assertContains(response, 'og-map.jpg')
+
+    def test_photo_pages_use_the_photo_as_preview(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with override_settings(MEDIA_ROOT=root / 'media'):
+                make_image(root / 'a.png', color=(10, 20, 30))
+                photo = photos.add(root / 'a.png', caption='Ben.', feature='12', year=1958)
+                response = self.client.get(f'/photos/{photo.id}/')
+                self.assertContains(response, '<meta property="og:image" content="http://testserver/media/')
+                self.assertContains(response, '<meta property="og:title" content="Ben. · Derry">')
+                # Страница места берёт первое фото места.
+                response = self.client.get('/places/12-derry-public-library/')
+                self.assertContains(response, '<meta property="og:image" content="http://testserver/media/')

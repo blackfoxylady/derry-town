@@ -20,6 +20,13 @@ def canonical_url(context):
 
 
 @register.simple_tag(takes_context=True)
+def absolute_url(context, path):
+    """Абсолютный адрес относительного пути — для og:image и подобных мета-тегов,
+    где соцсети требуют полный URL."""
+    return context['request'].build_absolute_uri(path)
+
+
+@register.simple_tag(takes_context=True)
 def alternate_url(context, lang):
     """Абсолютный адрес страницы в заданном языке — для hreflang."""
     request = context['request']

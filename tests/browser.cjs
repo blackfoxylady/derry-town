@@ -74,7 +74,7 @@ const path=require('node:path');
   const url=process.env.DERRY_URL||'http://127.0.0.1:8765';
   assert.equal(await page.locator('header a:has-text("Sources & method")').getAttribute('href'),'/method/');
   await page.goto(url+'/method/',{waitUntil:'networkidle'});
-  assert.match(await page.locator('h1').innerText(),/Built from the novel/);
+  assert.match(await page.locator('.method h1').innerText(),/Built from the novel/);
   assert.equal(await page.locator('.source').count(),7);
   // Photo gallery: map deep link and back; a fresh install may hold zero photos.
   await page.goto(url+'/?place=12',{waitUntil:'networkidle'});
@@ -100,6 +100,26 @@ const path=require('node:path');
   }
   assert.deepEqual(errors,[]);
   reports.push({viewport:name,dimensions:size,checks:'map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, method page, place page, ru version, gallery deep links',errors});
+  await context.close();
+ }
+ // Responsive regression: with a plain (non-mobile) viewport the layout viewport cannot
+ // expand to fit overflowing content, so any real overflow shows up as scrollWidth > 390.
+ {
+  const url=process.env.DERRY_URL||'http://127.0.0.1:8765';
+  const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1});
+  const page=await context.newPage();
+  await page.goto(url+'/photos/',{waitUntil:'networkidle'});
+  const photoHref=await page.locator('.card .pic').count()?await page.locator('.card .pic').first().getAttribute('href'):null;
+  const pages=['/','/photos/','/method/','/places/12-derry-public-library/'];
+  if(photoHref)pages.push(photoHref);
+  for(const lang of ['','/ru'])for(const p of pages){
+   await page.goto(url+lang+p,{waitUntil:'networkidle'});
+   if(p==='/')await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
+   const m=await page.evaluate(()=>{const r=document.querySelector('.lang').getBoundingClientRect();return{over:document.documentElement.scrollWidth-window.innerWidth,langIn:r.left>=0&&r.right<=window.innerWidth}});
+   assert.equal(m.over<=0,true,(lang+p)+' overflows horizontally by '+m.over+'px at 390px');
+   assert.equal(m.langIn,true,(lang+p)+' clips the language switcher at 390px');
+  }
+  reports.push({viewport:'narrow-390',dimensions:{width:390,height:844},checks:'no horizontal overflow, language switcher reachable (en+ru: map, gallery, photo, place, method)',errors:[]});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'browser-report.json'),JSON.stringify({browser:browser.version(),reports},null,2));
