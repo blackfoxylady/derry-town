@@ -14,7 +14,7 @@ const path=require('node:path');
   await page.goto(process.env.DERRY_URL||'http://127.0.0.1:8765',{waitUntil:'networkidle'});
   await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
   assert.equal(await page.evaluate(()=>DerryAtlas.unlocatedCount),9);
-  assert.equal(await page.locator('#world>*').count(),3071);
+  assert.equal(await page.locator('#world>*').count(),3086);
   assert(await page.locator('.mark').count()>15);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   assert(await page.locator('.brand h1').evaluate(n=>n.getBoundingClientRect().top>=0));

@@ -12,10 +12,13 @@ function el(tag,attrs={},parent=null){const n=document.createElementNS(NS,tag);f
 function pathData(pts,close=false){return pts.map((p,i)=>(i?'L':'M')+p[0]+','+(-p[1])).join(' ')+(close?' Z':'')}
 function scene(){
  const ex=PAYLOAD.extent;el('image',{x:ex[0],y:-ex[3],width:ex[2]-ex[0],height:ex[3]-ex[1],href:PAYLOAD.relief,class:'relief'},world);
+ const lighten=c=>'#'+[1,3,5].map(i=>Math.round(parseInt(c.slice(i,i+2),16)*.62+255*.38).toString(16).padStart(2,'0')).join('');
  for(const o of PAYLOAD.base){let n;const at={fill:o.fill||'none',stroke:o.stroke||'none','stroke-width':o.width||0,'stroke-linecap':'round','stroke-linejoin':'round',class:o.layer||'base'};if(o.dash)at['stroke-dasharray']=o.dash.join(' ');
   if(o.type==='line'||o.type==='poly')n=el('path',{...at,d:pathData(o.points,o.type==='poly')},world);
   else if(o.type==='circle')n=el('circle',{...at,cx:o.x,cy:-o.y,r:o.r},world);
   else if(o.type==='rect')n=el('rect',{...at,x:-o.w/2,y:-o.h/2,width:o.w,height:o.h,transform:`translate(${o.x},${-o.y}) rotate(${-o.angle})`},world);
+  // Open water reads flat as one tint; a narrower lighter core over the fill keeps the banks darker.
+  if(o.type==='line'&&!o.dash&&o.stroke===PAYLOAD.palette.water)el('path',{d:pathData(o.points),fill:'none',stroke:lighten(o.stroke),'stroke-width':o.width*.5,'stroke-linecap':'round','stroke-linejoin':'round',class:o.layer||'base'},world);
  }
 }
 function screen(x,y){return [(x-state.cx)*state.k+state.w/2,(state.cy-y)*state.k+state.h/2]}
@@ -33,6 +36,9 @@ function render(){
   const color=PAYLOAD.colors[s.kind],g=el('g',{class:'mark',tabindex:'0',role:'button','aria-label':s.id+'. '+s.name,'data-id':s.id},markers);
   if(Math.abs(mx-x)+Math.abs(my-y)>2){el('path',{d:`M${x},${y}L${mx},${my}`,stroke:color,'stroke-width':.75,fill:'none','pointer-events':'none'},g);el('circle',{cx:x,cy:y,r:1.7,fill:color},g)}
   if(s.id===state.selected)el('circle',{cx:mx,cy:my,r:14,fill:'#fbf7e0',stroke:'#a88746','stroke-width':2.5},g);
+  // A pale halo under each symbol lifts it off busy ground such as the Barrens green.
+  if(s.confidence==='C')el('path',{d:`M${mx},${my-12.4}L${mx+12.4},${my}L${mx},${my+12.4}L${mx-12.4},${my}Z`,fill:'#fffef7'},g);
+  else el('circle',{cx:mx,cy:my,r:10.5,fill:'#fffef7'},g);
   if(s.confidence==='C')el('path',{d:`M${mx},${my-11}L${mx+11},${my}L${mx},${my+11}L${mx-11},${my}Z`,fill:'#f8f5e8',stroke:color,'stroke-width':1.3},g);
   else el('circle',{cx:mx,cy:my,r:9,fill:s.confidence==='A'?color:'#f8f5e8',stroke:color,'stroke-width':1.3},g);
   const txt=el('text',{x:mx,y:my+3.2,'text-anchor':'middle',fill:s.confidence==='A'?'#fff':color},g);txt.textContent=String(s.id).padStart(2,'0');const title=el('title',{},g);title.textContent=s.name;
