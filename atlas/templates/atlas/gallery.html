@@ -1,0 +1,17 @@
+{% extends 'atlas/gallery_base.html' %}
+{% block title %}Photographs{% endblock %}
+{% block content %}
+<section class="filters" aria-label="Photograph filters">
+{% for g in groups %}{% if g.options %}<div class="frow"><span class="fname">{{ g.title }}</span><span class="chips">{% for o in g.options %}<a class="chip{% if o.active %} on{% endif %}" href="{{ o.url }}">{{ o.label }}{% if o.count %}<span class="n">{{ o.count }}</span>{% endif %}</a>{% endfor %}</span></div>{% endif %}{% endfor %}
+<div class="frow status"><span>{{ cards|length }} photograph{{ cards|length|pluralize }}</span>{% if filtered %}<a class="clear" href="{{ clear_url }}">Clear filters ×</a>{% endif %}</div>
+</section>
+{% if cards %}
+<ul class="grid">
+{% for c in cards %}<li class="card">
+<a class="pic" href="/photos/{{ c.photo.id }}/"><img src="{{ c.thumb }}" alt="{{ c.photo.caption|default:c.photo.original_name }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy"></a>
+<p class="caption"><a href="/photos/{{ c.photo.id }}/">{{ c.photo.caption|default:c.photo.original_name }}</a></p>
+<p class="meta">{% if c.photo.year %}<a href="{{ c.year_url }}">{{ c.photo.year }}</a>{% endif %}{% if c.photo.year and c.place_url %} · {% endif %}{% if c.place_url %}<a href="{{ c.place_url }}">{{ c.place_label }}</a>{% endif %}</p>
+</li>{% endfor %}
+</ul>
+{% else %}<p class="empty">No photographs match these filters. <a href="{{ clear_url }}">Show all photographs</a>.</p>{% endif %}
+{% endblock %}

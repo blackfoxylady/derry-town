@@ -1,5 +1,5 @@
 {
-  "browser": "153.0.8010.47",
+  "browser": "151.0.7922.34",
   "reports": [
     {
       "viewport": "desktop",
@@ -7,7 +7,7 @@
         "width": 1440,
         "height": 1000
       },
-      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog",
+      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog, gallery deep links",
       "errors": []
     },
     {
@@ -16,7 +16,7 @@
         "width": 390,
         "height": 844
       },
-      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog",
+      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog, gallery deep links",
       "errors": []
     }
   ]

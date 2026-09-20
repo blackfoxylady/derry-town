@@ -74,7 +74,9 @@ map.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);last=null;
 map.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.003),...local(e))},{passive:false});map.addEventListener('dblclick',e=>{if(!state.measuring&&!e.target.closest('.mark'))zoom(1.8,...local(e))});
 map.addEventListener('keydown',e=>{if(e.key==='+'||e.key==='='){e.preventDefault();zoom(1.4)}else if(e.key==='-'){e.preventDefault();zoom(1/1.4)}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.cx+=({'ArrowLeft':-80,'ArrowRight':80}[e.key]||0)/state.k;state.cy+=({'ArrowUp':80,'ArrowDown':-80}[e.key]||0)/state.k;state.view='';render()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(state.measuring)toggleMeasure(false);else closeDetail()}});
-new ResizeObserver(entries=>{const r=entries[0].contentRect;state.w=r.width;state.h=r.height;if(!state.ready){state.ready=true;fit('city')}else render()}).observe(q('.stage'));
+// Deep link from the photo gallery: /?place=12 or /?place=U3 opens the place card.
+function deepLink(){const p=new URLSearchParams(location.search).get('place');if(p)select(/^\d+$/.test(p)?Number(p):p,true)}
+new ResizeObserver(entries=>{const r=entries[0].contentRect;state.w=r.width;state.h=r.height;if(!state.ready){state.ready=true;fit('city');deepLink()}else render()}).observe(q('.stage'));
 list();
 // Exposed read-only diagnostics make the offline artifact easy to validate.
 window.DerryAtlas={get revision(){return PAYLOAD.revision},get siteCount(){return D.sites.length},get unlocatedCount(){return D.unplaced.length},get view(){return {...state,active:[...state.active]}},select,fit,format};

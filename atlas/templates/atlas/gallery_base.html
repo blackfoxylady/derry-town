@@ -1,0 +1,7 @@
+{% load static %}
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}Photographs{% endblock %} · Derry</title>
+<link rel="stylesheet" href="{% static 'atlas/gallery.css' %}"></head><body>
+<header><div class="brand"><h1>DERRY</h1><p>Photographs from a literary atlas of Stephen King’s <i>IT</i><br>1957–58 · 1984–85</p></div><div class="header-actions"><span class="pill">NOVEL-BASED RECONSTRUCTION</span><a class="quiet" href="/">Map</a></div></header>
+<main class="page">{% block content %}{% endblock %}</main>
+</body></html>

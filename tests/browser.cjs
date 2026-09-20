@@ -58,8 +58,22 @@ const path=require('node:path');
   await page.locator('#aboutBtn').click();assert(await page.locator('#about').isVisible());
   assert.equal(await page.locator('#sources .source').count(),7);
   await page.locator('#closeAbout').click();
+  // Photo gallery: map deep link and back; a fresh install may hold zero photos.
+  const url=process.env.DERRY_URL||'http://127.0.0.1:8765';
+  await page.goto(url+'/?place=12',{waitUntil:'networkidle'});
+  await page.waitForFunction(()=>window.DerryAtlas?.view.selected===12,{timeout:120000});
+  assert.match(await page.locator('#detail').innerText(),/Place 12/i);
+  await page.goto(url+'/photos/',{waitUntil:'networkidle'});
+  assert.match(await page.locator('.status').innerText(),/\d+ photographs?/);
+  if(await page.locator('.card').count()){
+   await page.locator('.card .pic').first().click();
+   await page.waitForURL(/\/photos\/\d+\/$/);
+   assert(await page.locator('.facts').isVisible());
+   const toMap=page.locator('a:has-text("Show on the map")');
+   if(await toMap.count()){await toMap.first().click();await page.waitForFunction(()=>typeof window.DerryAtlas?.view.selected==='number',{timeout:120000})}
+  }
   assert.deepEqual(errors,[]);
-  reports.push({viewport:name,dimensions:size,checks:'map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog',errors});
+  reports.push({viewport:name,dimensions:size,checks:'map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog, gallery deep links',errors});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'browser-report.json'),JSON.stringify({browser:browser.version(),reports},null,2));

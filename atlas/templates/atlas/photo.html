@@ -1,0 +1,16 @@
+{% extends 'atlas/gallery_base.html' %}
+{% block title %}{{ photo.caption|default:photo.original_name|truncatechars:60 }}{% endblock %}
+{% block content %}
+<p class="crumbs"><a href="/photos/">← All photographs</a></p>
+<article class="photo">
+<figure><a href="{{ urls.original }}" title="Open the original file"><img src="{{ urls.medium }}" alt="{{ photo.caption|default:photo.original_name }}" width="{{ photo.width }}" height="{{ photo.height }}"></a>
+{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure>
+<dl class="facts">
+{% if photo.year %}<dt>Year</dt><dd><a href="{{ year_url }}">{{ photo.year }}</a></dd>{% endif %}
+{% if place_label %}<dt>Place</dt><dd><a href="{{ place_url }}">{{ place_label }}</a>{% if map_url %} · <a href="{{ map_url }}">Show on the map</a>{% endif %}</dd>{% endif %}
+{% if characters %}<dt>Characters</dt><dd>{% for c in characters %}<a href="{{ c.url }}">{{ c.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd>{% endif %}
+{% if tags %}<dt>Tags</dt><dd class="chips">{% for t in tags %}<a class="chip" href="{{ t.url }}">{{ t.slug }}</a>{% endfor %}</dd>{% endif %}
+<dt>Original</dt><dd><a href="{{ urls.original }}">{{ photo.width }} × {{ photo.height }} px · {{ photo.ext|upper }}</a></dd>
+</dl>
+</article>
+{% endblock %}
