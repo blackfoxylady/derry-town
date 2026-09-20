@@ -35,7 +35,8 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
 .crumbs{font-size:12px;margin:0 0 14px}
 .photo{max-width:820px}
 .photo figure{margin:0}
-.photo img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:7px;background:#e8e4d4}
+/* Фото вписывается в экран: не выше ~3/4 вьюпорта, портретные не распирают страницу. */
+.photo img{display:block;max-width:100%;width:auto;height:auto;max-height:75vh;margin:0 auto;border:1px solid var(--line);border-radius:7px;background:#e8e4d4}
 .photo figcaption{font:600 17px/1.35 Georgia,serif;margin:14px 0 4px}
 .facts{display:grid;grid-template-columns:110px 1fr;gap:8px 14px;margin:18px 0 0;font-size:13px}
 .facts dt{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding-top:2px}
