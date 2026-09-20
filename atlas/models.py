@@ -130,6 +130,7 @@ class Photo(models.Model):
     ext = models.CharField(max_length=8)
     original_name = models.CharField(max_length=255)
     caption = models.TextField(blank=True)
+    caption_ru = models.TextField(blank=True, default='')
     year = models.PositiveSmallIntegerField(null=True, blank=True)
     feature_key = models.CharField(max_length=100, blank=True, default='')
     order = models.PositiveIntegerField(default=0)

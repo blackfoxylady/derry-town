@@ -1,8 +1,18 @@
 (async function startAtlas(){
 
 'use strict';
-const [response,photoResponse]=await Promise.all([fetch('/api/v1/map/',{cache:'no-cache'}),fetch('/api/v1/photos/',{cache:'no-cache'})]);
-if(!response.ok)throw new Error('Map data unavailable ('+response.status+').');
+// URLs come from the template (window.ATLAS_URLS); the fallback keeps the offline artifact working.
+const URLS=window.ATLAS_URLS||{mapData:'/api/v1/map/',photoData:'/api/v1/photos/',gallery:'/photos/',photo:'/photos/0/',place:'/places/x/'};
+const photoUrl=id=>URLS.photo.replace('/0/','/'+id+'/');
+// The slug mirrors Django's slugify for these ASCII names; a stale slug 301-redirects anyway.
+const slugify=s=>String(s).toLowerCase().replace(/['’]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const placeUrl=s=>{const n=slugify(s.name);return URLS.place.replace('/x/','/'+String(s.id).toLowerCase()+(n?'-'+n:'')+'/')};
+// i18n: the jsi18n catalog defines gettext/ngettext; the offline artifact falls back to English.
+const _=typeof gettext==='function'?gettext:s=>s;
+const n_=typeof ngettext==='function'?ngettext:(s,p,n)=>n===1?s:p;
+const LANG=document.documentElement.lang||'en';
+const [response,photoResponse]=await Promise.all([fetch(URLS.mapData+'?lang='+LANG,{cache:'no-cache'}),fetch(URLS.photoData+'?lang='+LANG,{cache:'no-cache'})]);
+if(!response.ok)throw new Error(_('Map data unavailable')+' ('+response.status+').');
 const PAYLOAD=await response.json();
 // Photos are a separate data contour; the map still works if they fail to load.
 const PHOTOS=photoResponse.ok?(await photoResponse.json()).features:{};
@@ -31,7 +41,7 @@ function screen(x,y){return [(x-state.cx)*state.k+state.w/2,(state.cy-y)*state.k
 function geo(x,y){return [state.cx+(x-state.w/2)/state.k,state.cy-(y-state.h/2)/state.k]}
 function fit(id){const v=PAYLOAD.views.find(v=>v.id===id);state.view=id;const [a,b,c,d]=v.bounds;state.cx=(a+c)/2;state.cy=(b+d)/2;state.k=Math.min((state.w-60)/(c-a),(state.h-100)/(d-b));render();}
 function hits(s){return (s.kind==='Unlocated'||state.active.has(s.kind))&&(!state.search||[s.id,s.name,s.short,s.note,s.period].join(' ').toLowerCase().includes(state.search));}
-function format(m){return m>=1000?(m/1000).toLocaleString('en',{maximumFractionDigits:2})+' km':Math.round(m).toLocaleString('en')+' m'}
+function format(m){return m>=1000?(m/1000).toLocaleString(LANG,{maximumFractionDigits:2})+' '+_('km'):Math.round(m).toLocaleString(LANG)+' '+_('m')}
 function intersects(a,b,pad=2){return !(a[2]+pad<b[0]||a[0]-pad>b[2]||a[3]+pad<b[1]||a[1]-pad>b[3])}
 function render(){
  const {w,h,k,cx,cy}=state;map.setAttribute('viewBox',`0 0 ${w} ${h}`);world.setAttribute('transform',`translate(${w/2-cx*k},${h/2+cy*k}) scale(${k})`);
@@ -80,7 +90,7 @@ function drawPhotos(occupied){
   const p0=f.photos[0];let hsh=0;for(const c of key)hsh=(hsh*31+c.charCodeAt(0))%997;const tilt=hsh%7-3;
   el('path',{d:`M${ax},${ay}L${px},${py}`,stroke:'#8a7a5c','stroke-width':.8,fill:'none'},photoLayer);
   el('circle',{cx:ax,cy:ay,r:1.8,fill:'#8a7a5c'},photoLayer);
-  const g=el('g',{class:'polaroid',transform:`translate(${px},${py})`,tabindex:'0',role:'button','data-key':key,'aria-label':'Photographs · '+f.name},photoLayer);
+  const g=el('g',{class:'polaroid',transform:`translate(${px},${py})`,tabindex:'0',role:'button','data-key':key,'aria-label':_('Photographs')+' · '+f.name},photoLayer);
   if(!full){const m=el('g',{class:'medallion'},g);
    el('circle',{r:R+.5,fill:'#fffef7',stroke:'#c9c0a4','stroke-width':.7},m);
    el('image',{href:p0.thumb,x:-R+1,y:-R+1,width:2*R-2,height:2*R-2,'clip-path':'url(#photoClip)',preserveAspectRatio:'xMidYMid slice'},m)}
@@ -97,13 +107,13 @@ function drawPhotos(occupied){
  }
 }
 // A polaroid opens the place card when the place has one; roads and other outlines go to the gallery.
-function openPhotoFeature(key){const f=PHOTOS[key];if(!f)return;if(f.object_type==='site')select(Number(key),false);else if(f.object_type==='unplaced')select(key,false);else location.href='/photos/?place='+key}
-function list(){const result=all.filter(hits);q('#count').textContent=result.length+' places · '+D.sites.filter(hits).length+' mapped';q('#list').innerHTML=result.length?result.map(s=>`<li><button data-place="${s.id}" class="${state.selected===s.id?'selected':''}"><span class="num" style="color:${PAYLOAD.colors[s.kind]||'#697166'}">${String(s.id).padStart(2,'0')}</span><span><span class="item-title">${esc(s.name)}</span><span class="item-sub">${esc(s.period)} · ${s.confidence==='U'?'Unlocated / off map':s.confidence+' location'}</span></span></button></li>`).join(''):'<li class="empty">No matching places. Try a shorter name or enable more categories.</li>';q('#list').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>select(/^U/.test(b.dataset.place)?b.dataset.place:Number(b.dataset.place),true)));}
-function select(id,focus){const s=all.find(s=>s.id===id);if(!s)return;state.selected=id;q('#intro').hidden=true;const panel=q('#detail');panel.hidden=false;const conf={A:'A · Text-anchored relationship',B:'B · Inferred position',C:'C · Proposed location',U:'U · Unlocated / off map'};
+function openPhotoFeature(key){const f=PHOTOS[key];if(!f)return;if(f.object_type==='site')select(Number(key),false);else if(f.object_type==='unplaced')select(key,false);else location.href=URLS.gallery+'?place='+key}
+function list(){const result=all.filter(hits),mapped=D.sites.filter(hits).length;q('#count').textContent=result.length+' '+n_('place','places',result.length)+' · '+mapped+' '+_('mapped');q('#list').innerHTML=result.length?result.map(s=>`<li><button data-place="${s.id}" class="${state.selected===s.id?'selected':''}"><span class="num" style="color:${PAYLOAD.colors[s.kind]||'#697166'}">${String(s.id).padStart(2,'0')}</span><span><span class="item-title">${esc(s.name)}</span><span class="item-sub">${esc(s.period)} · ${s.confidence==='U'?esc(_('Unlocated / off map')):esc(_('%s location').replace('%s',s.confidence))}</span></span></button></li>`).join(''):'<li class="empty">'+esc(_('No matching places. Try a shorter name or enable more categories.'))+'</li>';q('#list').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>select(/^U/.test(b.dataset.place)?b.dataset.place:Number(b.dataset.place),true)));}
+function select(id,focus){const s=all.find(s=>s.id===id);if(!s)return;state.selected=id;q('#intro').hidden=true;const panel=q('#detail');panel.hidden=false;const conf={A:_('A · Text-anchored relationship'),B:_('B · Inferred position'),C:_('C · Proposed location'),U:_('U · Unlocated / off map')};
  const refs=[];for(const r of s.sources||[]){const g=refs.find(g=>g.reference===r.reference);if(g){if(r.note)g.notes.push(r.note)}else refs.push({reference:r.reference,notes:r.note?[r.note]:[]})}
  const fp=PHOTOS[String(s.id)];
- const photoRow=fp?`<div class="card-photos">${fp.photos.map(p=>`<a class="card-photo" href="/photos/${p.id}/" title="${esc(p.caption)}"><img src="${esc(p.thumb)}" alt="${esc(p.caption||s.name)}" loading="lazy"></a>`).join('')}</div><p class="card-photos-more"><a href="/photos/?place=${esc(String(s.id))}">All photographs of this place →</a></p>`:'';
- panel.innerHTML=`<div class="detail-top"><div><div class="eyebrow">Place ${esc(String(s.id).padStart(2,'0'))}</div><h2>${esc(s.name)}</h2></div><button class="close" id="closeDetail" aria-label="Close place">×</button></div><div class="meta">${esc(s.period)}</div><p><span class="badge">${conf[s.confidence]}</span></p><p>${esc(s.note)}</p>${photoRow}<details open><summary>Sources & evidence</summary><ul class="refs">${refs.length?refs.map(g=>`<li>${esc(g.reference)}${g.notes.map(n=>'<br>'+esc(n)).join('')}</li>`).join(''):`<li>${esc(s.reference)}</li>`}</ul></details>`;
+ const photoRow=fp?`<div class="card-photos">${fp.photos.map(p=>`<a class="card-photo" href="${photoUrl(p.id)}" title="${esc(p.caption)}"><img src="${esc(p.thumb)}" alt="${esc(p.caption||s.name)}" loading="lazy"></a>`).join('')}</div><p class="card-photos-more"><a href="${URLS.gallery}?place=${esc(String(s.id))}">${esc(_('All photographs of this place'))} →</a></p>`:'';
+ panel.innerHTML=`<div class="detail-top"><div><div class="eyebrow">${esc(_('Place %s').replace('%s',String(s.id).padStart(2,'0')))}</div><h2>${esc(s.name)}</h2></div><button class="close" id="closeDetail" aria-label="${esc(_('Close place'))}">×</button></div><div class="meta">${esc(s.period)}</div><p><span class="badge">${conf[s.confidence]}</span></p><p>${esc(s.note)}</p>${photoRow}<details open><summary>${esc(_('Sources & evidence'))}</summary><ul class="refs">${refs.length?refs.map(g=>`<li>${esc(g.reference)}${g.notes.map(n=>'<br>'+esc(n)).join('')}</li>`).join(''):`<li>${esc(s.reference)}</li>`}</ul></details><p class="card-page"><a href="${placeUrl(s)}" target="_blank" rel="noopener">${esc(_('Place page'))} →</a></p>`;
  q('#closeDetail').onclick=closeDetail;q('#scroll').scrollTop=0;
  if(typeof id==='number'&&focus){state.cx=s.x;state.cy=s.y;state.k=Math.max(state.k,.48);state.view='';}
  list();render();if(matchMedia('(max-width:780px)').matches&&!q('#workspace').classList.contains('open')){q('#workspace').classList.add('open');q('#placesToggle').setAttribute('aria-expanded','true');state.panelAutoOpened=true;}
@@ -111,16 +121,16 @@ function select(id,focus){const s=all.find(s=>s.id===id);if(!s)return;state.sele
 function closeDetail(){state.selected=null;q('#detail').hidden=true;q('#intro').hidden=false;if(state.panelAutoOpened){state.panelAutoOpened=false;q('#workspace').classList.remove('open');q('#placesToggle').setAttribute('aria-expanded','false');}list();render()}
 function zoom(f,x=state.w/2,y=state.h/2){const [gx,gy]=geo(x,y);state.k=Math.min(4,Math.max(.012,state.k*f));state.cx=gx-(x-state.w/2)/state.k;state.cy=gy+(y-state.h/2)/state.k;state.view='';render()}
 function showToast(msg){q('#toast').textContent=msg;q('#toast').hidden=!msg}
-function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();if(!state.measure.length)return;state.measure.forEach(p=>{const[x,y]=screen(...p);el('circle',{cx:x,cy:y,r:4,fill:'#a34b35',stroke:'#fff','stroke-width':1.3},layer)});if(state.measure.length===2){const a=screen(...state.measure[0]),b=screen(...state.measure[1]);el('path',{d:`M${a}L${b}`,fill:'none',stroke:'#a34b35','stroke-width':2,'stroke-dasharray':'5 3'},layer);showToast(format(Math.hypot(state.measure[0][0]-state.measure[1][0],state.measure[0][1]-state.measure[1][1]))+' · straight line in this reconstruction');}}
-function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').classList.toggle('on',state.measuring);q('#measure').setAttribute('aria-pressed',state.measuring);map.classList.toggle('measuring',state.measuring);showToast(state.measuring?'Select two points to measure. Drag to pan. Escape clears.':'');render()}
+function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();if(!state.measure.length)return;state.measure.forEach(p=>{const[x,y]=screen(...p);el('circle',{cx:x,cy:y,r:4,fill:'#a34b35',stroke:'#fff','stroke-width':1.3},layer)});if(state.measure.length===2){const a=screen(...state.measure[0]),b=screen(...state.measure[1]);el('path',{d:`M${a}L${b}`,fill:'none',stroke:'#a34b35','stroke-width':2,'stroke-dasharray':'5 3'},layer);showToast(format(Math.hypot(state.measure[0][0]-state.measure[1][0],state.measure[0][1]-state.measure[1][1]))+' · '+_('straight line in this reconstruction'));}}
+function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').classList.toggle('on',state.measuring);q('#measure').setAttribute('aria-pressed',state.measuring);map.classList.toggle('measuring',state.measuring);showToast(state.measuring?_('Select two points to measure. Drag to pan. Escape clears.'):'');render()}
 scene();
-q('#methodGeometry').textContent=D.method_geometry;
-q('#filters').innerHTML=Object.keys(PAYLOAD.colors).map(c=>`<label><input type="checkbox" checked data-kind="${c}">${c}</label>`).join('');q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);list();render()});
-q('#sources').innerHTML=D.web_sources.map(s=>`<div class="source"><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${s.id} · ${esc(s.title)}</a><p>${esc(s.role)}</p></div>`).join('');
+// Category keys are canonical data; only the visible labels translate.
+const KIND_LABELS={Homes:_('Homes'),Civic:_('Civic'),Encounters:_('Encounters'),Historical:_('Historical'),Barrens:_('Barrens'),Outlying:_('Outlying')};
+q('#filters').innerHTML=Object.keys(PAYLOAD.colors).map(c=>`<label><input type="checkbox" checked data-kind="${c}">${esc(KIND_LABELS[c]||c)}</label>`).join('');q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);list();render()});
 q('#search').oninput=e=>{state.search=e.target.value.trim().toLowerCase();q('#clearSearch').hidden=!e.target.value;list();render()};q('#clearSearch').onclick=()=>{q('#search').value='';state.search='';q('#clearSearch').hidden=true;list();render();q('#search').focus()};
 q('#showPhotos').onchange=e=>{state.photos=e.target.checked;render()};q('#showNames').onchange=e=>{state.names=e.target.checked;render()};q('#showRelief').onchange=e=>{world.querySelectorAll('.relief').forEach(n=>n.style.display=e.target.checked?'':'none')};q('#showBuildings').onchange=e=>{world.querySelectorAll('.buildings').forEach(n=>n.style.display=e.target.checked?'':'none')};
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#reset').onclick=()=>fit('city');q('#measure').onclick=()=>toggleMeasure();
-q('#aboutBtn').onclick=()=>q('#about').showModal();q('#closeAbout').onclick=()=>q('#about').close();q('#placesToggle').onclick=()=>{const open=q('#workspace').classList.toggle('open');q('#placesToggle').setAttribute('aria-expanded',open);state.panelAutoOpened=false};
+q('#placesToggle').onclick=()=>{const open=q('#workspace').classList.toggle('open');q('#placesToggle').setAttribute('aria-expanded',open);state.panelAutoOpened=false};
 q('#panelClose').onclick=()=>{state.panelAutoOpened=false;q('#workspace').classList.remove('open');q('#placesToggle').setAttribute('aria-expanded','false')};
 const pointers=new Map();let last=null,start=null,moved=false,lastPinch=0,hadPinch=false;
 function local(e){const r=map.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
@@ -138,4 +148,4 @@ list();
 // Exposed read-only diagnostics make the offline artifact easy to validate.
 window.DerryAtlas={get revision(){return PAYLOAD.revision},get siteCount(){return D.sites.length},get unlocatedCount(){return D.unplaced.length},get photoFeatureCount(){return Object.keys(PHOTOS).length},get view(){return {...state,active:[...state.active]}},select,fit,format};
 
-})().catch(error=>{const el=document.querySelector('#toast');el.hidden=false;el.textContent=error.message+' Please reload the page.';console.error(error);});
+})().catch(error=>{const el=document.querySelector('#toast');el.hidden=false;el.textContent=error.message+' '+(typeof gettext==='function'?gettext('Please reload the page.'):'Please reload the page.');console.error(error);});

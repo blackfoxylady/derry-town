@@ -1,8 +1,10 @@
-{% load static %}
+{% load i18n static atlas_tags %}
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}Photographs{% endblock %} · Derry</title>
+<html lang="{{ LANGUAGE_CODE }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}{% trans "Photographs" %}{% endblock %} · Derry</title>
+<meta name="description" content="{% block meta_description %}{% trans 'Photographs from a literary atlas of Stephen King’s IT: the places, characters and years of Derry.' %}{% endblock %}">
+<link rel="canonical" href="{% canonical_url %}"><link rel="alternate" hreflang="en" href="{% alternate_url 'en' %}"><link rel="alternate" hreflang="ru" href="{% alternate_url 'ru' %}"><link rel="alternate" hreflang="x-default" href="{% alternate_url 'en' %}">
 <link rel="icon" href="{% static 'atlas/favicon.ico' %}" sizes="any"><link rel="icon" type="image/png" sizes="16x16" href="{% static 'atlas/favicon-16x16.png' %}"><link rel="icon" type="image/png" sizes="32x32" href="{% static 'atlas/favicon-32x32.png' %}"><link rel="icon" type="image/png" sizes="512x512" href="{% static 'atlas/favicon.png' %}"><link rel="apple-touch-icon" sizes="180x180" href="{% static 'atlas/apple-touch-icon.png' %}">
 <link rel="stylesheet" href="{% static 'atlas/gallery.css' %}"></head><body>
-<header><div class="brand"><h1><a href="/">DERRY</a></h1><p>Photographs from a literary atlas of Stephen King’s <i>IT</i><br>1957–58 · 1984–85</p></div><div class="header-actions"><span class="pill">NOVEL-BASED RECONSTRUCTION</span><a class="quiet" href="/">Map</a></div></header>
+<header><div class="brand"><h1><a href="{% url 'index' %}">DERRY</a></h1><p>{% blocktranslate %}Photographs from a literary atlas of Stephen King’s <i>IT</i>{% endblocktranslate %}<br>1957–58 · 1984–85</p></div><div class="header-actions"><span class="pill">{% trans "NOVEL-BASED RECONSTRUCTION" %}</span><a class="quiet" href="{% url 'index' %}">{% trans "Map" %}</a><span class="lang" aria-label="Language">{% if LANGUAGE_CODE == 'ru' %}<a href="{% lang_url 'en' %}" hreflang="en" lang="en">EN</a><b>RU</b>{% else %}<b>EN</b><a href="{% lang_url 'ru' %}" hreflang="ru" lang="ru">RU</a>{% endif %}</span></div></header>
 <main class="page">{% block content %}{% endblock %}</main>
 </body></html>

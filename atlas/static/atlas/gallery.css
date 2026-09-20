@@ -44,3 +44,22 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
 .facts dt{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding-top:2px}
 .facts dd{margin:0}
 @media(max-width:780px){.brand h1{font-size:25px}.brand p{display:none}.page{padding:14px 14px 40px}.frow{flex-wrap:wrap;gap:4px 10px}.fname{flex-basis:100%;padding-bottom:2px}.facts{grid-template-columns:1fr;gap:2px}.facts dd{margin-bottom:8px}}
+/* Language switcher in the header: a segmented control in the .quiet style. */
+.lang{display:inline-flex;border:1px solid #c7cebf;border-radius:5px;overflow:hidden;font-size:12px}
+.lang a,.lang b{padding:7px 9px;font-weight:400;color:inherit;text-decoration:none}
+.lang b{background:#315e5a;color:#fff;font-weight:600}
+/* Place and method pages. */
+.place h1,.method h1{font:700 30px Georgia,serif;margin:6px 0 10px}
+.place h2,.method h2{font:600 18px Georgia,serif;margin:26px 0 10px}
+.eyebrow{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.period{font-size:11px;color:#576a57;text-transform:uppercase;letter-spacing:.55px;margin:0 0 12px}
+.badge{font-size:11px;font-weight:700;padding:5px 7px;border:1px solid #b7c6ac;border-radius:4px;display:inline-block;background:#f6f6ec}
+.place .note{max-width:640px;font-size:14px}
+.place-links{font-size:12px}
+.refs{margin:7px 0 0;padding:0;list-style:none;color:#586b59;font-size:12px;max-width:640px}
+.refs li{padding:6px 0;border-bottom:1px solid #d1dbc9}
+.source{padding:11px 0;border-top:1px solid #d6ddcd;max-width:640px}
+.source a{font-weight:650}
+.source p{font-size:12px;margin:5px 0;color:#586b59}
+.method p{max-width:640px;font-size:13px}
+.help{color:var(--muted);font-size:11px;margin-top:16px}

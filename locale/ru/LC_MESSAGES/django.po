@@ -1,0 +1,329 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: derry-town\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: atlas/views.py
+msgid "A · Text-anchored relationship"
+msgstr "A · Связь, закреплённая текстом"
+
+msgid "B · Inferred position"
+msgstr "B · Выведенное положение"
+
+msgid "C · Proposed location"
+msgstr "C · Предположительное расположение"
+
+msgid "U · Unlocated / off map"
+msgstr "U · Не локализовано / вне карты"
+
+msgid "Place"
+msgstr "Место"
+
+msgid "Character"
+msgstr "Персонаж"
+
+msgid "Tags"
+msgstr "Теги"
+
+msgid "Year"
+msgstr "Год"
+
+#: gallery_base.html
+msgid "Photographs"
+msgstr "Фотографии"
+
+msgid "Photographs from a literary atlas of Stephen King’s <i>IT</i>"
+msgstr "Фотографии из литературного атласа романа Стивена Кинга <i>«Оно»</i>"
+
+msgid "NOVEL-BASED RECONSTRUCTION"
+msgstr "РЕКОНСТРУКЦИЯ ПО РОМАНУ"
+
+msgid "Map"
+msgstr "Карта"
+
+#: gallery.html
+msgid "Photograph filters"
+msgstr "Фильтры фотографий"
+
+msgid "%(n)s photograph"
+msgid_plural "%(n)s photographs"
+msgstr[0] "%(n)s фотография"
+msgstr[1] "%(n)s фотографии"
+msgstr[2] "%(n)s фотографий"
+
+msgid "Clear filters"
+msgstr "Сбросить фильтры"
+
+msgid "No photographs match these filters."
+msgstr "Под эти фильтры не подходит ни одна фотография."
+
+msgid "Show all photographs"
+msgstr "Показать все фотографии"
+
+#: photo.html
+msgid "All photographs"
+msgstr "Все фотографии"
+
+msgid "Open the original file"
+msgstr "Открыть оригинальный файл"
+
+msgid "Characters"
+msgstr "Персонажи"
+
+msgid "Original"
+msgstr "Оригинал"
+
+msgid "Show on the map"
+msgstr "Показать на карте"
+
+msgid "About this place"
+msgstr "Страница места"
+
+#: place.html
+msgid "Place %(number)s"
+msgstr "Место %(number)s"
+
+msgid "Unlocated place"
+msgstr "Нелокализованное место"
+
+msgid "All photographs of this place"
+msgstr "Все фотографии этого места"
+
+msgid "Sources & evidence"
+msgstr "Источники и свидетельства"
+
+#: method.html
+msgid "Sources & method"
+msgstr "Источники и метод"
+
+msgid "Built from the novel"
+msgstr "Построено по роману"
+
+msgid ""
+"This is a reasoned reconstruction of fictional geography, not a canonical or "
+"surveyed map. It is inspired by Stephen King’s novel <i>IT</i>, and the "
+"novel’s own descriptions are its only literary source. Film and television "
+"geography has not been used."
+msgstr ""
+"Это осмысленная реконструкция вымышленной географии, а не каноническая или "
+"измеренная карта. Она вдохновлена романом Стивена Кинга <i>«Оно»</i>, и её "
+"единственный литературный источник — описания самого романа. География "
+"фильмов и сериалов не использовалась."
+
+msgid ""
+"The town plan combines both main periods and the historical interludes. "
+"Dates in the place cards distinguish former sites and replacements; the map "
+"does not depict a single historical day. It covers surface geography only."
+msgstr ""
+"План города совмещает оба основных периода и исторические интерлюдии. Даты "
+"в карточках мест различают прежние места и их замены; карта не изображает "
+"один исторический день. Она охватывает только наземную географию."
+
+msgid "What the symbols mean"
+msgstr "Что означают символы"
+
+msgid ""
+"<b>A · Text-anchored relationship.</b> The street, adjoining feature or "
+"named site is explicit. The plotted coordinate remains reconstructed.<br><b>"
+"B · Inferred position.</b> Routes, proximity and relative directions "
+"constrain the placement.<br><b>C · Proposed location.</b> A substantial gap "
+"remains; the position is a plausible option.<br><b>U · Unlocated / off map."
+"</b> The place is indexed without an invented coordinate."
+msgstr ""
+"<b>A · Связь, закреплённая текстом.</b> Улица, соседний объект или "
+"названное место указаны явно. Нанесённая координата всё равно "
+"реконструирована.<br><b>B · Выведенное положение.</b> Маршруты, близость и "
+"взаимные направления ограничивают размещение.<br><b>C · Предположительное "
+"расположение.</b> Существенный пробел остаётся; позиция — правдоподобный "
+"вариант.<br><b>U · Не локализовано / вне карты.</b> Место включено в "
+"указатель без выдуманной координаты."
+
+msgid "The novel"
+msgstr "Роман"
+
+msgid ""
+"Stephen King, <i>IT</i> (1986). References in the place cards name chapters "
+"and interludes. No text of the novel is reproduced on this website."
+msgstr ""
+"Стивен Кинг, «Оно» (<i>IT</i>, 1986). Отсылки в карточках мест называют "
+"главы и интерлюдии. Текст романа на этом сайте не воспроизводится."
+
+msgid "Where the book does not settle the geometry"
+msgstr "Где книга не определяет географию"
+
+msgid ""
+"The original research notes record the reconstruction decisions and "
+"remaining contradictions. Current evidence is shown in the place cards."
+msgstr ""
+"Оригинальные исследовательские заметки фиксируют решения реконструкции и "
+"оставшиеся противоречия. Актуальные свидетельства показаны в карточках мест."
+
+msgid "Open sources consulted"
+msgstr "Использованные открытые источники"
+
+msgid ""
+"The map is served by this website. Optional source links open external "
+"websites. Drag to pan; use the wheel, buttons or pinch gesture to zoom. "
+"With the map focused, arrow keys pan and + / − zoom. The ruler measures "
+"straight-line distances in the reconstruction, not canonical travel "
+"distances. Press Escape to clear a measurement or close a place card."
+msgstr ""
+"Карту обслуживает этот сайт. Необязательные ссылки на источники открывают "
+"внешние сайты. Перетаскивайте, чтобы перемещаться; масштабируйте колесом, "
+"кнопками или щипком. Когда карта в фокусе, стрелки перемещают, а + / − "
+"масштабируют. Линейка измеряет расстояния по прямой в реконструкции, а не "
+"канонические дорожные расстояния. Escape сбрасывает измерение и закрывает "
+"карточку места."
+
+#: meta descriptions
+msgid ""
+"Photographs from a literary atlas of Stephen King’s IT: the places, "
+"characters and years of Derry."
+msgstr ""
+"Фотографии из литературного атласа романа Стивена Кинга «Оно»: места, "
+"персонажи и годы Дерри."
+
+msgid ""
+"A reasoned interactive map of Derry, Maine — the fictional town of Stephen "
+"King’s IT: 83 mapped places with book evidence and photographs."
+msgstr ""
+"Осмысленная интерактивная карта Дерри, штат Мэн — вымышленного города из "
+"романа Стивена Кинга «Оно»: 83 места на карте с книжными свидетельствами и "
+"фотографиями."
+
+msgid ""
+"How this map of Derry was reconstructed from the novel: sources, confidence "
+"levels and method."
+msgstr ""
+"Как эта карта Дерри реконструирована по роману: источники, уровни "
+"достоверности и метод."
+
+#: index.html
+msgid "Derry · A literary atlas of IT"
+msgstr "Дерри · Литературный атлас романа «Оно»"
+
+msgid "A literary atlas of Stephen King’s <i>IT</i>"
+msgstr "Литературный атлас романа Стивена Кинга <i>«Оно»</i>"
+
+msgid "Historical sites"
+msgstr "Исторические места"
+
+msgid "Places"
+msgstr "Места"
+
+msgid "Photos"
+msgstr "Фото"
+
+msgid "Place index"
+msgstr "Указатель мест"
+
+msgid "The places remembered"
+msgstr "Места, которые помнят"
+
+msgid "Close place index"
+msgstr "Закрыть указатель мест"
+
+msgid "Search a place, person or event…"
+msgstr "Поиск места, персонажа или события…"
+
+msgid "Search locations"
+msgstr "Поиск по местам"
+
+msgid "Clear search"
+msgstr "Очистить поиск"
+
+msgid "Filter locations"
+msgstr "Фильтр мест"
+
+msgid ""
+"<b>One town, several remembered times.</b> Former places remain on the same "
+"map as their later uses."
+msgstr ""
+"<b>Один город, несколько времён.</b> Прежние места остаются на той же "
+"карте, что и их позднейшие воплощения."
+
+msgid ""
+"Choose a numbered marker to see the book reference and the reasoning behind "
+"its position. Zoom in for smaller sites. Search also includes places that "
+"cannot be located."
+msgstr ""
+"Выберите нумерованный маркер, чтобы увидеть отсылку к книге и обоснование "
+"положения. Приближайте карту, чтобы находить небольшие места. Поиск "
+"включает и места, которые нельзя локализовать."
+
+msgid ""
+"Filled circle: text-anchored relationship.<br>Open circle: inferred "
+"position.<br>Diamond: proposed location."
+msgstr ""
+"Закрашенный круг: связь, закреплённая текстом.<br>Пустой круг: выведенное "
+"положение.<br>Ромб: предположительное расположение."
+
+msgid "Interactive map"
+msgstr "Интерактивная карта"
+
+msgid "Derry map. Use arrow keys to pan and plus or minus to zoom."
+msgstr "Карта Дерри. Стрелки — перемещение, плюс и минус — масштаб."
+
+msgid "Map regions"
+msgstr "Районы карты"
+
+msgid "Town"
+msgstr "Город"
+
+msgid "Centre"
+msgstr "Центр"
+
+msgid "Barrens"
+msgstr "Пустошь"
+
+msgid "Clearing"
+msgstr "Поляна"
+
+msgid "Zoom in"
+msgstr "Приблизить"
+
+msgid "Zoom out"
+msgstr "Отдалить"
+
+msgid "Show all Derry"
+msgstr "Показать весь Дерри"
+
+msgid "Measure straight-line distance"
+msgstr "Измерить расстояние по прямой"
+
+msgid "Measure a straight-line distance"
+msgstr "Измерить расстояние по прямой"
+
+msgid "Reconstructed distances · metres / kilometres"
+msgstr "Реконструированные расстояния · метры / километры"
+
+msgid "Map key & layers"
+msgstr "Легенда и слои"
+
+msgid "Place names"
+msgstr "Названия мест"
+
+msgid "Conceptual relief"
+msgstr "Условный рельеф"
+
+msgid "Illustrative buildings"
+msgstr "Условные здания"
+
+msgid ""
+"Green: woodland / park<br>Blue: surface water<br>Dashed blue: covered "
+"channel<br>Dashed brown: inferred footpath"
+msgstr ""
+"Зелёный: лес / парк<br>Синий: открытая вода<br>Синий пунктир: скрытый "
+"канал<br>Коричневый пунктир: предполагаемая тропа"
+
+msgid ""
+"Contours are not measured elevations. All coordinates and boundaries are "
+"reconstructed."
+msgstr ""
+"Горизонтали не являются измеренными высотами. Все координаты и границы "
+"реконструированы."

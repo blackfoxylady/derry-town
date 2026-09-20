@@ -1,0 +1,23 @@
+{% extends 'atlas/gallery_base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Sources & method" %}{% endblock %}
+{% block meta_description %}{% trans 'How this map of Derry was reconstructed from the novel: sources, confidence levels and method.' %}{% endblock %}
+{% block content %}
+<article class="method">
+<h1>{% trans "Built from the novel" %}</h1>
+<p>{% blocktranslate %}This is a reasoned reconstruction of fictional geography, not a canonical or surveyed map. It is inspired by Stephen King’s novel <i>IT</i>, and the novel’s own descriptions are its only literary source. Film and television geography has not been used.{% endblocktranslate %}</p>
+<p>{% blocktranslate %}The town plan combines both main periods and the historical interludes. Dates in the place cards distinguish former sites and replacements; the map does not depict a single historical day. It covers surface geography only.{% endblocktranslate %}</p>
+<h2>{% trans "What the symbols mean" %}</h2>
+<p>{% blocktranslate %}<b>A · Text-anchored relationship.</b> The street, adjoining feature or named site is explicit. The plotted coordinate remains reconstructed.<br><b>B · Inferred position.</b> Routes, proximity and relative directions constrain the placement.<br><b>C · Proposed location.</b> A substantial gap remains; the position is a plausible option.<br><b>U · Unlocated / off map.</b> The place is indexed without an invented coordinate.{% endblocktranslate %}</p>
+<h2>{% trans "The novel" %}</h2>
+<p>{% blocktranslate %}Stephen King, <i>IT</i> (1986). References in the place cards name chapters and interludes. No text of the novel is reproduced on this website.{% endblocktranslate %}</p>
+<h2>{% trans "Where the book does not settle the geometry" %}</h2>
+{% if method_geometry %}<p>{{ method_geometry }}</p>{% endif %}
+<p>{% blocktranslate %}The original research notes record the reconstruction decisions and remaining contradictions. Current evidence is shown in the place cards.{% endblocktranslate %}</p>
+{% if sources %}
+<h2>{% trans "Open sources consulted" %}</h2>
+{% for s in sources %}<div class="source"><a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.key }} · {{ s.title }}</a><p>{{ s.role }}</p></div>{% endfor %}
+{% endif %}
+<p class="help">{% blocktranslate %}The map is served by this website. Optional source links open external websites. Drag to pan; use the wheel, buttons or pinch gesture to zoom. With the map focused, arrow keys pan and + / − zoom. The ruler measures straight-line distances in the reconstruction, not canonical travel distances. Press Escape to clear a measurement or close a place card.{% endblocktranslate %}</p>
+</article>
+{% endblock %}

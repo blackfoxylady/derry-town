@@ -45,6 +45,8 @@ class Command(BaseCommand):
             if action == 'edit':
                 for field in ['name', 'short', 'description', 'period', 'confidence', 'geometry', 'sources']:
                     p.add_argument('--' + field)
+                p.add_argument('--description-ru', dest='description_ru',
+                               help="Russian description (metadata['ru']['note']); '' clears it.")
                 p.add_argument('--x', type=float)
                 p.add_argument('--y', type=float)
         p = sub.add_parser('export'); p.add_argument('file')
@@ -119,6 +121,19 @@ class Command(BaseCommand):
                 if l['feature_id'] == f['key'] and l['spec'].get('follow_name'):
                     l['text'] = o['name']
         if o['description'] is not None: f['note'] = o['description']
+        if o['description_ru'] is not None:
+            # Русский текст живёт в metadata['ru'] — canonical-поля и снапшоты не меняются.
+            meta = dict(f['metadata'] or {})
+            ru = dict(meta.get('ru') or {})
+            if o['description_ru']:
+                ru['note'] = o['description_ru']
+            else:
+                ru.pop('note', None)
+            if ru:
+                meta['ru'] = ru
+            else:
+                meta.pop('ru', None)
+            f['metadata'] = meta
         if (o['x'] is None) != (o['y'] is None):
             raise ValueError('Supply both --x and --y.')
         if o['geometry'] or o['x'] is not None:

@@ -20,7 +20,8 @@ def describe(photo):
         marks.append(f'tags={tags}')
     if photo.order:
         marks.append(f'order={photo.order}')
-    return '\t'.join(marks) + ('\n\t' + photo.caption if photo.caption else '')
+    text = '\t'.join(marks) + ('\n\t' + photo.caption if photo.caption else '')
+    return text + ('\n\t[ru] ' + photo.caption_ru if photo.caption_ru else '')
 
 
 class Command(BaseCommand):
@@ -31,6 +32,7 @@ class Command(BaseCommand):
         p = sub.add_parser('add', help='Import one photo file.')
         p.add_argument('file')
         p.add_argument('--caption', default='')
+        p.add_argument('--caption-ru', default='', dest='caption_ru')
         p.add_argument('--feature', default='')
         p.add_argument('--year', type=int)
         p.add_argument('--character', action='append', default=[], dest='characters')
@@ -42,6 +44,7 @@ class Command(BaseCommand):
         p = sub.add_parser('edit', help='Change attributes of one photo; files stay as imported.')
         p.add_argument('id', type=int)
         p.add_argument('--caption')
+        p.add_argument('--caption-ru', dest='caption_ru', help="Russian caption; '' clears it.")
         p.add_argument('--feature', help="Feature key; '' detaches the photo.")
         p.add_argument('--year', type=int)
         p.add_argument('--character', action='append', dest='characters',
@@ -67,7 +70,8 @@ class Command(BaseCommand):
     def run(self, o):
         action = o['action']
         if action == 'add':
-            photo = photos.add(o['file'], caption=o['caption'], feature=o['feature'], year=o['year'],
+            photo = photos.add(o['file'], caption=o['caption'], caption_ru=o['caption_ru'],
+                               feature=o['feature'], year=o['year'],
                                characters=o['characters'], tags=o['tags'], order=o['order'])
             self.stdout.write('Added ' + describe(photo))
         elif action == 'import':
@@ -85,7 +89,7 @@ class Command(BaseCommand):
                 self.stdout.write('Added ' + describe(photo))
             self.stdout.write(f'Imported {len(imported)} photos.')
         elif action == 'edit':
-            changes = {k: o[k] for k in ('caption', 'feature', 'year', 'characters', 'tags', 'order')
+            changes = {k: o[k] for k in ('caption', 'caption_ru', 'feature', 'year', 'characters', 'tags', 'order')
                        if o[k] is not None}
             if o['no_characters']:
                 changes['characters'] = []

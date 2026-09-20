@@ -39,3 +39,9 @@ a.quiet{text-decoration:none;color:inherit;display:inline-block}
 .stage::after{content:"";position:absolute;inset:9px;border:1px solid #b1a988;outline:1px solid #d8d2bc;outline-offset:2px;pointer-events:none}
 @media(max-width:780px){.stage::after{display:none}}
 @media print{.stage::after{display:none}}
+/* Language switcher in the header: a segmented control in the .quiet style. */
+.lang{display:inline-flex;border:1px solid #c7cebf;border-radius:5px;overflow:hidden;font-size:12px}
+.lang a,.lang b{padding:7px 9px;font-weight:400;color:inherit;text-decoration:none}
+.lang b{background:#315e5a;color:#fff;font-weight:600}
+/* Quiet link from the place card to its standalone page. */
+.card-page{font-size:11px;margin:10px 0 0}.card-page a{color:#586b59}

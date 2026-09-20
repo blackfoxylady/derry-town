@@ -12,11 +12,14 @@ INSTALLED_APPS = ['django.contrib.staticfiles', 'atlas']
 MIDDLEWARE = ['django.middleware.security.SecurityMiddleware',
               'django.middleware.gzip.GZipMiddleware',
               'whitenoise.middleware.WhiteNoiseMiddleware',
+              'config.middleware.UrlLocaleMiddleware',
               'django.middleware.common.CommonMiddleware',
               'django.middleware.clickjacking.XFrameOptionsMiddleware']
 ROOT_URLCONF = 'config.urls'
 WSGI_APPLICATION = 'config.wsgi.application'
-TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates', 'APP_DIRS': True}]
+TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates', 'APP_DIRS': True,
+              'OPTIONS': {'context_processors': ['django.template.context_processors.request',
+                                                 'django.template.context_processors.i18n']}}]
 DATABASES = {'default': {'ENGINE': 'django.db.backends.postgresql',
     'NAME': os.environ.get('POSTGRES_DB', 'derry'),
     'USER': os.environ.get('POSTGRES_USER', 'derry'),
@@ -30,6 +33,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 USE_TZ = True
 TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en'
+LANGUAGES = [('en', 'English'), ('ru', 'Russian')]
+LOCALE_PATHS = [BASE_DIR / 'locale']
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STORAGES = {'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},

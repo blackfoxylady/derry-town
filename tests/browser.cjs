@@ -70,14 +70,25 @@ const path=require('node:path');
   await page.mouse.click(box.x+box.width*.65,box.y+box.height*.55);
   assert.match(await page.locator('#toast').innerText(),/( m| km) · straight line/);
   await page.keyboard.press('Escape');
-  await page.locator('#aboutBtn').click();assert(await page.locator('#about').isVisible());
-  assert.equal(await page.locator('#sources .source').count(),7);
-  await page.locator('#closeAbout').click();
-  // Photo gallery: map deep link and back; a fresh install may hold zero photos.
+  // Sources & method lives on its own page now, linked from the header.
   const url=process.env.DERRY_URL||'http://127.0.0.1:8765';
+  assert.equal(await page.locator('header a:has-text("Sources & method")').getAttribute('href'),'/method/');
+  await page.goto(url+'/method/',{waitUntil:'networkidle'});
+  assert.match(await page.locator('h1').innerText(),/Built from the novel/);
+  assert.equal(await page.locator('.source').count(),7);
+  // Photo gallery: map deep link and back; a fresh install may hold zero photos.
   await page.goto(url+'/?place=12',{waitUntil:'networkidle'});
   await page.waitForFunction(()=>window.DerryAtlas?.view.selected===12,{timeout:120000});
   assert.match(await page.locator('#detail').innerText(),/Place 12/i);
+  // The card links to the standalone place page (indexable, English slug).
+  const placeHref=await page.locator('#detail .card-page a').getAttribute('href');
+  assert.match(placeHref,/^\/places\/12(-|\/)/);
+  await page.goto(url+placeHref,{waitUntil:'networkidle'});
+  assert.match(await page.locator('.place h1').innerText(),/\S/);
+  // The Russian version serves the same map under /ru/.
+  await page.goto(url+'/ru/',{waitUntil:'networkidle'});
+  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
+  assert.equal(await page.locator('html').getAttribute('lang'),'ru');
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
   assert.match(await page.locator('.status').innerText(),/\d+ photographs?/);
   if(await page.locator('.card').count()){
@@ -88,7 +99,7 @@ const path=require('node:path');
    if(await toMap.count()){await toMap.first().click();await page.waitForFunction(()=>typeof window.DerryAtlas?.view.selected==='number',{timeout:120000})}
   }
   assert.deepEqual(errors,[]);
-  reports.push({viewport:name,dimensions:size,checks:'map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, source dialog, gallery deep links',errors});
+  reports.push({viewport:name,dimensions:size,checks:'map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, method page, place page, ru version, gallery deep links',errors});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'browser-report.json'),JSON.stringify({browser:browser.version(),reports},null,2));

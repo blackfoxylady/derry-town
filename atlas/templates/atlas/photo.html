@@ -1,16 +1,18 @@
 {% extends 'atlas/gallery_base.html' %}
-{% block title %}{{ photo.caption|default:photo.original_name|truncatechars:60 }}{% endblock %}
+{% load i18n %}
+{% block title %}{{ caption|default:photo.original_name|truncatechars:60 }}{% endblock %}
+{% block meta_description %}{{ caption|default:photo.original_name|truncatechars:160 }}{% endblock %}
 {% block content %}
-<p class="crumbs"><a href="/photos/">← All photographs</a></p>
+<p class="crumbs"><a href="{% url 'gallery' %}">← {% trans "All photographs" %}</a></p>
 <article class="photo">
-<figure><a href="{{ urls.original }}" title="Open the original file"><img src="{{ urls.medium }}" alt="{{ photo.caption|default:photo.original_name }}" width="{{ photo.width }}" height="{{ photo.height }}"></a>
-{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure>
+<figure><a href="{{ urls.original }}" title="{% trans 'Open the original file' %}"><img src="{{ urls.medium }}" alt="{{ caption|default:photo.original_name }}" width="{{ photo.width }}" height="{{ photo.height }}"></a>
+{% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}</figure>
 <dl class="facts">
-{% if photo.year %}<dt>Year</dt><dd><a href="{{ year_url }}">{{ photo.year }}</a></dd>{% endif %}
-{% if place_label %}<dt>Place</dt><dd><a href="{{ place_url }}">{{ place_label }}</a>{% if map_url %} · <a href="{{ map_url }}">Show on the map</a>{% endif %}</dd>{% endif %}
-{% if characters %}<dt>Characters</dt><dd>{% for c in characters %}<a href="{{ c.url }}">{{ c.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd>{% endif %}
-{% if tags %}<dt>Tags</dt><dd class="chips">{% for t in tags %}<a class="chip" href="{{ t.url }}">{{ t.slug }}</a>{% endfor %}</dd>{% endif %}
-<dt>Original</dt><dd><a href="{{ urls.original }}">{{ photo.width }} × {{ photo.height }} px · {{ photo.ext|upper }}</a></dd>
+{% if photo.year %}<dt>{% trans "Year" %}</dt><dd><a href="{{ year_url }}">{{ photo.year }}</a></dd>{% endif %}
+{% if place_label %}<dt>{% trans "Place" %}</dt><dd><a href="{{ place_url }}">{{ place_label }}</a>{% if map_url %} · <a href="{{ map_url }}">{% trans "Show on the map" %}</a>{% endif %}{% if place_page_url %} · <a href="{{ place_page_url }}" target="_blank" rel="noopener">{% trans "About this place" %}</a>{% endif %}</dd>{% endif %}
+{% if characters %}<dt>{% trans "Characters" %}</dt><dd>{% for c in characters %}<a href="{{ c.url }}">{{ c.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd>{% endif %}
+{% if tags %}<dt>{% trans "Tags" %}</dt><dd class="chips">{% for t in tags %}<a class="chip" href="{{ t.url }}">{{ t.slug }}</a>{% endfor %}</dd>{% endif %}
+<dt>{% trans "Original" %}</dt><dd><a href="{{ urls.original }}">{{ photo.width }} × {{ photo.height }} px · {{ photo.ext|upper }}</a></dd>
 </dl>
 </article>
 {% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'atlas/gallery_base.html' %}
+{% load i18n %}
+{% block title %}{{ feature.name }}{% endblock %}
+{% block meta_description %}{% if note %}{{ note|truncatechars:160 }}{% else %}{{ feature.name }}{% if feature.period %} · {{ feature.period }}{% endif %}{% endif %}{% endblock %}
+{% block content %}
+<article class="place">
+<div class="eyebrow">{% if feature.object_type == 'site' %}{% blocktranslate with number=feature.key %}Place {{ number }}{% endblocktranslate %}{% else %}{% trans "Unlocated place" %}{% endif %}</div>
+<h1>{{ feature.name }}</h1>
+{% if feature.period %}<p class="period">{{ feature.period }}</p>{% endif %}
+{% if confidence %}<p><span class="badge">{{ confidence }}</span></p>{% endif %}
+{% if note %}<p class="note">{{ note }}</p>{% endif %}
+<p class="place-links"><a href="{{ map_url }}">{% trans "Show on the map" %}</a>{% if cards %} · <a href="{{ gallery_url }}">{% trans "All photographs of this place" %}</a>{% endif %}</p>
+{% if cards %}
+<h2>{% trans "Photographs" %}</h2>
+<ul class="grid">
+{% for c in cards %}<li class="card">
+<a class="pic" href="{% url 'photo' c.photo.id %}"><img src="{{ c.thumb }}" alt="{{ c.caption|default:c.photo.original_name }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy"></a>
+<p class="caption"><a href="{% url 'photo' c.photo.id %}">{{ c.caption|default:c.photo.original_name }}</a></p>
+{% if c.photo.year %}<p class="meta">{{ c.photo.year }}</p>{% endif %}
+</li>{% endfor %}
+</ul>
+{% endif %}
+{% if refs %}
+<h2>{% trans "Sources & evidence" %}</h2>
+<ul class="refs">
+{% for r in refs %}<li>{{ r.reference }}{% for n in r.notes %}<br>{{ n }}{% endfor %}</li>{% endfor %}
+</ul>
+{% endif %}
+</article>
+{% endblock %}

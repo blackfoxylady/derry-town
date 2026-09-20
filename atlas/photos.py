@@ -156,17 +156,18 @@ def _apply_links(photo, characters, tags):
 
 def _validated(entry):
     """Нормализует атрибуты одной фотографии из аргументов команды/манифеста."""
-    allowed = {'file', 'caption', 'feature', 'year', 'characters', 'tags', 'order'}
+    allowed = {'file', 'caption', 'caption_ru', 'feature', 'year', 'characters', 'tags', 'order'}
     unknown = set(entry) - allowed
     if unknown:
         raise ValueError(f'Unknown photo fields: {sorted(unknown)}.')
     caption = entry.get('caption', '')
-    if not isinstance(caption, str):
+    caption_ru = entry.get('caption_ru', '')
+    if not isinstance(caption, str) or not isinstance(caption_ru, str):
         raise ValueError('Caption must be a string.')
     order = entry.get('order', 0)
     if not isinstance(order, int) or isinstance(order, bool) or order < 0:
         raise ValueError(f'Order must be a non-negative integer, got {order!r}.')
-    return {'caption': caption,
+    return {'caption': caption, 'caption_ru': caption_ru,
             'year': check_year(entry.get('year')),
             'feature_key': check_feature(entry.get('feature') or ''),
             'order': order,
@@ -223,15 +224,15 @@ def edit(photo_id, **changes):
             photo = Photo.objects.select_for_update().get(pk=photo_id)
         except Photo.DoesNotExist:
             raise ValueError(f'Photo {photo_id} does not exist.') from None
-        entry = {'caption': photo.caption, 'year': photo.year,
+        entry = {'caption': photo.caption, 'caption_ru': photo.caption_ru, 'year': photo.year,
                  'feature': photo.feature_key, 'order': photo.order,
                  'characters': list(photo.characters.values_list('slug', flat=True)),
                  'tags': list(photo.tags.values_list('slug', flat=True))}
         entry.update({k: v for k, v in changes.items() if v is not None})
         attrs = _validated(entry)
-        for field in ('caption', 'year', 'feature_key', 'order'):
+        for field in ('caption', 'caption_ru', 'year', 'feature_key', 'order'):
             setattr(photo, field, attrs[field])
-        photo.save(update_fields=['caption', 'year', 'feature_key', 'order'])
+        photo.save(update_fields=['caption', 'caption_ru', 'year', 'feature_key', 'order'])
         _apply_links(photo, attrs['characters'], attrs['tags'])
     return photo
 
