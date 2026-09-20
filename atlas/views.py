@@ -40,6 +40,42 @@ def _media_urls(photo):
     return {k: settings.MEDIA_URL + v for k, v in relative_paths(photo.sha256, photo.ext).items()}
 
 
+def _photo_anchor(shape):
+    """Точка для миниатюры на карте: у точечных фигур — сама точка, у линий
+    и контуров — средняя вершина (полароид стоит на середине дороги, а не на конце)."""
+    if 'points' in shape:
+        return shape['points'][len(shape['points']) // 2]
+    return [shape['x'], shape['y']]
+
+
+@require_safe
+def photo_data(request):
+    """Фото для карты: превью в карточках мест и слой миниатюр.
+
+    Отдаётся отдельно от /api/v1/map/: payload карты кешируется по ревизии
+    атласа, а фото — контур вне ревизий, их правки ревизий не создают.
+    """
+    grouped = {}
+    for p in Photo.objects.exclude(feature_key='').order_by('order', 'id'):
+        grouped.setdefault(p.feature_key, []).append(p)
+    features = Feature.objects.select_related('geometry').in_bulk(grouped)
+    result = {}
+    for key, group in grouped.items():
+        feature = features.get(key)
+        if feature is None:  # привязка не пережила правку атласа; чинится через `photos check`
+            continue
+        entry = {'name': feature.name, 'object_type': feature.object_type,
+                 'photos': [{'id': p.id, 'thumb': _media_urls(p)['thumb'],
+                             'caption': p.caption, 'year': p.year} for p in group]}
+        if feature.geometry_id:
+            entry['anchor'] = _photo_anchor(feature.geometry.shape)
+        result[key] = entry
+    response = JsonResponse({'features': result},
+                            json_dumps_params={'ensure_ascii': False, 'separators': (',', ':')})
+    response['Cache-Control'] = 'no-cache'
+    return response
+
+
 def _gallery_url(place='', character='', tags=(), year=''):
     """URL галереи; запятая и двоеточие не экранируются, чтобы ссылками
     вида ?place=road:02&tag=library,summer было удобно делиться."""

@@ -7,10 +7,33 @@
 @media(max-width:780px){#panelClose{display:block}}
 /* The header "Photos" link shares the .quiet button look. */
 a.quiet{text-decoration:none;color:inherit;display:inline-block}
+/* The DERRY wordmark links home but keeps its plain-text look. */
+.brand h1 a{color:inherit;text-decoration:none}
 /* Compact header: keep controls and title fully visible on narrow screens. */
 @media(max-width:780px){.brand{display:block;min-width:0}.brand p{display:none}.brand h1{line-height:1.1}.header-actions{flex-shrink:0}.header-actions .quiet{white-space:nowrap}}
 /* Touch: the visible glyphs stay small, so extend the tap area to ~44px. */
 @media(max-width:780px){.close{position:relative}.close::after{content:"";position:absolute;inset:-12px}}
+/* Photo layer: polaroids pinned to the map. The tilt lives on an inner group as a CSS
+   variable so hover can straighten and enlarge it without fighting the SVG translate. */
+.polaroid{cursor:pointer}
+.polaroid:focus{outline:none}
+.polaroid-tilt{transform:rotate(var(--tilt,0deg));transform-box:fill-box;transform-origin:center;transition:transform .16s ease-out,opacity .12s,visibility .12s;filter:drop-shadow(0 1.5px 2.2px rgba(31,48,41,.38))}
+.polaroid:hover .polaroid-tilt,.polaroid:focus-visible .polaroid-tilt{transform:rotate(0deg) scale(1.9)}
+/* Mid zoom: a marker-sized medallion stands in; hovering pops the full polaroid out of it. */
+.polaroid-tilt.pop{visibility:hidden;opacity:0;transform:rotate(var(--tilt,0deg)) scale(.3)}
+.polaroid:hover .polaroid-tilt.pop,.polaroid:focus-visible .polaroid-tilt.pop{visibility:visible;opacity:1;transform:rotate(0deg) scale(1.9)}
+.medallion{transition:opacity .12s;filter:drop-shadow(0 1px 1.6px rgba(31,48,41,.35))}
+.polaroid:hover .medallion,.polaroid:focus-visible .medallion{opacity:0}
+.polaroid-year{font:italic 7px Georgia,"Times New Roman",serif;fill:#6b5d49;pointer-events:none}
+@media print{#photoLayer{display:none}}
+/* Place card: a short strip of polaroid thumbnails above the sources. */
+.card-photos{display:flex;flex-wrap:wrap;gap:10px;margin:13px 0 2px}
+.card-photo{display:block;width:76px;background:#fffef7;padding:4px 4px 13px;box-shadow:0 1px 3px rgba(31,48,41,.32);transform:rotate(-1.6deg);transition:transform .15s}
+.card-photos .card-photo:nth-child(even){transform:rotate(1.7deg)}
+.card-photo:hover,.card-photo:focus-visible{transform:rotate(0deg) scale(1.07)}
+.card-photo img{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#e8e4d4}
+.card-photos-more{font-size:11px}
+.card-photos-more a{color:#315e5a;font-weight:650}
 /* Atlas neatline: a fine double frame around the stage. Overlays sit at 17px+, so the
    lines at 6px/9px never cross them; on narrow screens the panels reach 10px — no frame. */
 .stage::after{content:"";position:absolute;inset:9px;border:1px solid #b1a988;outline:1px solid #d8d2bc;outline-offset:2px;pointer-events:none}

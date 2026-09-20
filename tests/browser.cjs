@@ -48,7 +48,22 @@ const path=require('node:path');
   await page.locator('#showBuildings').check();
   await page.locator('#showNames').uncheck();assert.equal(await page.locator('.map-name').count(),0);
   await page.locator('#showNames').check();
+  await page.locator('#showPhotos').uncheck();assert.equal(await page.locator('#photoLayer .polaroid').count(),0);
+  await page.locator('#showPhotos').check();
   await page.locator('.map-legend summary').click();
+  // Photo layer: polaroids at the town view. Desktop only (the mobile town view is
+  // below the polaroid zoom threshold); a fresh install may hold zero photos.
+  if(name==='desktop'&&await page.evaluate(()=>DerryAtlas.photoFeatureCount)){
+   await page.locator('#reset').click();
+   assert(await page.locator('#photoLayer .polaroid').count()>0);
+   const pol=page.locator('#photoLayer .polaroid[data-key="12"]');
+   if(await pol.count()){
+    await pol.click();
+    assert.match(await page.locator('#detail').innerText(),/Library/);
+    assert(await page.locator('#detail .card-photo').count()>0);
+    assert(await page.locator('#detail .card-photos-more a').count()===1);
+   }
+  }
   await page.locator('#measure').click();
   const box=await page.locator('#map').boundingBox();
   await page.mouse.click(box.x+box.width*.25,box.y+box.height*.48);
@@ -73,7 +88,7 @@ const path=require('node:path');
    if(await toMap.count()){await toMap.first().click();await page.waitForFunction(()=>typeof window.DerryAtlas?.view.selected==='number',{timeout:120000})}
   }
   assert.deepEqual(errors,[]);
-  reports.push({viewport:name,dimensions:size,checks:'map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog, gallery deep links',errors});
+  reports.push({viewport:name,dimensions:size,checks:'map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, source dialog, gallery deep links',errors});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'browser-report.json'),JSON.stringify({browser:browser.version(),reports},null,2));
