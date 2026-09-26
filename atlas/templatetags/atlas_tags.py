@@ -1,7 +1,23 @@
+import json
 from django import template
 from django.urls import translate_url
+from django.utils.safestring import mark_safe
 
 register = template.Library()
+
+# Внутри <script> JSON нельзя оставлять сырым: '</script>' в подписи фото
+# оборвал бы тег. Экранирование то же, что у стандартного json_script.
+_JSON_SCRIPT_ESCAPES = {ord('<'): '\\u003C', ord('>'): '\\u003E', ord('&'): '\\u0026'}
+
+
+@register.simple_tag
+def jsonld(data):
+    """Блок микроразметки <script type="application/ld+json"> из словаря."""
+    if not data:
+        return ''
+    return mark_safe('<script type="application/ld+json">'
+                     + json.dumps(data, ensure_ascii=False).translate(_JSON_SCRIPT_ESCAPES)
+                     + '</script>')
 
 
 @register.simple_tag(takes_context=True)

@@ -10,6 +10,7 @@ from django.utils._os import safe_join
 from django.utils.text import slugify
 from django.utils.translation import get_language, gettext_lazy as _
 from django.views.decorators.http import require_safe
+from . import schema
 from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
 from .models import Character, Evidence, Feature, MapState, Photo, PlaceCover, Setting, Source, Tag
 from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
@@ -18,7 +19,7 @@ from .rendering import current_payload, RENDER_VERSION
 
 @require_safe
 def index(request):
-    response = render(request, 'atlas/index.html')
+    response = render(request, 'atlas/index.html', {'jsonld': schema.index(request)})
     response['Cache-Control'] = 'no-cache'
     return response
 
@@ -252,7 +253,8 @@ def gallery(request):
                       'year_url': _gallery_url(year=str(p.year)) if p.year else ''})
     response = render(request, 'atlas/gallery.html', {
         'groups': groups, 'cards': cards, 'clear_url': reverse('gallery'),
-        'filtered': bool(place or character or tags or year)})
+        'filtered': bool(place or character or tags or year),
+        'jsonld': schema.gallery(request)})
     response['Cache-Control'] = 'no-cache'
     return response
 
@@ -265,7 +267,7 @@ def photo_page(request, photo_id):
     # контуров маркера нет, поэтому ссылки на карту у таких фото нет.
     on_map = feature is not None and feature.object_type in ('site', 'unplaced')
     map_url = reverse('index') + '?place=' + feature.key if on_map else ''
-    response = render(request, 'atlas/photo.html', {
+    context = {
         'photo': photo, 'urls': _media_urls(photo), 'caption': _caption(photo),
         'place_page_url': reverse('place', args=[place_slug(feature)]) if on_map else '',
         'place_label': feature.name if feature else photo.feature_key,
@@ -274,7 +276,9 @@ def photo_page(request, photo_id):
         'year_url': _gallery_url(year=str(photo.year)) if photo.year else '',
         'characters': [{'name': c.name, 'url': _gallery_url(character=c.slug)}
                        for c in photo.characters.order_by('name')],
-        'tags': [{'slug': t.slug, 'url': _gallery_url(tags=[t.slug])} for t in photo.tags.order_by('slug')]})
+        'tags': [{'slug': t.slug, 'url': _gallery_url(tags=[t.slug])} for t in photo.tags.order_by('slug')]}
+    context['jsonld'] = schema.photo(request, context)
+    response = render(request, 'atlas/photo.html', context)
     response['Cache-Control'] = 'no-cache'
     return response
 
@@ -311,7 +315,7 @@ def place_page(request, slug):
             group['notes'].append(note)
     photos = Photo.objects.filter(feature_key=feature.key)
     covers = [_cover_context(c) for c in PlaceCover.objects.filter(feature_key=feature.key)]
-    response = render(request, 'atlas/place.html', {
+    context = {
         'feature': feature, 'note': _feature_note(feature),
         'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
         'covers': covers,
@@ -320,7 +324,9 @@ def place_page(request, slug):
         # совсем без фото шаблон подставит общую карту.
         'og_photo': covers[0]['large'] if covers else _media_urls(photos[0])['medium'] if photos else '',
         'map_url': reverse('index') + '?place=' + feature.key,
-        'gallery_url': _gallery_url(place=feature.key)})
+        'gallery_url': _gallery_url(place=feature.key)}
+    context['jsonld'] = schema.place(request, context)
+    response = render(request, 'atlas/place.html', context)
     response['Cache-Control'] = 'no-cache'
     return response
 
@@ -343,7 +349,8 @@ def method(request):
         ru = (s.metadata or {}).get('ru', {}) if _is_ru() and isinstance(s.metadata, dict) else {}
         sources.append({'key': s.key, 'url': s.url, 'title': ru.get('title') or s.title,
                         'role': ru.get('role') or s.role})
-    response = render(request, 'atlas/method.html', {'method_geometry': geometry, 'sources': sources})
+    response = render(request, 'atlas/method.html', {'method_geometry': geometry, 'sources': sources,
+                                                     'jsonld': schema.method(request)})
     response['Cache-Control'] = 'no-cache'
     return response
 
