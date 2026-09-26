@@ -7,7 +7,7 @@
         "width": 1440,
         "height": 1000
       },
-      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog, gallery deep links",
+      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, method page, place page, ru version, gallery deep links",
       "errors": []
     },
     {
@@ -16,7 +16,16 @@
         "width": 390,
         "height": 844
       },
-      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, ruler, source dialog, gallery deep links",
+      "checks": "map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, method page, place page, ru version, gallery deep links",
+      "errors": []
+    },
+    {
+      "viewport": "narrow-390",
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "checks": "no horizontal overflow, language switcher reachable (en+ru: map, gallery, photo, place, method)",
       "errors": []
     }
   ]

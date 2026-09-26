@@ -139,3 +139,21 @@ class AtlasTests(TestCase):
         doc,_=ds.read_current()
         doc['tables']['geometry'][0]['shape']={'type':'line','points':[[0,0]]}
         with self.assertRaises(ValueError):ds.validate(doc)
+
+    def test_every_base_entry_carries_a_litho_class(self):
+        payload=compile_payload(*ds.read_current())
+        classes={}
+        for o in payload['base']:
+            self.assertIn('cls',o)
+            classes[o['cls']]=classes.get(o['cls'],0)+1
+            fid=o.get('feature_id') or ''
+            if fid.startswith('road'):
+                self.assertTrue(o['cls'].startswith('road-'),(fid,o['cls']))
+            if fid.startswith(('water:','tributaries')) and not fid.startswith('water:covered'):
+                self.assertIn(o['cls'],('water-core','water-edge','valley'))
+        for expected in ('contour','building','water-core','water-edge','covered',
+                         'rail','rail-ties','road-primary-casing','road-primary-fill',
+                         'path','forest','barrens','veg'):
+            self.assertGreater(classes.get(expected,0),0,expected)
+        # 'misc' stays a small remainder, not a dump for whole layers.
+        self.assertLess(classes.get('misc',0),60,classes)

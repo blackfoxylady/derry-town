@@ -14,7 +14,9 @@ const path=require('node:path');
   await page.goto(process.env.DERRY_URL||'http://127.0.0.1:8765',{waitUntil:'networkidle'});
   await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
   assert.equal(await page.evaluate(()=>DerryAtlas.unlocatedCount),9);
-  assert.equal(await page.locator('#world>*').count(),3086);
+  // Litho world: paper + clipped slot groups + sheet frame; buildings collapse into <use>.
+  assert(await page.locator('#world .slot-water *').count()>10);
+  assert(await page.locator('#world *').count()>2000);
   assert(await page.locator('.mark').count()>15);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   assert(await page.locator('.brand h1').evaluate(n=>n.getBoundingClientRect().top>=0));

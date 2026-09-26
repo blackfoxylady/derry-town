@@ -37,14 +37,18 @@ a.quiet{text-decoration:none;color:inherit;display:inline-block}
 .card-photo img{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#e8e4d4}
 .card-photos-more{font-size:11px}
 .card-photos-more a{color:#315e5a;font-weight:650}
-/* Atlas neatline: a fine double frame around the stage. Overlays sit at 17px+, so the
-   lines at 6px/9px never cross them; on narrow screens the panels reach 10px — no frame. */
-.stage::after{content:"";position:absolute;inset:9px;border:1px solid #b1a988;outline:1px solid #d8d2bc;outline-offset:2px;pointer-events:none}
-@media(max-width:780px){.stage::after{display:none}}
-@media print{.stage::after{display:none}}
+/* The old screen-fixed neatline is gone: the litho sheet draws its own frame in world space. */
 /* Language switcher in the header: a segmented control in the .quiet style. */
 .lang{display:inline-flex;border:1px solid #c7cebf;border-radius:5px;overflow:hidden;font-size:12px}
 .lang a,.lang b{padding:7px 9px;font-weight:400;color:inherit;text-decoration:none}
 .lang b{background:#315e5a;color:#fff;font-weight:600}
 /* Quiet link from the place card to its standalone page. */
 .card-page{font-size:11px;margin:10px 0 0}.card-page a{color:#586b59}
+/* Legend: place-type badge key, two columns of icon + meaning. */
+.legend-icons{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px;margin:6px 0 2px}
+.legend-icons span{display:flex;align-items:center;gap:5px;min-width:0}
+.legend-icons svg{flex:0 0 auto}
+/* Litho overlay text: paper halo, engraving serif. */
+.halo{paint-order:stroke;stroke:#f6f3e9;stroke-linejoin:round;font-family:Georgia,"Times New Roman",serif;fill:#6b5c42;pointer-events:none}
+/* Litho LOD: data-z on the svg (far/mid/near by zoom) gates detail layers. */
+#map[data-z=far] .lod-mid,#map[data-z=far] .lod-near,#map[data-z=mid] .lod-near{display:none}

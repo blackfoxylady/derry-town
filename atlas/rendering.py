@@ -21,7 +21,60 @@ from django.conf import settings
 from . import dataset as ds
 from .models import MapState
 
-RENDER_VERSION = '1'
+RENDER_VERSION = '3'
+
+# Litho renderer layer classes. Styles are content-addressed (no semantic keys),
+# so the class is derived from feature id plus style, mirroring the handoff
+# converter's rules; 'misc' falls back to as-is drawing in the client.
+ROAD_CASING = [(30, 'highway'), (22, 'main'), (19, 'primary'), (13, 'secondary')]
+ROAD_FILL = [(20, 'highway'), (16, 'main'), (12, 'primary'), (6, 'secondary')]
+
+
+def _light(color):
+    return color and sum(int(color[i:i+2], 16) for i in (1, 3, 5)) / 3 > 208
+
+
+def classify(o, generator=None):
+    layer = o.get('layer', 'base'); fid = o.get('feature_id') or ''
+    stroke = o.get('stroke'); fill = o.get('fill'); width = o.get('width', 0)
+    if generator == 'terrain' or layer == 'relief':
+        return 'contour'
+    if generator == 'rail_ties':
+        return 'rail-ties'
+    if layer == 'buildings':
+        return 'building'
+    if fid.startswith('water:covered'):
+        return 'covered'
+    if fid.startswith(('water:', 'tributaries')):
+        if stroke == '#d9dfc3':
+            return 'valley'
+        return 'water-core' if stroke == '#87b0ba' else 'water-edge'
+    if fid == 'area:barrens':
+        return 'barrens'
+    if fid.startswith('rail'):
+        return 'rail-fill' if _light(stroke) else 'rail'
+    if fid.startswith('paths'):
+        return 'path'
+    if fid.startswith('road'):
+        if o.get('dash'):
+            return 'road-trackdash' if width >= 6 else 'road-lane'
+        role, table = ('fill', ROAD_FILL) if _light(stroke) else ('casing', ROAD_CASING)
+        return 'road-%s-%s' % (next((c for w, c in table if width >= w), 'track'), role)
+    if fill in ('#bdcdaa', '#b4c7a2'):
+        return 'forest'
+    if fill == '#cdd8bc':
+        return 'forest-light'
+    if fill in ('#dce2c7', '#e0ddc9'):
+        return 'park'
+    if fill == '#d7cbb5':
+        return 'lot'
+    if stroke in ('#9cac83', '#879674'):
+        return 'veg'
+    if stroke in ('#7e7c6d', '#7b7564') and width >= 18:
+        return 'bridge'
+    if stroke in ('#e8dbc2', '#eadbc2') and width >= 12:
+        return 'bridge-fill'
+    return 'misc'
 
 
 def smooth(pts, n=10):
@@ -88,7 +141,7 @@ def compile_payload(doc, revision):
         style = indexed['style'][c['style_id']]['value']; recipe = c['recipe']
         generator = recipe.get('generator', 'shape')
         if generator == 'terrain':
-            base.extend({'type':'line','points':pts,**style,'component_id':c['key']} for pts in contours)
+            base.extend({'type':'line','points':pts,**style,'component_id':c['key'],'cls':'contour'} for pts in contours)
             continue
         f = features.get(c['feature_id'])
         shape = copy.deepcopy(geometry[c['geometry_id'] or f['geometry_id']]['shape'])
@@ -106,10 +159,12 @@ def compile_payload(doc, revision):
                     ang = math.atan2(b[1]-a[1],b[0]-a[0])+math.pi/2
                     length = recipe['half_length']
                     pts = [[b[0]-length*math.cos(ang),b[1]-length*math.sin(ang)], [b[0]+length*math.cos(ang),b[1]+length*math.sin(ang)]]
-                    base.append({'type':'line','points':pts,**style,'feature_id':c['feature_id'],'component_id':c['key']})
+                    base.append({'type':'line','points':pts,**style,'feature_id':c['feature_id'],'component_id':c['key'],'cls':'rail-ties'})
                     acc = 0
         else:
-            base.append({**shape, **style, 'feature_id':c['feature_id'], 'component_id':c['key']})
+            entry = {**shape, **style, 'feature_id':c['feature_id'], 'component_id':c['key']}
+            entry['cls'] = classify(entry, generator)
+            base.append(entry)
     for o in base:
         if 'points' in o:
             o['points'] = [[round(x,2),round(y,2)] for x,y in o['points']]
