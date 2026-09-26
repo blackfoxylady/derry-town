@@ -61,6 +61,17 @@ class GalleryTests(TestCase):
         # Год показан: в наборе два разных года.
         self.assertContains(response, '?year=1985')
 
+    def test_gallery_cards_offer_responsive_sources(self):
+        response = self.client.get('/photos/')
+        rel = photos.relative_paths(self.ben.sha256, self.ben.ext)
+        self.assertContains(response, f'{rel["thumb"]} 320w')
+        self.assertContains(response, f'{rel["medium"]} 1200w')
+        self.assertContains(response, 'sizes="(max-width:525px) calc(100vw - 30px)')
+
+        response = self.client.get('/places/12-derry-public-library/')
+        self.assertContains(response, f'{rel["thumb"]} 320w')
+        self.assertContains(response, f'{rel["medium"]} 1200w')
+
     def test_place_filter_and_readable_url(self):
         response = self.client.get('/photos/', {'place': '12'})
         self.assertEqual(self.captions(response), ['Ben at the library.', 'The library building.'])

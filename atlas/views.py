@@ -11,7 +11,7 @@ from django.utils.text import slugify
 from django.utils.translation import get_language, gettext_lazy as _
 from django.views.decorators.http import require_safe
 from .models import Character, Evidence, Feature, MapState, Photo, Setting, Source, Tag
-from .photos import relative_paths
+from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
 from .rendering import current_payload, RENDER_VERSION
 
 
@@ -95,6 +95,32 @@ def _localized_payload(payload):
 
 def _media_urls(photo):
     return {k: settings.MEDIA_URL + v for k, v in relative_paths(photo.sha256, photo.ext).items()}
+
+
+def _card_image(photo):
+    """Responsive sources for a gallery card without inventing file widths.
+
+    Derivatives preserve the original aspect ratio and are never enlarged, so
+    portrait images and small originals can be narrower than the configured
+    maximum side. Width descriptors must contain that real intrinsic width or
+    the browser may choose an undersized source on high-density screens.
+    """
+    urls = _media_urls(photo)
+    longest = max(photo.width, photo.height)
+
+    def fitted_width(max_side):
+        return photo.width if longest <= max_side else max(1, round(photo.width * max_side / longest))
+
+    sources = [(urls['thumb'], fitted_width(THUMB_SIZE)),
+               (urls['medium'], fitted_width(MEDIUM_SIZE))]
+    # Very small originals produce identical thumb and medium widths. Keep the
+    # srcset valid by listing each width only once.
+    unique = []
+    for url, width in sources:
+        if all(existing_width != width for _, existing_width in unique):
+            unique.append((url, width))
+    return {'thumb': urls['thumb'], 'medium': urls['medium'],
+            'srcset': ', '.join(f'{url} {width}w' for url, width in unique)}
 
 
 def _photo_anchor(shape):
@@ -208,7 +234,7 @@ def gallery(request):
     cards = []
     for p in photos:
         f = features.get(p.feature_key)
-        cards.append({'photo': p, 'thumb': _media_urls(p)['thumb'], 'caption': _caption(p),
+        cards.append({'photo': p, **_card_image(p), 'caption': _caption(p),
                       'place_label': f.name if f else p.feature_key,
                       'place_url': _gallery_url(place=p.feature_key) if p.feature_key else '',
                       'year_url': _gallery_url(year=str(p.year)) if p.year else ''})
@@ -275,7 +301,7 @@ def place_page(request, slug):
     response = render(request, 'atlas/place.html', {
         'feature': feature, 'note': _feature_note(feature),
         'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
-        'cards': [{'photo': p, 'thumb': _media_urls(p)['thumb'], 'caption': _caption(p)} for p in photos],
+        'cards': [{'photo': p, **_card_image(p), 'caption': _caption(p)} for p in photos],
         # Превью для соцсетей: первое фото места; без фото шаблон подставит общую карту.
         'og_photo': _media_urls(photos[0])['medium'] if photos else '',
         'map_url': reverse('index') + '?place=' + feature.key,

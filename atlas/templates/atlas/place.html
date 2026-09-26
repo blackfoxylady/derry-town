@@ -17,7 +17,7 @@
 <h2>{% trans "Photographs" %}</h2>
 <ul class="grid">
 {% for c in cards %}<li class="card">
-<a class="pic" href="{% url 'photo' c.photo.id %}"><img src="{{ c.thumb }}" alt="{{ c.caption|default:c.photo.original_name }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy"></a>
+<a class="pic" href="{% url 'photo' c.photo.id %}"><img src="{{ c.thumb }}" srcset="{{ c.srcset }}" sizes="(max-width:525px) calc(100vw - 30px), (max-width:799px) calc(50vw - 23px), (max-width:1057px) calc(33.333vw - 26.667px), 239px" alt="{{ c.caption|default:c.photo.original_name }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy" decoding="async"></a>
 <p class="caption"><a href="{% url 'photo' c.photo.id %}">{{ c.caption|default:c.photo.original_name }}</a></p>
 {% if c.photo.year %}<p class="meta">{{ c.photo.year }}</p>{% endif %}
 </li>{% endfor %}

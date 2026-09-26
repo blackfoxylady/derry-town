@@ -9,7 +9,7 @@
 {% if cards %}
 <ul class="grid">
 {% for c in cards %}<li class="card">
-<a class="pic" href="{% url 'photo' c.photo.id %}"><img src="{{ c.thumb }}" alt="{{ c.caption|default:c.photo.original_name }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy"></a>
+<a class="pic" href="{% url 'photo' c.photo.id %}"><img src="{{ c.thumb }}" srcset="{{ c.srcset }}" sizes="(max-width:525px) calc(100vw - 30px), (max-width:799px) calc(50vw - 23px), (max-width:1057px) calc(33.333vw - 26.667px), 239px" alt="{{ c.caption|default:c.photo.original_name }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy" decoding="async"></a>
 <p class="caption"><a href="{% url 'photo' c.photo.id %}">{{ c.caption|default:c.photo.original_name }}</a></p>
 <p class="meta">{% if c.photo.year %}<a href="{{ c.year_url }}">{{ c.photo.year }}</a>{% endif %}{% if c.photo.year and c.place_url %} · {% endif %}{% if c.place_url %}<a href="{{ c.place_url }}">{{ c.place_label }}</a>{% endif %}</p>
 </li>{% endfor %}
