@@ -99,6 +99,7 @@ erDiagram
         string ext
         string original_name
         string caption
+        string caption_ru
         number year
         string feature_key
         number order
@@ -120,3 +121,16 @@ erDiagram
     }
     Photo ||--o{ Photo_tags : "photo_id"
     Tag ||--o{ Photo_tags : "tag_id"
+    PlaceCover {
+        number id PK
+        string sha256
+        string ext
+        string original_name
+        string feature_key
+        number year
+        string alt
+        string alt_ru
+        number width
+        number height
+        datetime created
+    }

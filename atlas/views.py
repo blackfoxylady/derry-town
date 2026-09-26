@@ -10,7 +10,8 @@ from django.utils._os import safe_join
 from django.utils.text import slugify
 from django.utils.translation import get_language, gettext_lazy as _
 from django.views.decorators.http import require_safe
-from .models import Character, Evidence, Feature, MapState, Photo, Setting, Source, Tag
+from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
+from .models import Character, Evidence, Feature, MapState, Photo, PlaceCover, Setting, Source, Tag
 from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
 from .rendering import current_payload, RENDER_VERSION
 
@@ -106,21 +107,32 @@ def _card_image(photo):
     the browser may choose an undersized source on high-density screens.
     """
     urls = _media_urls(photo)
-    longest = max(photo.width, photo.height)
+    srcset = _fitted_srcset(photo.width, photo.height,
+                            [(urls['thumb'], THUMB_SIZE), (urls['medium'], MEDIUM_SIZE)])
+    return {'thumb': urls['thumb'], 'medium': urls['medium'], 'srcset': srcset}
 
-    def fitted_width(max_side):
-        return photo.width if longest <= max_side else max(1, round(photo.width * max_side / longest))
 
-    sources = [(urls['thumb'], fitted_width(THUMB_SIZE)),
-               (urls['medium'], fitted_width(MEDIUM_SIZE))]
-    # Very small originals produce identical thumb and medium widths. Keep the
-    # srcset valid by listing each width only once.
+def _fitted_srcset(width, height, sources):
+    """srcset из пар (url, max_side производного) с реальными intrinsic-ширинами."""
+    longest = max(width, height)
     unique = []
-    for url, width in sources:
-        if all(existing_width != width for _, existing_width in unique):
-            unique.append((url, width))
-    return {'thumb': urls['thumb'], 'medium': urls['medium'],
-            'srcset': ', '.join(f'{url} {width}w' for url, width in unique)}
+    for url, max_side in sources:
+        fitted = width if longest <= max_side else max(1, round(width * max_side / longest))
+        # Very small originals produce identical derivative widths. Keep the
+        # srcset valid by listing each width only once.
+        if all(existing_width != fitted for _, existing_width in unique):
+            unique.append((url, fitted))
+    return ', '.join(f'{url} {w}w' for url, w in unique)
+
+
+def _cover_context(cover):
+    """Данные заглавного фото для шаблона места; alt локализуется как caption."""
+    urls = {k: settings.MEDIA_URL + v for k, v in cover_relative_paths(cover.sha256, cover.ext).items()}
+    return {'year': cover.year, 'src': urls['medium'], 'large': urls['large'],
+            'srcset': _fitted_srcset(cover.width, cover.height,
+                                     [(urls['medium'], COVER_MEDIUM_SIZE), (urls['large'], COVER_LARGE_SIZE)]),
+            'alt': (cover.alt_ru or cover.alt) if _is_ru() else cover.alt,
+            'width': cover.width, 'height': cover.height}
 
 
 def _photo_anchor(shape):
@@ -298,12 +310,15 @@ def place_page(request, slug):
         elif note:
             group['notes'].append(note)
     photos = Photo.objects.filter(feature_key=feature.key)
+    covers = [_cover_context(c) for c in PlaceCover.objects.filter(feature_key=feature.key)]
     response = render(request, 'atlas/place.html', {
         'feature': feature, 'note': _feature_note(feature),
         'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
+        'covers': covers,
         'cards': [{'photo': p, **_card_image(p), 'caption': _caption(p)} for p in photos],
-        # Превью для соцсетей: первое фото места; без фото шаблон подставит общую карту.
-        'og_photo': _media_urls(photos[0])['medium'] if photos else '',
+        # Превью для соцсетей: заглавное фото, иначе первое фото места;
+        # совсем без фото шаблон подставит общую карту.
+        'og_photo': covers[0]['large'] if covers else _media_urls(photos[0])['medium'] if photos else '',
         'map_url': reverse('index') + '?place=' + feature.key,
         'gallery_url': _gallery_url(place=feature.key)})
     response['Cache-Control'] = 'no-cache'

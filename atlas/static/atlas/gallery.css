@@ -57,6 +57,20 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
 .period{font-size:11px;color:#576a57;text-transform:uppercase;letter-spacing:.55px;margin:0 0 12px}
 .badge{font-size:11px;font-weight:700;padding:5px 7px;border:1px solid #b7c6ac;border-radius:4px;display:inline-block;background:#f6f6ec}
 .place .note{max-width:640px;font-size:14px}
+/* Заглавное фото места: стопка изображений с кроссфейдом; переключатель годов — сегментный контрол в стиле .lang. */
+.place-cover{position:relative;max-width:640px;aspect-ratio:3/2;overflow:hidden;border:1px solid var(--line);border-radius:6px;background:#e8e4d4;margin:20px 0}
+.place-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s ease}
+.place-cover img.on{opacity:1}
+.cover-years{position:absolute;left:14px;bottom:14px;display:flex;background:#f8f6ee;border:1px solid #c7cebf;border-radius:5px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.cover-years button{border:0;margin:0;padding:7px 12px;background:transparent;color:var(--ink);font:600 15px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;cursor:pointer}
+.cover-years button+button{border-left:1px solid #c7cebf}
+.cover-years button[aria-pressed="true"]{background:#315e5a;color:#fff}
+.cover-years button:focus-visible{outline:3px solid #a88746;outline-offset:-3px}
+@media(prefers-reduced-motion:reduce){.place-cover img{transition:none}}
+/* Мобильный: фото от края до края, переключатель с зоной нажатия ≥44px. */
+@media(max-width:600px){.place-cover{max-width:none;margin:16px -14px 18px;border:0;border-radius:0}
+.cover-years{left:10px;bottom:10px}
+.cover-years button{min-height:42px;padding:0 14px;font-size:14px}}
 .place-links{font-size:12px}
 .refs{margin:7px 0 0;padding:0;list-style:none;color:#586b59;font-size:12px;max-width:640px}
 .refs li{padding:6px 0;border-bottom:1px solid #d1dbc9}

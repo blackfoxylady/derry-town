@@ -10,6 +10,23 @@
 <div class="eyebrow">{% if feature.object_type == 'site' %}{% blocktranslate with number=feature.key %}Place {{ number }}{% endblocktranslate %}{% else %}{% trans "Unlocated place" %}{% endif %}</div>
 <h1>{{ feature.name }}</h1>
 {% if feature.period %}<p class="period">{{ feature.period }}</p>{% endif %}
+{% if covers %}
+<div class="place-cover">
+{% for c in covers %}<img{% if forloop.first %} class="on"{% endif %} data-year="{{ c.year }}" src="{{ c.src }}" srcset="{{ c.srcset }}" sizes="(max-width:600px) 100vw, 640px" alt="{{ c.alt }}" width="{{ c.width }}" height="{{ c.height }}"{% if not forloop.first %} loading="lazy"{% endif %} decoding="async">{% endfor %}
+{% if covers|length > 1 %}<div class="cover-years" role="group" aria-label="{% trans 'Year' %}">
+{% for c in covers %}<button type="button" data-year="{{ c.year }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">{{ c.year }}</button>{% endfor %}
+</div>{% endif %}
+</div>
+{% if covers|length > 1 %}<script>
+(function(){
+var box=document.querySelector('.place-cover'),imgs=box.querySelectorAll('img'),buttons=box.querySelectorAll('.cover-years button');
+buttons.forEach(function(b){b.addEventListener('click',function(){
+buttons.forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});
+imgs.forEach(function(im){im.classList.toggle('on',im.dataset.year===b.dataset.year);});
+});});
+})();
+</script>{% endif %}
+{% endif %}
 {% if confidence %}<p><span class="badge">{{ confidence }}</span></p>{% endif %}
 {% if note %}<p class="note">{{ note }}</p>{% endif %}
 <p class="place-links"><a href="{{ map_url }}">{% trans "Show on the map" %}</a>{% if cards %} · <a href="{{ gallery_url }}">{% trans "All photographs of this place" %}</a>{% endif %}</p>

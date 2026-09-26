@@ -106,6 +106,29 @@ python manage.py photos import /tmp/photos-batch   # ищет manifest.json ря
 
 После правок атласа, удаляющих места, выполните `photos check`: команда сообщит висячие привязки, отсутствующие и ничейные файлы.
 
+## Заглавные фото мест
+
+Заглавное фото страницы места — отдельный контур `covers`, устроенный как `photos` (файлы в `media/covers/`, дедупликация по SHA-256, руками файлы не кладутся):
+
+```sh
+docker compose cp cover.png web:/tmp/cover.png
+python manage.py covers add /tmp/cover.png \
+  --feature 4 --year 1958 \
+  --alt 'Derry Elementary School, brick facade, 1958.' \
+  --alt-ru 'Начальная школа Дерри: кирпичный фасад, 1958 год.'
+```
+
+`--feature`, `--year` и `--alt` обязательны; `--alt-ru` — русский alt, пустой откатывается на английский. У места не больше двух фото и не больше одного на год (при двух на странице появляется переключатель годов); привязать можно только site/unplaced.
+
+Партия — каталог с манифестом, как у фотографий, применяется атомарно:
+
+```sh
+docker compose cp ./covers-batch web:/tmp/covers-batch
+python manage.py covers import /tmp/covers-batch   # ищет manifest.json рядом с файлами
+```
+
+Манифест — JSON-список объектов: `file` (имя в каталоге), `feature`, `year`, `alt`, необязательный `alt_ru`. Прочее: `covers list`, `covers show 1`, `covers edit 1 --alt '...'`, `covers remove 1`, а после правок атласа — `covers check`.
+
 ## Обновление сайта и экспорта
 
 После commit обновите страницу сайта. Для предварительной сборки используйте `atlas rebuild`. PNG рельефа и векторная сцена вычисляются из одной версии. Затем `atlas render --output /app/var/exports` создаёт PDF/SVG актуальной карты; manifest.json содержит номер версии и хеш. Самостоятельное редактирование выгруженного SVG не возвращает изменения в БД.

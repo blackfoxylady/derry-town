@@ -81,6 +81,12 @@
 <g id="Tag"><rect x="440" y="1240" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="454" y="1267" class="title">Tag</text>
 <text x="454" y="1293" class="field">PK slug</text>
 </g>
+<g id="PlaceCover"><rect x="860" y="1000" width="280" height="140" rx="8" fill="#ffffff" stroke="#9aaa98"/><text x="874" y="1027" class="title">PlaceCover</text>
+<text x="874" y="1053" class="field">PK id</text>
+<text x="874" y="1076" class="field">sha256 · ext · alt · alt_ru</text>
+<text x="874" y="1099" class="field">feature_key (строка, не FK)</text>
+<text x="874" y="1122" class="field">year · width · height</text>
+</g>
 <text x="30" y="1415" class="field">Setting and MapView have no relational foreign keys; JSON references are validated by the application.</text>
 <text x="30" y="1442" class="field">Full field definitions: data_dictionary.md · Editable relationship source: er.mmd</text>
 <text x="750" y="1295" class="field">Photo — Character and Photo — Tag are many-to-many</text>

@@ -118,6 +118,35 @@ class Tag(models.Model):
     slug = models.CharField(max_length=100, primary_key=True)
 
 
+class PlaceCover(models.Model):
+    """Заглавные фото страниц мест — контур вне ревизий атласа, как Photo.
+
+    Привязка к месту строковым ключом (см. Photo о причинах). У места ноль,
+    одно или два фото разных лет; год и alt обязательны, alt_ru — перевод
+    с откатом на английский. Файлы живут в media/covers/, отдельно от
+    фотогалереи, и в её выдачах (галерея, карта, sitemap) не участвуют.
+    """
+    sha256 = models.CharField(max_length=64, unique=True)
+    ext = models.CharField(max_length=8)
+    original_name = models.CharField(max_length=255)
+    feature_key = models.CharField(max_length=100)
+    year = models.PositiveSmallIntegerField()
+    alt = models.TextField()
+    alt_ru = models.TextField(blank=True, default='')
+    width = models.PositiveIntegerField()
+    height = models.PositiveIntegerField()
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['feature_key', 'year']
+        constraints = [
+            models.UniqueConstraint(fields=['feature_key', 'year'], name='cover_unique_feature_year'),
+            models.CheckConstraint(condition=Q(year__gte=1850, year__lte=2100), name='cover_year_range'),
+            models.CheckConstraint(condition=~Q(feature_key=''), name='cover_feature_required'),
+            models.CheckConstraint(condition=~Q(alt=''), name='cover_alt_required'),
+        ]
+
+
 class Photo(models.Model):
     """Фотографии — отдельный контур вне ревизий атласа.
 

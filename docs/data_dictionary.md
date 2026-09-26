@@ -163,6 +163,7 @@ SQL имена приведены для PostgreSQL. JSONField хранится 
 | `ext` | varchar(8) | нет | Расширение оригинала: png, jpg или webp. |
 | `original_name` | varchar(255) | нет | Имя загруженного файла, для справки. |
 | `caption` | text | нет | Подпись фотографии. |
+| `caption_ru` | text | нет | Служебное поле. |
 | `year` | smallint ≥ 0 | да | Год эпохи романа или null; справочник ALLOWED_YEARS в atlas/photos.py. |
 | `feature_key` | varchar(100) | нет | Строковый ключ Feature, намеренно без FK: commit атласа полностью заменяет строки feature, и каскад стирал бы привязки. Проверяется photos.py и `photos check`. |
 | `order` | integer ≥ 0 | нет | Порядок в галерее и карточке места. |
@@ -189,6 +190,24 @@ SQL имена приведены для PostgreSQL. JSONField хранится 
 | `id` | bigint identity | нет | PK. Числовой PK; у MapState всегда 1. |
 | `photo_id` | FK → atlas_photo.id | нет | Связь; on_delete=CASCADE. |
 | `tag_id` | FK → atlas_tag.slug | нет | Связь; on_delete=CASCADE. |
+
+## `atlas_placecover` — PlaceCover
+
+Заглавные фото страниц мест: отдельный контур вне ревизий (как Photo), файлы в media/covers. Не больше двух на место и одного на год; редактируются только командой manage.py covers.
+
+| Поле | Тип | NULL | Назначение |
+|---|---|---|---|
+| `id` | bigint identity | нет | PK. Числовой PK; у MapState всегда 1. |
+| `sha256` | varchar(64) | нет | SHA-256 содержимого оригинала; определяет имена файлов и защищает от дублей. |
+| `ext` | varchar(8) | нет | Расширение оригинала: png, jpg или webp. |
+| `original_name` | varchar(255) | нет | Имя загруженного файла, для справки. |
+| `feature_key` | varchar(100) | нет | Строковый ключ Feature, намеренно без FK: commit атласа полностью заменяет строки feature, и каскад стирал бы привязки. Проверяется photos.py и `photos check`. |
+| `year` | smallint ≥ 0 | нет | Год эпохи романа, обязателен; уникален в пределах места (cover_unique_feature_year). |
+| `alt` | text | нет | Обязательный alt-текст для доступности; подписи на экране нет. |
+| `alt_ru` | text | нет | Русский alt; пустой откатывается на английский. |
+| `width` | integer ≥ 0 | нет | Ширина оригинала в пикселях. |
+| `height` | integer ≥ 0 | нет | Высота оригинала в пикселях. |
+| `created` | timestamptz | нет | UTC время загрузки. |
 
 ## Ограничения
 
