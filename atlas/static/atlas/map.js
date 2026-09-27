@@ -11,6 +11,14 @@ const placeUrl=s=>{const n=slugify(s.name);return URLS.place.replace('/x/','/'+S
 const _=typeof gettext==='function'?gettext:s=>s;
 const n_=typeof ngettext==='function'?ngettext:(s,p,n)=>n===1?s:p;
 const LANG=document.documentElement.lang||'en';
+// The directory is fully expanded in server HTML. On phones only, progressively
+// collapse it to native accordions while leaving every link in the document.
+const directoryMedia=matchMedia('(max-width:780px)');
+function syncDirectory(){const groups=[...document.querySelectorAll('.place-group')];if(!groups.length)return;
+ const target=location.hash&&document.getElementById(location.hash.slice(1));
+ groups.forEach((group,index)=>{group.open=!directoryMedia.matches||group===target||(!target&&index===0)})}
+syncDirectory();directoryMedia.addEventListener('change',syncDirectory);
+addEventListener('hashchange',()=>{const target=document.getElementById(location.hash.slice(1));if(target?.classList.contains('place-group'))target.open=true});
 const [response,photoResponse]=await Promise.all([fetch(URLS.mapData+'?lang='+LANG,{cache:'no-cache'}),fetch(URLS.photoData+'?lang='+LANG,{cache:'no-cache'})]);
 if(!response.ok)throw new Error(_('Map data unavailable')+' ('+response.status+').');
 const PAYLOAD=await response.json();

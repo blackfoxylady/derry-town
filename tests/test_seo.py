@@ -150,6 +150,23 @@ class SeoTests(TestCase):
             response,
             '<title>Derry Public Library — Дерри, штат Мэн · «Оно» Стивена Кинга</title>')
 
+    def test_home_renders_a_linked_place_directory_without_javascript(self):
+        response = self.client.get('/')
+        self.assertContains(response, '<h2 id="all-places-title">All places in Derry</h2>')
+        self.assertContains(response, 'Browse all 2 places')
+        self.assertContains(response, '1 mapped · 1 unlocated')
+        self.assertContains(response, 'href="/places/12-derry-public-library/"')
+        self.assertContains(response, 'href="/places/u3-tracker-brothers/"')
+        self.assertContains(response, 'class="directory-copy"', count=2)
+        body = response.content.decode()
+        self.assertLess(body.index('>Civic<'), body.index('>Unlocated<'))
+
+        response = self.client.get('/ru/')
+        self.assertContains(response, '<h2 id="all-places-title">Все места Дерри</h2>')
+        self.assertContains(response, '1 на карте · 1 без координат')
+        self.assertContains(response, 'href="/ru/places/12-derry-public-library/"')
+        self.assertContains(response, 'href="/ru/places/u3-tracker-brothers/"')
+
     def test_photo_pages_use_the_photo_as_preview(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

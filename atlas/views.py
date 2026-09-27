@@ -21,7 +21,53 @@ from .rendering import current_payload, RENDER_VERSION
 
 @require_safe
 def index(request):
-    mapped_count = Feature.objects.filter(object_type='site').count()
+    features = list(Feature.objects.filter(object_type__in=('site', 'unplaced')).only(
+        'key', 'object_type', 'name', 'kind', 'period'))
+    mapped_count = sum(feature.object_type == 'site' for feature in features)
+    unlocated_count = len(features) - mapped_count
+
+    # The same editorial order is used by the map filters. Unknown future kinds
+    # are kept rather than silently disappearing from the server-rendered index.
+    kind_order = ('Homes', 'Civic', 'Barrens', 'Encounters', 'Historical', 'Outlying')
+    buckets = {kind: [] for kind in kind_order}
+    buckets['Unlocated'] = []
+    for feature in features:
+        kind = 'Unlocated' if feature.object_type == 'unplaced' else feature.kind
+        buckets.setdefault(kind or 'Other', []).append(feature)
+
+    labels = {
+        'Homes': _('Homes'), 'Civic': _('Civic'), 'Barrens': _('Barrens'),
+        'Encounters': _('Encounters'), 'Historical': _('Historical'),
+        'Outlying': _('Outlying'), 'Unlocated': _('Unlocated'), 'Other': _('Other'),
+    }
+
+    def feature_sort(feature):
+        return (0, int(feature.key)) if feature.key.isdigit() else (1, feature.key)
+
+    ordered_kinds = [kind for kind in kind_order if buckets[kind]]
+    ordered_kinds += sorted(kind for kind in buckets
+                            if kind not in (*kind_order, 'Unlocated') and buckets[kind])
+    if buckets['Unlocated']:
+        ordered_kinds.append('Unlocated')
+    place_groups = []
+    for kind in ordered_kinds:
+        items = []
+        for feature in sorted(buckets[kind], key=feature_sort):
+            items.append({
+                'feature': feature,
+                'number': f'{int(feature.key):02d}' if feature.key.isdigit() else feature.key.upper(),
+                'url': reverse('place', args=[place_slug(feature)]),
+            })
+        place_groups.append({
+            'slug': slugify(kind), 'title': labels.get(kind, kind), 'items': items,
+        })
+
+    place_count = len(features)
+    directory_jump = ngettext(
+        'Browse all %(count)s place', 'Browse all %(count)s places', place_count
+    ) % {'count': place_count}
+    directory_stats = _('%(mapped)s mapped · %(unlocated)s unlocated') % {
+        'mapped': mapped_count, 'unlocated': unlocated_count}
     page_title = _('Map of Derry, Maine — Stephen King’s IT Literary Atlas')
     meta_description = ngettext(
         'Explore an interactive map of Derry, Maine, reconstructed from Stephen King’s IT, '
@@ -29,7 +75,12 @@ def index(request):
         'Explore an interactive map of Derry, Maine, reconstructed from Stephen King’s IT, '
         'with %(count)s mapped places, book evidence and photographs.',
         mapped_count) % {'count': mapped_count}
-    context = {'page_title': page_title, 'meta_description': meta_description}
+    context = {
+        'page_title': page_title, 'meta_description': meta_description,
+        'mapped_count': mapped_count, 'unlocated_count': unlocated_count,
+        'place_count': place_count, 'place_groups': place_groups,
+        'directory_jump': directory_jump, 'directory_stats': directory_stats,
+    }
     context['jsonld'] = schema.index(request, page_title, meta_description)
     response = render(request, 'atlas/index.html', context)
     response['Cache-Control'] = 'no-cache'

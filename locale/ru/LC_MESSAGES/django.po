@@ -308,6 +308,54 @@ msgstr ""
 msgid "Badges by the markers (zoom in) show the type of place:"
 msgstr "Значки у маркеров (при приближении) показывают тип места:"
 
+#: server-rendered place directory
+msgid "Homes"
+msgstr "Дома"
+
+msgid "Civic"
+msgstr "Городские места"
+
+msgid "Barrens"
+msgstr "Пустошь"
+
+msgid "Encounters"
+msgstr "Встречи"
+
+msgid "Historical"
+msgstr "Исторические места"
+
+msgid "Outlying"
+msgstr "Окраины"
+
+msgid "Unlocated"
+msgstr "Без координат"
+
+msgid "Other"
+msgstr "Прочее"
+
+msgid "Browse all %(count)s place"
+msgid_plural "Browse all %(count)s places"
+msgstr[0] "Смотреть %(count)s место"
+msgstr[1] "Смотреть все %(count)s места"
+msgstr[2] "Смотреть все %(count)s мест"
+
+msgid "%(mapped)s mapped · %(unlocated)s unlocated"
+msgstr "%(mapped)s на карте · %(unlocated)s без координат"
+
+msgid "All places in Derry"
+msgstr "Все места Дерри"
+
+msgid ""
+"Browse the locations reconstructed from Stephen King’s IT. Every name links "
+"to a standalone page with book evidence and an explanation of its position."
+msgstr ""
+"Просмотрите места, реконструированные по роману Стивена Кинга «Оно». Каждое "
+"название ведёт на отдельную страницу с книжными свидетельствами и "
+"обоснованием положения."
+
+msgid "Place categories"
+msgstr "Категории мест"
+
 #: SEO titles and descriptions
 msgid "Map of Derry, Maine — Stephen King’s IT Literary Atlas"
 msgstr "Карта Дерри, штат Мэн — литературный атлас «Оно» Стивена Кинга"

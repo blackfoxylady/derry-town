@@ -12,8 +12,13 @@ const path=require('node:path');
   page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.url().startsWith(process.env.DERRY_URL||'http://127.0.0.1:8765')&&r.status()>=400)errors.push(r.status()+' '+r.url())});
   await page.goto(process.env.DERRY_URL||'http://127.0.0.1:8765',{waitUntil:'networkidle'});
-  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
-  assert.equal(await page.evaluate(()=>DerryAtlas.unlocatedCount),9);
+  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
+  assert.equal(await page.evaluate(()=>DerryAtlas.unlocatedCount),8);
+  // The crawlable directory is present independently of the JS-built sidebar.
+  assert.equal(await page.locator('.place-directory-list a').count(),92);
+  assert.equal(await page.locator('.place-directory-list a[href="/places/12-derry-public-library/"]').count(),1);
+  assert.equal(await page.locator('.directory-jump').isVisible(),true);
+  assert.equal(await page.locator('.place-group[open]').count(),name==='mobile'?1:7);
   // Litho world: paper + clipped slot groups + sheet frame; buildings collapse into <use>.
   assert(await page.locator('#world .slot-water *').count()>10);
   assert(await page.locator('#world *').count()>2000);
@@ -89,7 +94,7 @@ const path=require('node:path');
   assert.match(await page.locator('.place h1').innerText(),/\S/);
   // The Russian version serves the same map under /ru/.
   await page.goto(url+'/ru/',{waitUntil:'networkidle'});
-  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
+  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
   assert.equal(await page.locator('html').getAttribute('lang'),'ru');
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
   assert.match(await page.locator('.status').innerText(),/\d+ photographs?/);
@@ -101,7 +106,7 @@ const path=require('node:path');
    if(await toMap.count()){await toMap.first().click();await page.waitForFunction(()=>typeof window.DerryAtlas?.view.selected==='number',{timeout:120000})}
   }
   assert.deepEqual(errors,[]);
-  reports.push({viewport:name,dimensions:size,checks:'map, 83+9 counts, search, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, method page, place page, ru version, gallery deep links',errors});
+  reports.push({viewport:name,dimensions:size,checks:'map, 84+8 counts, server-rendered place directory, search, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, method page, place page, ru version, gallery deep links',errors});
   await context.close();
  }
  // Responsive regression: with a plain (non-mobile) viewport the layout viewport cannot
@@ -116,7 +121,7 @@ const path=require('node:path');
   if(photoHref)pages.push(photoHref);
   for(const lang of ['','/ru'])for(const p of pages){
    await page.goto(url+lang+p,{waitUntil:'networkidle'});
-   if(p==='/')await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
+   if(p==='/')await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
    const m=await page.evaluate(()=>{const r=document.querySelector('.lang').getBoundingClientRect();return{over:document.documentElement.scrollWidth-window.innerWidth,langIn:r.left>=0&&r.right<=window.innerWidth}});
    assert.equal(m.over<=0,true,(lang+p)+' overflows horizontally by '+m.over+'px at 390px');
    assert.equal(m.langIn,true,(lang+p)+' clips the language switcher at 390px');
