@@ -43,10 +43,16 @@ class Command(BaseCommand):
             if action in ['edit', 'delete']:
                 p.add_argument('id')
             if action == 'edit':
-                for field in ['name', 'short', 'description', 'period', 'confidence', 'geometry', 'sources']:
+                for field in ['name', 'short', 'description', 'about', 'confidence-explanation',
+                              'period', 'confidence', 'geometry', 'sources']:
                     p.add_argument('--' + field)
                 p.add_argument('--description-ru', dest='description_ru',
                                help="Russian description (metadata['ru']['note']); '' clears it.")
+                p.add_argument('--about-ru', dest='about_ru',
+                               help="Russian place overview (metadata['ru']['about']); '' clears it.")
+                p.add_argument('--confidence-explanation-ru', dest='confidence_explanation_ru',
+                               help=("Russian confidence explanation "
+                                     "(metadata['ru']['confidence_explanation']); '' clears it."))
                 p.add_argument('--x', type=float)
                 p.add_argument('--y', type=float)
         p = sub.add_parser('export'); p.add_argument('file')
@@ -121,14 +127,25 @@ class Command(BaseCommand):
                 if l['feature_id'] == f['key'] and l['spec'].get('follow_name'):
                     l['text'] = o['name']
         if o['description'] is not None: f['note'] = o['description']
-        if o['description_ru'] is not None:
-            # Русский текст живёт в metadata['ru'] — canonical-поля и снапшоты не меняются.
+        if o['about'] is not None: f['about'] = o['about']
+        if o['confidence_explanation'] is not None:
+            f['confidence_explanation'] = o['confidence_explanation']
+        localized = {
+            'note': o['description_ru'],
+            'about': o['about_ru'],
+            'confidence_explanation': o['confidence_explanation_ru'],
+        }
+        if any(value is not None for value in localized.values()):
+            # Русский текст живёт в metadata['ru'] — canonical-поля остаются английскими.
             meta = dict(f['metadata'] or {})
             ru = dict(meta.get('ru') or {})
-            if o['description_ru']:
-                ru['note'] = o['description_ru']
-            else:
-                ru.pop('note', None)
+            for key, value in localized.items():
+                if value is None:
+                    continue
+                if value:
+                    ru[key] = value
+                else:
+                    ru.pop(key, None)
             if ru:
                 meta['ru'] = ru
             else:

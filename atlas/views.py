@@ -41,6 +41,16 @@ def _feature_note(feature):
     return (_feature_ru(feature).get('note') or feature.note) if _is_ru() else feature.note
 
 
+def _feature_place_content(feature):
+    """Long-form place copy, with the same per-field RU fallback as notes."""
+    ru = _feature_ru(feature) if _is_ru() else {}
+    return {
+        'about': ru.get('about') or feature.about,
+        'confidence_explanation': (
+            ru.get('confidence_explanation') or feature.confidence_explanation),
+    }
+
+
 def _caption(photo, ru=None):
     ru = _is_ru() if ru is None else ru
     return (photo.caption_ru or photo.caption) if ru else photo.caption
@@ -315,9 +325,12 @@ def place_page(request, slug):
             group['notes'].append(note)
     photos = Photo.objects.filter(feature_key=feature.key)
     covers = [_cover_context(c) for c in PlaceCover.objects.filter(feature_key=feature.key)]
+    place_content = _feature_place_content(feature)
     context = {
         'feature': feature, 'note': _feature_note(feature),
         'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
+        'place_about': place_content['about'],
+        'confidence_explanation': place_content['confidence_explanation'],
         'covers': covers,
         'cards': [{'photo': p, **_card_image(p), 'caption': _caption(p)} for p in photos],
         # Превью для соцсетей: заглавное фото, иначе первое фото места;

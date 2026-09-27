@@ -23,6 +23,8 @@ class Feature(models.Model):
     rank = models.PositiveSmallIntegerField(default=3)
     period = models.CharField(max_length=200, blank=True)
     note = models.TextField(blank=True)
+    about = models.TextField(blank=True, default='')
+    confidence_explanation = models.TextField(blank=True, default='')
     geometry = models.ForeignKey(Geometry, null=True, blank=True, on_delete=models.PROTECT)
     metadata = models.JSONField(default=dict)
 

@@ -46,5 +46,18 @@ imgs.forEach(function(im){im.classList.toggle('on',im.dataset.year===b.dataset.y
 {% for r in refs %}<li>{{ r.reference }}{% for n in r.notes %}<br>{{ n }}{% endfor %}</li>{% endfor %}
 </ul>
 {% endif %}
+{% if place_about or confidence_explanation %}
+{% get_current_language as LANGUAGE_CODE %}
+<section class="place-content">
+{% if place_about %}
+<h2>{% if LANGUAGE_CODE == 'ru' %}О месте {{ feature.name }}{% else %}About {{ feature.name }}{% endif %}</h2>
+<p>{{ place_about }}</p>
+{% endif %}
+{% if confidence_explanation %}
+<h2>{% if LANGUAGE_CODE == 'ru' %}Почему месту присвоен уровень {{ feature.confidence }}{% else %}Why this location is marked {{ feature.confidence }}{% endif %}</h2>
+<p>{{ confidence_explanation }}</p>
+{% endif %}
+</section>
+{% endif %}
 </article>
 {% endblock %}

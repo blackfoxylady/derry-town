@@ -44,6 +44,28 @@ class PlacePageTests(TestCase):
         self.assertContains(response, 'Ben reads here.')
         self.assertContains(response, 'Second mention.')
         self.assertContains(response, '/?place=12')
+        self.assertNotContains(response, 'class="place-content"')
+
+    def test_long_form_content_is_safe_and_follows_sources(self):
+        self.library.about = 'A civic landmark with a literal <script> tag in its draft.'
+        self.library.confidence_explanation = 'The street is named; the exact lot is inferred.'
+        self.library.save(update_fields=['about', 'confidence_explanation'])
+
+        response = self.client.get('/places/12-derry-public-library/')
+        body = response.content.decode()
+        self.assertContains(response, 'About Derry Public Library')
+        self.assertContains(response, 'Why this location is marked B')
+        self.assertContains(response, '&lt;script&gt;', html=False)
+        self.assertNotContains(response, '<script> tag')
+        self.assertLess(body.index('Sources & evidence'), body.index('class="place-content"'))
+
+    def test_partial_long_form_content_has_no_empty_section(self):
+        self.library.about = 'A civic landmark.'
+        self.library.save(update_fields=['about'])
+
+        response = self.client.get('/places/12-derry-public-library/')
+        self.assertContains(response, 'About Derry Public Library')
+        self.assertNotContains(response, 'Why this location is marked B')
 
     def test_stale_or_bare_slug_redirects_to_canonical(self):
         for path in ('/places/12/', '/places/12-old-name/'):

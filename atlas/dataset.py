@@ -132,6 +132,9 @@ def validate(doc):
     geometries = indexed['geometry']
     kinds = {'Homes', 'Civic', 'Encounters', 'Historical', 'Barrens', 'Outlying'}
     for f in features.values():
+        for field in ('about', 'confidence_explanation'):
+            if not isinstance(f[field], str):
+                raise ValueError(f'feature/{f["key"]}: {field} must be text.')
         if f['object_type'] not in ('site', 'unplaced', 'road', 'water', 'area', 'path', 'rail', 'landmark', 'decoration'):
             raise ValueError('Unknown object_type.')
         if f['rank'] not in (1, 2, 3) or f['confidence'] not in ('', 'A', 'B', 'C', 'U'):

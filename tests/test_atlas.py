@@ -1,9 +1,11 @@
 import copy
+import importlib
 import io
 import json
 import tempfile
 from pathlib import Path
 from django.conf import settings
+from django.apps import apps
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase, override_settings
@@ -28,6 +30,30 @@ class AtlasTests(TestCase):
         self.assertEqual(set(Feature.objects.filter(object_type='site').values_list('key',flat=True)), {str(i) for i in range(1,85)})
         self.assertEqual(set(Feature.objects.filter(object_type='unplaced').values_list('key',flat=True)), {'U'+str(i) for i in range(1,10) if i != 5})
         self.assertEqual(Feature.objects.filter(object_type='site',evidence__isnull=False).distinct().count(),84)
+
+    def test_only_elementary_school_has_long_form_place_content(self):
+        school = Feature.objects.get(pk='4')
+        self.assertTrue(school.about.startswith('Derry Elementary School is a civic landmark'))
+        self.assertTrue(school.confidence_explanation.startswith('The school is marked A'))
+        self.assertGreaterEqual(len((school.about + ' ' + school.confidence_explanation).split()), 130)
+        self.assertLessEqual(len((school.about + ' ' + school.confidence_explanation).split()), 220)
+        self.assertFalse(Feature.objects.exclude(pk='4').exclude(about='').exists())
+        self.assertFalse(Feature.objects.exclude(pk='4').exclude(confidence_explanation='').exists())
+
+    def test_place_content_migration_upgrades_legacy_revision_snapshots(self):
+        legacy = copy.deepcopy(self.seed)
+        for feature in legacy['tables']['feature']:
+            feature.pop('about')
+            feature.pop('confidence_explanation')
+        revision = Revision.objects.create(author='legacy', reason='old snapshot', before=legacy,
+                                           after=copy.deepcopy(legacy), digest=ds.digest(legacy))
+
+        migration = importlib.import_module('atlas.migrations.0008_feature_place_content')
+        migration.update_revision_snapshots(apps, None)
+        revision.refresh_from_db()
+        self.assertTrue(all('about' in feature and 'confidence_explanation' in feature
+                            for feature in revision.after['tables']['feature']))
+        self.assertEqual(revision.digest, ds.digest(revision.after))
 
     def test_edit_restart_and_seed_preserve_changes(self):
         self.cmd('edit','12','--name','Library corrected','--x','-1490','--y','-505','--author','dev','--reason','test')
@@ -139,6 +165,9 @@ class AtlasTests(TestCase):
         doc,_=ds.read_current()
         doc['tables']['geometry'][0]['shape']={'type':'line','points':[[0,0]]}
         with self.assertRaises(ValueError):ds.validate(doc)
+        doc,_=ds.read_current()
+        next(f for f in doc['tables']['feature'] if f['key']=='4')['about']=['not','text']
+        with self.assertRaisesRegex(ValueError, 'about must be text'):ds.validate(doc)
 
     def test_every_base_entry_carries_a_litho_class(self):
         payload=compile_payload(*ds.read_current())

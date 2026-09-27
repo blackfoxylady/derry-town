@@ -74,6 +74,9 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
 .place-links{font-size:12px}
 .refs{margin:7px 0 0;padding:0;list-style:none;color:#586b59;font-size:12px;max-width:640px}
 .refs li{padding:6px 0;border-bottom:1px solid #d1dbc9}
+.place-content{max-width:640px;margin-top:30px;padding-top:2px;border-top:1px solid var(--line)}
+.place-content h2{margin-top:24px}
+.place-content p{font-size:14px;line-height:1.65;margin:0}
 .source{padding:11px 0;border-top:1px solid #d6ddcd;max-width:640px}
 .source a{font-weight:650}
 .source p{font-size:12px;margin:5px 0;color:#586b59}

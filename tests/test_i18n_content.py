@@ -24,8 +24,10 @@ class RuContentTests(TestCase):
         cls.library = Feature.objects.create(
             key='12', object_type='site', name='Derry Public Library', short='Library',
             kind='Civic', confidence='B', rank=2, period='1958', note='A stone building.',
-            geometry=point,
-            metadata={'ru': {'note': 'Каменное здание.', 'evidence': {'e1': 'Бен читает здесь.'}}})
+            about='The library is a civic landmark.',
+            confidence_explanation='Its street relationship is inferred.', geometry=point,
+            metadata={'ru': {'note': 'Каменное здание.', 'about': 'Библиотека — городской ориентир.',
+                             'evidence': {'e1': 'Бен читает здесь.'}}})
         book = Source.objects.create(key='novel', title='IT', kind='book')
         Evidence.objects.create(key='e1', feature=cls.library, source=book,
                                 reference='Ch. 4 - Ben Hanscom / 1', note='Ben reads here.', order=1)
@@ -41,8 +43,14 @@ class RuContentTests(TestCase):
         self.assertContains(response, 'Second mention.')  # без перевода — английский
         self.assertContains(response, 'Derry Public Library')  # названия не переводятся
         self.assertContains(response, 'Ch. 4 - Ben Hanscom / 1')  # главы — в оригинале
+        self.assertContains(response, 'Библиотека — городской ориентир.')
+        # Для отсутствующего русского поля действует поэлементный fallback на английский.
+        self.assertContains(response, 'Its street relationship is inferred.')
+        self.assertContains(response, 'О месте Derry Public Library')
+        self.assertContains(response, 'Почему месту присвоен уровень B')
         response = self.client.get('/places/12-derry-public-library/')
         self.assertContains(response, 'A stone building.')
+        self.assertContains(response, 'The library is a civic landmark.')
         self.assertNotContains(response, 'Каменное здание.')
 
     def test_method_page_russian_geometry_note(self):
@@ -111,6 +119,14 @@ class AtlasEditRuTests(TestCase):
                       Setting.objects.get(pk='i18n_ru').value['method_geometry'])
         self.assertContains(self.client.get('/ru/places/12-derry-public-library/'),
                             'стеклянный переход')
+        school = Feature.objects.get(pk='4')
+        self.assertTrue(school.metadata['ru']['about'].startswith('Derry Elementary School —'))
+        self.assertIn('точный земельный участок',
+                      school.metadata['ru']['confidence_explanation'])
+        school_page = self.client.get('/ru/places/4-derry-elementary-school/')
+        self.assertContains(school_page, 'О месте Derry Elementary School')
+        self.assertContains(school_page, 'общественный ориентир')
+        self.assertContains(school_page, 'Почему месту присвоен уровень A')
         self.assertContains(self.client.get('/ru/method/'), 'водонапорную башню')
         self.assertContains(self.client.get('/method/'), 'Standpipe')  # английская без изменений
 
@@ -118,3 +134,22 @@ class AtlasEditRuTests(TestCase):
         self.cmd('edit', '12', '--description-ru', 'Черновик.', '--author', 'dev', '--reason', 'set')
         self.cmd('edit', '12', '--description-ru', '', '--author', 'dev', '--reason', 'clear')
         self.assertEqual(Feature.objects.get(pk='12').metadata, {})
+
+    def test_edit_place_content_in_both_languages_and_clear_translation(self):
+        self.cmd('edit', '12', '--about', 'English overview.',
+                 '--confidence-explanation', 'English placement explanation.',
+                 '--about-ru', 'Русская справка.',
+                 '--confidence-explanation-ru', 'Русское объяснение привязки.',
+                 '--author', 'dev', '--reason', 'place content')
+        feature = Feature.objects.get(pk='12')
+        self.assertEqual(feature.about, 'English overview.')
+        self.assertEqual(feature.confidence_explanation, 'English placement explanation.')
+        self.assertEqual(feature.metadata['ru']['about'], 'Русская справка.')
+        self.assertEqual(feature.metadata['ru']['confidence_explanation'],
+                         'Русское объяснение привязки.')
+
+        self.cmd('edit', '12', '--about-ru', '', '--confidence-explanation-ru', '',
+                 '--author', 'dev', '--reason', 'clear translated place content')
+        feature.refresh_from_db()
+        self.assertNotIn('about', feature.metadata.get('ru', {}))
+        self.assertNotIn('confidence_explanation', feature.metadata.get('ru', {}))

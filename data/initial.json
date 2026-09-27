@@ -38748,6 +38748,8 @@
         "rank": 1,
         "period": "1957-58",
         "note": "High on Witcham Street, near the hill crest. The address number, plot and orientation of the house are unspecified. Georgie's room is included here; Zack Denbrough's workshop is associated with this feature, but the text does not independently locate it.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:1",
         "metadata": {}
       },
@@ -38761,6 +38763,8 @@
         "rank": 1,
         "period": "1957; revisited 1985",
         "note": "On Witcham Street, close to Jackson, downhill from the Denbrough house. The drain is upstream of the junction on this reconstruction; the exact kerb position is uncertain.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:2",
         "metadata": {}
       },
@@ -38774,6 +38778,8 @@
         "rank": 2,
         "period": "1897-1985",
         "note": "At Witcham and Jackson. Its clock and steeple figure in the final storm. The chosen corner is reconstructed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:3",
         "metadata": {}
       },
@@ -38787,6 +38793,8 @@
         "rank": 1,
         "period": "1957-58; 1985",
         "note": "On Jackson Street, with a view toward the Witcham junction. Charter Street and Derry Park are near the playground; the building footprint is illustrative.",
+        "about": "Derry Elementary School is a civic landmark in the reconstructed town of Derry, Maine. It belongs to the Jackson Street district, near the junction with Witcham Street. The school grounds connect with Charter Street, while Derry Park provides another nearby reference point. In the atlas, the school is represented as a brick educational building present during both principal periods, 1957–58 and 1985. Its position helps organize this part of the map by linking the school, playground, park, and surrounding streets.",
+        "confidence_explanation": "The school is marked A · Text-anchored relationship because the novel explicitly places it on Jackson Street. Other passages narrow the setting further: the playground has a Charter Street gate, a school window looks across Jackson toward the Witcham junction, and Derry Park is associated with the school. These clues support this part of the street network and the school’s relationship to nearby landmarks. They do not identify a surveyed building lot, however, so the plotted coordinate and building footprint remain part of the reconstruction.",
         "geometry_id": "g:4",
         "metadata": {}
       },
@@ -38800,6 +38808,8 @@
         "rank": 2,
         "period": "1958; 1984-85",
         "note": "A public park near the elementary school. It is distinct from Bassey, McCarron and Memorial Parks. The boundary is inferred.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:5",
         "metadata": {}
       },
@@ -38813,6 +38823,8 @@
         "rank": 2,
         "period": "1957-58",
         "note": "Ben is three blocks from home at the canal during his winter encounter. No street address is established. This is a candidate residential position within that walking range, not a recovered address.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:6",
         "metadata": {}
       },
@@ -38826,6 +38838,8 @@
         "rank": 1,
         "period": "1958; 1985",
         "note": "Beverly Marsh's childhood apartment; the Mrs Kersh encounter in 1985. The street number is explicit. Block lengths and the building plot are reconstructed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:7",
         "metadata": {}
       },
@@ -38839,6 +38853,8 @@
         "rank": 3,
         "period": "1958",
         "note": "The house and porch are described, but no recoverable street address was found. This residential position is a cartographic proposal, chosen within cycling reach of Bill and the school.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:8",
         "metadata": {}
       },
@@ -38852,6 +38868,8 @@
         "rank": 3,
         "period": "1958",
         "note": "No defensible street address is established in the examined passages. This is a proposed position in the residential district, not an identification of a named street.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:9",
         "metadata": {}
       },
@@ -38865,6 +38883,8 @@
         "rank": 3,
         "period": "1958",
         "note": "Domestic chores and the family home are mentioned, but these do not locate a plot. A residential position is proposed solely to make the map usable; it has the weakest location status.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:10",
         "metadata": {}
       },
@@ -38878,6 +38898,8 @@
         "rank": 1,
         "period": "1985",
         "note": "Mike Hanlon's adult home and garage, where Silver is repaired. Palmer Lane is a one-block connector between Jackson and Main. The number 61 is explicit; the plot is reconstructed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:11",
         "metadata": {}
       },
@@ -38891,6 +38913,8 @@
         "rank": 1,
         "period": "1958; 1985",
         "note": "At Kansas Street and one end of semicircular Costello Avenue. The adult library is in front, the children's wing behind, joined by a glass corridor. This is also Mike's workplace and the site of Henry's attack.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:12",
         "metadata": {}
       },
@@ -38904,6 +38928,8 @@
         "rank": 3,
         "period": "1958; 1985",
         "note": "About a block from the library, on the Kansas/Costello corridor. The precise frontage is inferred. Kept distinct from City Center and the Town House hotel.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:13",
         "metadata": {}
       },
@@ -38917,6 +38943,8 @@
         "rank": 2,
         "period": "1958",
         "note": "At the other junction of semicircular Costello Avenue and Kansas Street. Henry's group confronts Eddie outside the market; his arm is broken after a chase up Costello, just before Kansas. The storefront footprint is illustrative.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:14",
         "metadata": {}
       },
@@ -38930,6 +38958,8 @@
         "rank": 1,
         "period": "1958; 1985",
         "note": "On Main Street, on the same side as Nan's and across from Freese's. Its side exit opens into a fenced alley. It is not automatically equated with the earlier Bijou.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:15",
         "metadata": {}
       },
@@ -38943,6 +38973,8 @@
         "rank": 3,
         "period": "1958; 1985",
         "note": "Beside the Aladdin, with the escape alley between them. The mapped plots express adjacency rather than measured facades.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:16",
         "metadata": {}
       },
@@ -38956,6 +38988,8 @@
         "rank": 2,
         "period": "1958; 1985",
         "note": "Opposite the Aladdin/Nan's side of Main Street. Richie evades Henry in its toy department. The department arrangement is not mapped.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:17",
         "metadata": {}
       },
@@ -38969,6 +39003,8 @@
         "rank": 1,
         "period": "1958; former site in 1985",
         "note": "Mr Keene's shop on Center Street, backing onto Richard's Alley. Chapter 10 says it has gone; later passages still name it. Shown as a historical footprint, without inventing a replacement business.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:18",
         "metadata": {}
       },
@@ -38982,6 +39018,8 @@
         "rank": 2,
         "period": "1958; 1985",
         "note": "A pedestrian connector between Main and Center, behind the drug store. Penny-pitching site; later converted into a mini-mall.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:19",
         "metadata": {}
       },
@@ -38995,6 +39033,8 @@
         "rank": 1,
         "period": "1984-85",
         "note": "Hotel on Upper Main Street. Bassey Park is about 0.8 km farther up and across the street. The hotel is separate from the civic buildings.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:20",
         "metadata": {}
       },
@@ -39008,6 +39048,8 @@
         "rank": 1,
         "period": "1985",
         "note": "On the Pasture Road / Mall Road corridor, beyond the mall when travelling out from downtown. The restaurant grounds are proposed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:21",
         "metadata": {}
       },
@@ -39021,6 +39063,8 @@
         "rank": 1,
         "period": "1906; ruins 1958; mall 1985",
         "note": "The mall occupies the former Ironworks field at the northeastern end of the Barrens. Old Cape lies behind it to the west. Mike's giant-bird encounter occurs among the ruins. The ruins and mall share one site marker.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:22",
         "metadata": {}
       },
@@ -39034,6 +39078,8 @@
         "rank": 1,
         "period": "1958; 1985",
         "note": "The statue faces Outer Canal Street from the City Center lawn, near Bassey Park. The text gives almost 1.6 km from Freese's to City Center. The straight separation here is about 1.6 km; the precise walking route remains unresolved.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:23",
         "metadata": {}
       },
@@ -39047,6 +39093,8 @@
         "rank": 1,
         "period": "1958; 1984-85",
         "note": "Northeast of downtown, beside the canal, facing Derry High School across it. Includes the carnival and later horse-racing grounds; their precise internal layout is conjectural.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:24",
         "metadata": {}
       },
@@ -39060,6 +39108,8 @@
         "rank": 1,
         "period": "1958; 1984-85",
         "note": "Covered footbridge joining Bassey Park and Derry High School. It is about 0.8 km upriver from Main Street Bridge. It is not the bridge from which Adrian Mellon is thrown.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:25",
         "metadata": {}
       },
@@ -39073,6 +39123,8 @@
         "rank": 2,
         "period": "1958; 1984-85",
         "note": "Across the canal from Bassey Park, connected by the Kissing Bridge. Building and playing-field outlines are inferred.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:26",
         "metadata": {}
       },
@@ -39086,6 +39138,8 @@
         "rank": 1,
         "period": "1984",
         "note": "Adrian Mellon is thrown from this road bridge. It is downstream of the Kissing Bridge, near the Falcon and bus station. Main Street is bent to cross the canal again beyond the park; that road geometry is an inference.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:27",
         "metadata": {}
       },
@@ -39099,6 +39153,8 @@
         "rank": 2,
         "period": "1984",
         "note": "Beside the bus terminal, within a short walk of Main Street Bridge. The pair pass the terminal and turn left toward the bridge. The block position is inferred.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:28",
         "metadata": {}
       },
@@ -39112,6 +39168,8 @@
         "rank": 3,
         "period": "1984",
         "note": "Adjacent to the Falcon; bright station windows are visible during the attack on Adrian. The access road and footprint are reconstructed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:29",
         "metadata": {}
       },
@@ -39125,6 +39183,8 @@
         "rank": 1,
         "period": "1958; 1985",
         "note": "The Penobscot runs behind the hospital. In 1985 the original building survives inside a much larger complex. A riverside site is plausible; no exact address is fixed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:30",
         "metadata": {}
       },
@@ -39138,6 +39198,8 @@
         "rank": 1,
         "period": "1985; earlier Tracker annex",
         "note": "At the bottom of Up-Mile Hill, occupying the former Tracker Brothers' Annex. Bill finds Silver here. This is a different location from the Truck Depot and its ballfield.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:31",
         "metadata": {}
       },
@@ -39151,6 +39213,8 @@
         "rank": 2,
         "period": "1958; 1985",
         "note": "On Kansas Street behind Warehouse Row. Beverly escapes through a gap beside the Tracker annex, crosses a fence and uses the seminary grounds. The plot is arranged to make this route possible.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:32",
         "metadata": {}
       },
@@ -39164,6 +39228,8 @@
         "rank": 1,
         "period": "1958; 1984-85",
         "note": "On Kansas Street at Memorial Park, roughly 2.4 km west of downtown and near the Barrens' southern edge. This plan interprets west broadly as west-southwest; no surveyed elevation is claimed. The Johnson boy is found almost at its foot in December 1984 (First Interlude).",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:33",
         "metadata": {}
       },
@@ -39177,6 +39243,8 @@
         "rank": 2,
         "period": "1958; 1985",
         "note": "Standpipe park, with a sundial and birdbath. The Black Spot is placed in a former portion of the park; the present boundary is reconstructed. Stan's birdwatching is included here.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:34",
         "metadata": {}
       },
@@ -39190,6 +39258,8 @@
         "rank": 1,
         "period": "1930",
         "note": "The Second Interlude explicitly places the club where Memorial Park later stands, at the northern end of the old army base behind West Broadway. Exact shed position is unknown.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:35",
         "metadata": {}
       },
@@ -39203,6 +39273,8 @@
         "rank": 2,
         "period": "1930",
         "note": "The base extends south from behind West Broadway. Ridgeline Road branches from Witcham Road at its entrance. Its outline is a compact proposal; the novel describes more than 0.4 km2.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:36",
         "metadata": {}
       },
@@ -39216,6 +39288,8 @@
         "rank": 2,
         "period": "1957 onward",
         "note": "Georgie's burial place is named. The novel passages used do not determine its position within Derry. This edge-of-town placement is deliberately approximate and does not copy Bangor coordinates.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:37",
         "metadata": {}
       },
@@ -39229,6 +39303,8 @@
         "rank": 1,
         "period": "1958; 1984; later references",
         "note": "Abandoned house near the end of Neibolt Street, just outside the trainyards. The text calls it a former red Cape Cod. Its plot and nearby houses are reconstructed from the approach route. Lisa Albrecht is found directly across the street in October 1984 (First Interlude).",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:38",
         "metadata": {}
       },
@@ -39242,6 +39318,8 @@
         "rank": 2,
         "period": "1958",
         "note": "Mike's school, at Route 2 and Neibolt Street. Route 2 runs northwest for about 1.6 km from its Witcham junction. Neibolt continues toward the yards.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:39",
         "metadata": {}
       },
@@ -39255,6 +39333,8 @@
         "rank": 1,
         "period": "1958",
         "note": "Neibolt ends at the yard parking area. The yards adjoin the Barrens near the old coal/gravel pit. Six converging tracks are mentioned; the sidings shown are illustrative.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:40",
         "metadata": {}
       },
@@ -39268,6 +39348,8 @@
         "rank": 1,
         "period": "1958; derelict 1985",
         "note": "On Kansas Street, behind Kossuth on Eddie's walk toward downtown. The back lot slopes toward the Barrens. Kept separate from the downtown Tracker annex.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:41",
         "metadata": {}
       },
@@ -39281,6 +39363,8 @@
         "rank": 2,
         "period": "1958; 1985",
         "note": "Immediately behind the depot. A home run ends near the stream later dammed by the Losers. The field and fence are illustrative; its proximity to the dam is preserved.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:42",
         "metadata": {}
       },
@@ -39294,6 +39378,8 @@
         "rank": 1,
         "period": "1958; overgrown 1985",
         "note": "Accessible by the path from the Kansas Street bridge and near the river. The smoke-hole is the clubhouse itself, not a second location. The exact clearing position is inferred. Only its surface entrance is mapped.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:43",
         "metadata": {}
       },
@@ -39307,6 +39393,8 @@
         "rank": 1,
         "period": "June 1958",
         "note": "On the smaller western arm, not across the entire broad Kenduskeag. The split is about 64 m upstream and the reunion of the channels roughly 180 m farther toward town. The detailed sheet follows that local arrangement.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:44",
         "metadata": {}
       },
@@ -39320,6 +39408,8 @@
         "rank": 1,
         "period": "1958; 1985",
         "note": "Bridge over a small drainage tributary, not a bridge over the main Kenduskeag. Bill hides Silver beneath it. It is the familiar access point used again by the adults.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:45",
         "metadata": {}
       },
@@ -39333,6 +39423,8 @@
         "rank": 2,
         "period": "June 1958",
         "note": "Through the whitewashed Kansas Street railing above a steep slope and culvert. His subsequent flight toward Old Cape puts this on the Kansas bank; the exact break in the fence is unknown.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:46",
         "metadata": {}
       },
@@ -39346,6 +39438,8 @@
         "rank": 1,
         "period": "1958; 1985",
         "note": "The broken pumping cylinder used to enter the drains, beside the Kenduskeag, downstream of the lightning-struck tree. It is not explicitly identified as municipal Pumphouse #3. Only the surface access is shown.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:47",
         "metadata": {}
       },
@@ -39359,6 +39453,8 @@
         "rank": 1,
         "period": "1958; treatment plant 1985",
         "note": "In a gravel pit, reached by Old Lyme Street from Kansas Street. In 1985 the dump has been replaced by a modern waste-treatment plant. Their exact footprints are proposed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:48",
         "metadata": {}
       },
@@ -39372,6 +39468,8 @@
         "rank": 1,
         "period": "July 1958",
         "note": "A discarded Amana refrigerator beside a spruce on the Kansas-side approach to the dump. Patrick's trail leads away from the junk cars toward a pumping cylinder by the river; it is not assigned to the later entry cylinder.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:49",
         "metadata": {}
       },
@@ -39385,6 +39483,8 @@
         "rank": 1,
         "period": "3 July 1958",
         "note": "Abandoned coal/gravel pit beyond the dump, beside the trainyards and near the later Interstate overpass. This is a separate pit from the active city dump.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:50",
         "metadata": {}
       },
@@ -39398,6 +39498,8 @@
         "rank": 2,
         "period": "1958",
         "note": "A municipal sewage-pumping facility in the Barrens. Its exact site is not given. This candidate downstream position preserves separation from the small access cylinders along the banks.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:51",
         "metadata": {}
       },
@@ -39411,6 +39513,8 @@
         "rank": 1,
         "period": "August 1958",
         "note": "The children emerge from a pumping cylinder, gather at the river and later climb to Kansas Street. Exact identity of the exit and the oath bank is not fixed. The marker represents a plausible nearby stretch.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:52",
         "metadata": {}
       },
@@ -39424,6 +39528,8 @@
         "rank": 2,
         "period": "Winter 1957-58",
         "note": "At an open canal reach from which Ben looks southwest for about 0.8 km toward the Barrens. A street-side position just before the covered reach is proposed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:53",
         "metadata": {}
       },
@@ -39437,6 +39543,8 @@
         "rank": 2,
         "period": "19 June 1958",
         "note": "At Bassey Park beside the canal. The boy's last movements constrain the park and bank, but not a precise tree or coordinate.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:54",
         "metadata": {}
       },
@@ -39450,6 +39558,8 @@
         "rank": 1,
         "period": "9 October 1929",
         "note": "At the Main/Canal/Kansas junction near Machen's and the courthouse. Chapter 5 calls the approaches Kansas/Center/Main. The plan treats these as one compact junction complex, not two separate massacres.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:55",
         "metadata": {}
       },
@@ -39463,6 +39573,8 @@
         "rank": 2,
         "period": "1929; 1958; 1985",
         "note": "At the massacre intersection within firing distance of the courthouse and theater marquee. The precise side of the junction is inferred.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:56",
         "metadata": {}
       },
@@ -39476,6 +39588,8 @@
         "rank": 2,
         "period": "1905; 1929; 1985",
         "note": "Steps and clock overlook the central intersection. The jail is treated as part of the civic complex. Building dimensions and the relationship to the separately named Town Hall are not established.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:57",
         "metadata": {}
       },
@@ -39489,6 +39603,8 @@
         "rank": 2,
         "period": "1929 onward",
         "note": "At the point where the canal goes underground. The monument plot is reconstructed. It is distinct from Memorial Park by the Standpipe.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:58",
         "metadata": {}
       },
@@ -39502,6 +39618,8 @@
         "rank": 2,
         "period": "9 September 1905",
         "note": "A canal-area beerjoint with an escape to Exchange Street from its rear privy. The street block and exact building position are not securely given. The same passage also calls it the Sleepy Silver Dollar.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:59",
         "metadata": {}
       },
@@ -39515,6 +39633,8 @@
         "rank": 2,
         "period": "September 1905",
         "note": "An elm overhanging the canal on Canal Street, reached from the jail. The individual tree and its coordinate are unknown.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:60",
         "metadata": {}
       },
@@ -39528,6 +39648,8 @@
         "rank": 2,
         "period": "1741",
         "note": "One burned house stood approximately at the later Witcham/Jackson intersection. This marker locates that house vicinity, not the full boundary of the vanished settlement.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:61",
         "metadata": {}
       },
@@ -39541,6 +39663,8 @@
         "rank": 3,
         "period": "1958",
         "note": "At Kansas Street and Kossuth Lane. Kossuth descends about 400 m and ends abruptly at the Barrens. This junction is kept separate from the Kaspbrak home, which Eddie says was not here.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:62",
         "metadata": {}
       },
@@ -39554,6 +39678,8 @@
         "rank": 3,
         "period": "December 1957",
         "note": "At the turnpike construction area on Outer Jackson Street. The exact construction parcel is unknown.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:63",
         "metadata": {}
       },
@@ -39567,6 +39693,8 @@
         "rank": 3,
         "period": "1958",
         "note": "Cheryl's remains are found in Torrault Stream. Its discharge is associated with the Penobscot. The tributary corridor shown is a hydrologically plausible proposal.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:64",
         "metadata": {}
       },
@@ -39580,6 +39708,8 @@
         "rank": 2,
         "period": "1958; 1985",
         "note": "Between the school neighbourhood and the Costello/library walk. Contains a sledding hill. Shape and detailed location are inferred from the walking route.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:65",
         "metadata": {}
       },
@@ -39593,6 +39723,8 @@
         "rank": 2,
         "period": "1958",
         "note": "Near the Newport line; described both at the end of Kansas Street and on the Witcham Road approach. The roads are joined in the rural fringe to reconcile the descriptions. No literal regional location is claimed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:66",
         "metadata": {}
       },
@@ -39606,6 +39738,8 @@
         "rank": 2,
         "period": "1958",
         "note": "On the same rural approach as the Bowers place, with land reaching toward the Kenduskeag. Its road distance to the Ironworks is described as a little over 6.4 km. The fringe placement is approximate.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:67",
         "metadata": {}
       },
@@ -39619,6 +39753,8 @@
         "rank": 2,
         "period": "1958; closed 1985",
         "note": "At Main and Cony, two blocks from a view of the canal. The children wash the bloody rags here. The shown building is a retained former site.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:68",
         "metadata": {}
       },
@@ -39632,6 +39768,8 @@
         "rank": 3,
         "period": "1957-58",
         "note": "Home of Eddie and Dorsey Corcoran and the Macklins. Charter is near the elementary playground; the address is explicit, the position along the street inferred.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:69",
         "metadata": {}
       },
@@ -39645,6 +39783,8 @@
         "rank": 2,
         "period": "1985",
         "note": "Adjacent motels on Outer Jackson Street, separated by a raised walkway. Tom and Audra stay here. The location along Outer Jackson is approximate.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:70",
         "metadata": {}
       },
@@ -39658,6 +39798,8 @@
         "rank": 3,
         "period": "1958",
         "note": "Bill and Richie obtain molds for the silver balls here. No street address is given. An industrial-fringe position is proposed, separate from the destroyed Ironworks.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:71",
         "metadata": {}
       },
@@ -39671,6 +39813,8 @@
         "rank": 3,
         "period": "1929",
         "note": "A theater marquee provides a firing position in the Bradley Gang episode. Its relationship to the later Aladdin is not stated; the two are not merged.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:72",
         "metadata": {}
       },
@@ -39684,6 +39828,8 @@
         "rank": 3,
         "period": "1958",
         "note": "At the end of Exchange Street. Demolished during urban renewal before the adults return. The street end is proposed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:73",
         "metadata": {}
       },
@@ -39697,6 +39843,8 @@
         "rank": 3,
         "period": "1958",
         "note": "On Torrault Street, removed during urban renewal. The relation of that street to the similarly named stream is a reconstruction.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:74",
         "metadata": {}
       },
@@ -39710,6 +39858,8 @@
         "rank": 2,
         "period": "1930; 1958",
         "note": "Heights seen across the Barrens, beyond Old Cape, with an earlier country club. The hill shape and club position are proposed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:75",
         "metadata": {}
       },
@@ -39723,6 +39873,8 @@
         "rank": 2,
         "period": "1958; 1985",
         "note": "Low-income district on the western bank of the Barrens, west of the Ironworks/mall. Exact street pattern and buildings are reconstructed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:76",
         "metadata": {}
       },
@@ -39736,6 +39888,8 @@
         "rank": 3,
         "period": "1985",
         "note": "A more fashionable development beyond Old Cape. Only that relationship is supplied; extent and geometry are proposed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:77",
         "metadata": {}
       },
@@ -39749,6 +39903,8 @@
         "rank": 2,
         "period": "1905; 1930; 1958; 1985",
         "note": "The Mueller, Bowie and Tracker houses occupy the prestigious West Broadway blocks. The Mueller house is near Witcham and the Bowie house four houses away. The cluster is placed north of the old base; individual plots are illustrative.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:78",
         "metadata": {}
       },
@@ -39762,6 +39918,8 @@
         "rank": 2,
         "period": "July 1958",
         "note": "On the Kansas-side approach to the dump, among junked cars below the pit's steep side. Beverly practices with the Bullseye here. Car positions and the firing area are illustrative.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:79",
         "metadata": {}
       },
@@ -39775,6 +39933,8 @@
         "rank": 3,
         "period": "July 1958",
         "note": "At the river after the blood trail from the dump and refrigerator. The text does not equate it with Pumphouse #3 or the later entry cylinder; the reconstruction keeps them distinct.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:80",
         "metadata": {}
       },
@@ -39788,6 +39948,8 @@
         "rank": 3,
         "period": "1958; 1985",
         "note": "Named on the Route 7 / Witcham Road approach, before the Bowers and Hanlon places when entering town. Symbol placed near the sheet edge; distances on this peripheral approach are schematic.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:81",
         "metadata": {}
       },
@@ -39801,6 +39963,8 @@
         "rank": 3,
         "period": "April 1958",
         "note": "The culvert discovery associated with Matthew Clements, at a blocked-off part of Merit Street near the turnpike works. Merit is in Old Cape. Exact position of the culvert is proposed.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:82",
         "metadata": {}
       },
@@ -39814,6 +39978,8 @@
         "rank": 2,
         "period": "1851",
         "note": "Nine wintering loggers were found murdered at a camp on the Upper Kenduskeag, at a tip of the Barrens. Upper suggests an upstream end, but the word tip is ambiguous. This southwest riverside site is a proposal; neither the cabin nor its exact bank can be recovered.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:83",
         "metadata": {}
       },
@@ -39827,6 +39993,8 @@
         "rank": 3,
         "period": "1958",
         "note": "On Center Street; the block, frontage side and building footprint are unspecified. Bill buys Silver here. This original bicycle shop is distinct from Secondhand Rose, where the bicycle is rediscovered in 1985.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:84",
         "metadata": {}
       },
@@ -39840,6 +40008,8 @@
         "rank": 3,
         "period": "1851",
         "note": "Site of the poisoning of the Markson family. No address or relationship to a named street is supplied; no pin is assigned.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": null,
         "metadata": {}
       },
@@ -39853,6 +40023,8 @@
         "rank": 3,
         "period": "Mike Hanlon's school years",
         "note": "Named in Mike's brief biography. No usable street relationship was recovered. That biography also names Derry Elementary, while the childhood scenes place him at the Neibolt Street Church School; the inconsistency is retained.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": null,
         "metadata": {}
       },
@@ -39866,6 +40038,8 @@
         "rank": 3,
         "period": "1957-58",
         "note": "The whistle on Town Hall ends Ben's winter trance. Its location and relationship to the courthouse or City Center are not established; these buildings are not silently merged.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": null,
         "metadata": {}
       },
@@ -39879,6 +40053,8 @@
         "rank": 3,
         "period": "1985",
         "note": "Psychiatric institution outside Derry, in the Augusta area. Included as an off-map narrative location, not moved into the town plan.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": null,
         "metadata": {}
       },
@@ -39892,6 +40068,8 @@
         "rank": 3,
         "period": "1958",
         "note": "A drain where Veronica is found. No secure street address was recovered. It is not equated with Georgie's drain.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": null,
         "metadata": {}
       },
@@ -39905,6 +40083,8 @@
         "rank": 3,
         "period": "Patrick's childhood",
         "note": "Site of Avery's death and Patrick's domestic history. Wind crossing McCarron Park reaches the upstairs windows, but no side, direction or distance is stated. The Engstrom home is one block over and almost directly behind. No secure coordinate can be assigned.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": null,
         "metadata": {}
       },
@@ -39918,6 +40098,8 @@
         "rank": 3,
         "period": "1929",
         "note": "Just over the Newport line, near the later Rhulin Farms. This rural hiding place is outside the detailed reconstruction; no separate coordinate is assigned.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": null,
         "metadata": {}
       },
@@ -39931,6 +40113,8 @@
         "rank": 3,
         "period": "March 1985",
         "note": "In the Barrens. Georgie's photograph is found by a fallen log within about 3 m of the body. This is a significant clue before Mike calls the others, but the text does not locate the log within the valley.",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": null,
         "metadata": {}
       },
@@ -39944,6 +40128,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:01",
         "metadata": {
           "legacy_index": 0
@@ -39959,6 +40145,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:02",
         "metadata": {
           "legacy_index": 1
@@ -39974,6 +40162,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:03",
         "metadata": {
           "legacy_index": 2
@@ -39989,6 +40179,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:04",
         "metadata": {
           "legacy_index": 3
@@ -40004,6 +40196,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:05",
         "metadata": {
           "legacy_index": 4
@@ -40019,6 +40213,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:06",
         "metadata": {
           "legacy_index": 5
@@ -40034,6 +40230,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:07",
         "metadata": {
           "legacy_index": 6
@@ -40049,6 +40247,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:08",
         "metadata": {
           "legacy_index": 7
@@ -40064,6 +40264,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:09",
         "metadata": {
           "legacy_index": 8
@@ -40079,6 +40281,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:10",
         "metadata": {
           "legacy_index": 9
@@ -40094,6 +40298,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:11",
         "metadata": {
           "legacy_index": 10
@@ -40109,6 +40315,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:12",
         "metadata": {
           "legacy_index": 11
@@ -40124,6 +40332,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:13",
         "metadata": {
           "legacy_index": 12
@@ -40139,6 +40349,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:14",
         "metadata": {
           "legacy_index": 13
@@ -40154,6 +40366,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:15",
         "metadata": {
           "legacy_index": 14
@@ -40169,6 +40383,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:16",
         "metadata": {
           "legacy_index": 15
@@ -40184,6 +40400,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:17",
         "metadata": {
           "legacy_index": 16
@@ -40199,6 +40417,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:18",
         "metadata": {
           "legacy_index": 17
@@ -40214,6 +40434,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:19",
         "metadata": {
           "legacy_index": 18
@@ -40229,6 +40451,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:20",
         "metadata": {
           "legacy_index": 19
@@ -40244,6 +40468,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:21",
         "metadata": {
           "legacy_index": 20
@@ -40259,6 +40485,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:22",
         "metadata": {
           "legacy_index": 21
@@ -40274,6 +40502,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:23",
         "metadata": {
           "legacy_index": 22
@@ -40289,6 +40519,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:24",
         "metadata": {
           "legacy_index": 23
@@ -40304,6 +40536,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:25",
         "metadata": {
           "legacy_index": 24
@@ -40319,6 +40553,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:26",
         "metadata": {
           "legacy_index": 25
@@ -40334,6 +40570,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:27",
         "metadata": {
           "legacy_index": 26
@@ -40349,6 +40587,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:28",
         "metadata": {
           "legacy_index": 27
@@ -40364,6 +40604,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:29",
         "metadata": {
           "legacy_index": 28
@@ -40379,6 +40621,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:30",
         "metadata": {
           "legacy_index": 29
@@ -40394,6 +40638,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:31",
         "metadata": {
           "legacy_index": 30
@@ -40409,6 +40655,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:32",
         "metadata": {
           "legacy_index": 31
@@ -40424,6 +40672,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:33",
         "metadata": {
           "legacy_index": 32
@@ -40439,6 +40689,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:34",
         "metadata": {
           "legacy_index": 33
@@ -40454,6 +40706,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:35",
         "metadata": {
           "legacy_index": 34
@@ -40469,6 +40723,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:36",
         "metadata": {
           "legacy_index": 35
@@ -40484,6 +40740,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:37",
         "metadata": {
           "legacy_index": 36
@@ -40499,6 +40757,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:38",
         "metadata": {
           "legacy_index": 37
@@ -40514,6 +40774,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:39",
         "metadata": {
           "legacy_index": 38
@@ -40529,6 +40791,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:40",
         "metadata": {
           "legacy_index": 39
@@ -40544,6 +40808,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:41",
         "metadata": {
           "legacy_index": 40
@@ -40559,6 +40825,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:42",
         "metadata": {
           "legacy_index": 41
@@ -40574,6 +40842,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:43",
         "metadata": {
           "legacy_index": 42
@@ -40589,6 +40859,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:44",
         "metadata": {
           "legacy_index": 43
@@ -40604,6 +40876,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:45",
         "metadata": {
           "legacy_index": 44
@@ -40619,6 +40893,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:46",
         "metadata": {
           "legacy_index": 45
@@ -40634,6 +40910,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:47",
         "metadata": {
           "legacy_index": 46
@@ -40649,6 +40927,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:48",
         "metadata": {
           "legacy_index": 47
@@ -40664,6 +40944,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:49",
         "metadata": {
           "legacy_index": 48
@@ -40679,6 +40961,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:road:50",
         "metadata": {
           "legacy_index": 49
@@ -40694,6 +40978,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:water:river",
         "metadata": {
           "legacy_key": "river"
@@ -40709,6 +40995,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:water:west_arm",
         "metadata": {
           "legacy_key": "west_arm"
@@ -40724,6 +41012,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:water:east_arm",
         "metadata": {
           "legacy_key": "east_arm"
@@ -40739,6 +41029,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:water:canal",
         "metadata": {
           "legacy_key": "canal"
@@ -40754,6 +41046,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:water:outlet",
         "metadata": {
           "legacy_key": "outlet"
@@ -40769,6 +41063,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:water:covered",
         "metadata": {
           "legacy_key": "covered"
@@ -40784,6 +41080,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:water:penobscot",
         "metadata": {
           "legacy_key": "penobscot"
@@ -40799,6 +41097,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:area:barrens",
         "metadata": {}
       },
@@ -40812,6 +41112,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:tributaries:01",
         "metadata": {
           "legacy_group": "tributaries",
@@ -40828,6 +41130,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:tributaries:02",
         "metadata": {
           "legacy_group": "tributaries",
@@ -40844,6 +41148,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:tributaries:03",
         "metadata": {
           "legacy_group": "tributaries",
@@ -40860,6 +41166,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:tributaries:04",
         "metadata": {
           "legacy_group": "tributaries",
@@ -40876,6 +41184,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:tributaries:05",
         "metadata": {
           "legacy_group": "tributaries",
@@ -40892,6 +41202,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:tributaries:06",
         "metadata": {
           "legacy_group": "tributaries",
@@ -40908,6 +41220,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:01",
         "metadata": {
           "legacy_group": "paths",
@@ -40924,6 +41238,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:02",
         "metadata": {
           "legacy_group": "paths",
@@ -40940,6 +41256,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:03",
         "metadata": {
           "legacy_group": "paths",
@@ -40956,6 +41274,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:04",
         "metadata": {
           "legacy_group": "paths",
@@ -40972,6 +41292,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:05",
         "metadata": {
           "legacy_group": "paths",
@@ -40988,6 +41310,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:06",
         "metadata": {
           "legacy_group": "paths",
@@ -41004,6 +41328,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:07",
         "metadata": {
           "legacy_group": "paths",
@@ -41020,6 +41346,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:08",
         "metadata": {
           "legacy_group": "paths",
@@ -41036,6 +41364,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:09",
         "metadata": {
           "legacy_group": "paths",
@@ -41052,6 +41382,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:paths:10",
         "metadata": {
           "legacy_group": "paths",
@@ -41068,6 +41400,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:rail:01",
         "metadata": {
           "legacy_group": "rail",
@@ -41084,6 +41418,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:rail:02",
         "metadata": {
           "legacy_group": "rail",
@@ -41100,6 +41436,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:rail:03",
         "metadata": {
           "legacy_group": "rail",
@@ -41116,6 +41454,8 @@
         "rank": 3,
         "period": "",
         "note": "",
+        "about": "",
+        "confidence_explanation": "",
         "geometry_id": "g:rail:04",
         "metadata": {
           "legacy_group": "rail",
