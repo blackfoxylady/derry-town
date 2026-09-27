@@ -232,7 +232,7 @@ def edit(photo_id, **changes):
         attrs = _validated(entry)
         for field in ('caption', 'caption_ru', 'year', 'feature_key', 'order'):
             setattr(photo, field, attrs[field])
-        photo.save(update_fields=['caption', 'caption_ru', 'year', 'feature_key', 'order'])
+        photo.save(update_fields=['caption', 'caption_ru', 'year', 'feature_key', 'order', 'modified'])
         _apply_links(photo, attrs['characters'], attrs['tags'])
     return photo
 

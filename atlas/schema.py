@@ -89,7 +89,7 @@ def photo(request, ctx):
     """Страница фотографии из готового context'а photo_page: главный узел —
     ImageObject, по которому Google Images показывает атрибуцию."""
     p, caption = ctx['photo'], ctx['caption']
-    name = caption or p.original_name
+    name = caption or ctx['alt']
     root = _root(request)
     image = {'@type': 'ImageObject', 'name': name,
              'url': request.build_absolute_uri(request.path),

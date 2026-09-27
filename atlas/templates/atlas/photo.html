@@ -1,14 +1,17 @@
 {% extends 'atlas/gallery_base.html' %}
 {% load i18n atlas_tags %}
-{% block title %}{{ caption|default:photo.original_name|truncatechars:60 }}{% endblock %}
-{% block meta_description %}{{ caption|default:photo.original_name|truncatechars:160 }}{% endblock %}
-{% block og_title %}{{ caption|default:photo.original_name|truncatechars:60 }}{% endblock %}
-{% block og_description %}{{ caption|default:photo.original_name|truncatechars:160 }}{% endblock %}
-{% block og_image %}<meta property="og:image" content="{% absolute_url urls.medium %}"><meta property="og:image:alt" content="{{ caption|default:photo.original_name }}">{% endblock %}
+{% block title %}{{ page_title|truncatechars:60 }}{% endblock %}
+{% block meta_description %}{{ page_title|truncatechars:160 }}{% endblock %}
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ page_title|truncatechars:60 }}{% endblock %}
+{% block og_description %}{{ page_title|truncatechars:160 }}{% endblock %}
+{% block og_image %}<meta property="og:image" content="{% absolute_url urls.medium %}"><meta property="og:image:width" content="{{ og_image_width }}"><meta property="og:image:height" content="{{ og_image_height }}"><meta property="og:image:alt" content="{{ alt }}">{% endblock %}
+{% block article_meta %}<meta property="article:published_time" content="{{ published_time|date:'c' }}"><meta property="article:modified_time" content="{{ modified_time|date:'c' }}">{% endblock %}
 {% block content %}
 <p class="crumbs"><a href="{% url 'gallery' %}">← {% trans "All photographs" %}</a></p>
 <article class="photo">
-<figure><a href="{{ urls.original }}" title="{% trans 'Open the original file' %}"><img src="{{ urls.medium }}" alt="{{ caption|default:photo.original_name }}" width="{{ photo.width }}" height="{{ photo.height }}"></a>
+<h1>{{ page_title }}</h1>
+<figure><a href="{{ urls.original }}" title="{% trans 'Open the original file' %}"><img src="{{ urls.medium }}" srcset="{{ srcset }}" sizes="(max-width:864px) calc(100vw - 44px), 820px" alt="{{ alt }}" width="{{ photo.width }}" height="{{ photo.height }}"></a>
 {% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}</figure>
 <dl class="facts">
 {% if photo.year %}<dt>{% trans "Year" %}</dt><dd><a href="{{ year_url }}">{{ photo.year }}</a></dd>{% endif %}

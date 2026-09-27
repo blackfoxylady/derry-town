@@ -138,6 +138,7 @@ class PlaceCover(models.Model):
     width = models.PositiveIntegerField()
     height = models.PositiveIntegerField()
     created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['feature_key', 'year']
@@ -168,6 +169,7 @@ class Photo(models.Model):
     width = models.PositiveIntegerField()
     height = models.PositiveIntegerField()
     created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
     characters = models.ManyToManyField(Character, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
 

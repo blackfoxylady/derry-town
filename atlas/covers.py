@@ -149,7 +149,7 @@ def edit(cover_id, feature=None, year=None, alt=None, alt_ru=None):
         _check_slot(attrs['feature_key'], attrs['year'], exclude_id=cover.id)
         for field, value in attrs.items():
             setattr(cover, field, value)
-        cover.save(update_fields=list(attrs))
+        cover.save(update_fields=[*attrs, 'modified'])
     return cover
 
 

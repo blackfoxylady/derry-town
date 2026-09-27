@@ -1,6 +1,7 @@
 from collections import Counter
 from pathlib import Path
 from urllib.parse import urlencode
+from xml.sax.saxutils import escape
 from django.conf import settings
 from django.db.models import Count
 from django.http import FileResponse, Http404, JsonResponse, HttpResponse, HttpResponseNotModified
@@ -12,7 +13,8 @@ from django.utils.translation import get_language, gettext_lazy as _
 from django.views.decorators.http import require_safe
 from . import schema
 from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
-from .models import Character, Evidence, Feature, MapState, Photo, PlaceCover, Setting, Source, Tag
+from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
+                     Revision, Setting, Source, Tag)
 from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
 from .rendering import current_payload, RENDER_VERSION
 
@@ -54,6 +56,37 @@ def _feature_place_content(feature):
 def _caption(photo, ru=None):
     ru = _is_ru() if ru is None else ru
     return (photo.caption_ru or photo.caption) if ru else photo.caption
+
+
+def _photo_alt(photo, feature=None):
+    """Human-readable image fallback; original upload names are not alt text."""
+    caption = _caption(photo)
+    if caption:
+        return caption
+    place = feature.name if feature else 'Derry'
+    return f'Фотография: {place}' if _is_ru() else f'{place} photograph'
+
+
+def _fitted_dimensions(width, height, max_side):
+    longest = max(width, height)
+    if longest <= max_side:
+        return width, height
+    return max(1, round(width * max_side / longest)), max(1, round(height * max_side / longest))
+
+
+def _scene_modified():
+    """Timestamp of the database revision currently powering the map."""
+    state = MapState.objects.select_related('revision').filter(pk=1).first()
+    return state.revision.created if state and state.revision else None
+
+
+def _feature_published(feature_key, fallback=None):
+    """First atlas revision whose resulting snapshot contains the place."""
+    for revision in Revision.objects.order_by('created', 'id').only('created', 'after'):
+        tables = revision.after.get('tables', {}) if isinstance(revision.after, dict) else {}
+        if any(row.get('key') == feature_key for row in tables.get('feature', [])):
+            return revision.created
+    return fallback
 
 
 @require_safe
@@ -258,6 +291,7 @@ def gallery(request):
     for p in photos:
         f = features.get(p.feature_key)
         cards.append({'photo': p, **_card_image(p), 'caption': _caption(p),
+                      'alt': _photo_alt(p, f),
                       'place_label': f.name if f else p.feature_key,
                       'place_url': _gallery_url(place=p.feature_key) if p.feature_key else '',
                       'year_url': _gallery_url(year=str(p.year)) if p.year else ''})
@@ -277,8 +311,18 @@ def photo_page(request, photo_id):
     # контуров маркера нет, поэтому ссылки на карту у таких фото нет.
     on_map = feature is not None and feature.object_type in ('site', 'unplaced')
     map_url = reverse('index') + '?place=' + feature.key if on_map else ''
+    urls = _media_urls(photo)
+    caption = _caption(photo)
+    alt = _photo_alt(photo, feature)
+    og_width, og_height = _fitted_dimensions(photo.width, photo.height, MEDIUM_SIZE)
     context = {
-        'photo': photo, 'urls': _media_urls(photo), 'caption': _caption(photo),
+        'photo': photo, 'urls': urls, 'caption': caption, 'alt': alt,
+        'page_title': caption or alt,
+        'srcset': _fitted_srcset(photo.width, photo.height,
+                                 [(urls['medium'], MEDIUM_SIZE),
+                                  (urls['original'], max(photo.width, photo.height))]),
+        'og_image_width': og_width, 'og_image_height': og_height,
+        'published_time': photo.created, 'modified_time': photo.modified,
         'place_page_url': reverse('place', args=[place_slug(feature)]) if on_map else '',
         'place_label': feature.name if feature else photo.feature_key,
         'place_url': _gallery_url(place=photo.feature_key) if photo.feature_key else '',
@@ -325,17 +369,35 @@ def place_page(request, slug):
             group['notes'].append(note)
     photos = Photo.objects.filter(feature_key=feature.key)
     covers = [_cover_context(c) for c in PlaceCover.objects.filter(feature_key=feature.key)]
+    latest_photo = photos.order_by('-modified').values_list('modified', flat=True).first()
+    latest_cover = (PlaceCover.objects.filter(feature_key=feature.key)
+                    .order_by('-modified').values_list('modified', flat=True).first())
+    scene_modified = _scene_modified()
+    modified_candidates = [value for value in (scene_modified, latest_photo, latest_cover) if value]
+    modified_time = max(modified_candidates) if modified_candidates else None
     place_content = _feature_place_content(feature)
+    cards = [{'photo': p, **_card_image(p), 'caption': _caption(p),
+              'alt': _photo_alt(p, feature)} for p in photos]
+    if covers:
+        og_width, og_height = _fitted_dimensions(covers[0]['width'], covers[0]['height'],
+                                                 COVER_LARGE_SIZE)
+    elif cards:
+        og_width, og_height = _fitted_dimensions(cards[0]['photo'].width, cards[0]['photo'].height,
+                                                 MEDIUM_SIZE)
+    else:
+        og_width = og_height = None
     context = {
         'feature': feature, 'note': _feature_note(feature),
         'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
         'place_about': place_content['about'],
         'confidence_explanation': place_content['confidence_explanation'],
-        'covers': covers,
-        'cards': [{'photo': p, **_card_image(p), 'caption': _caption(p)} for p in photos],
+        'covers': covers, 'cards': cards,
         # Превью для соцсетей: заглавное фото, иначе первое фото места;
         # совсем без фото шаблон подставит общую карту.
         'og_photo': covers[0]['large'] if covers else _media_urls(photos[0])['medium'] if photos else '',
+        'og_image_width': og_width, 'og_image_height': og_height,
+        'published_time': _feature_published(feature.key, scene_modified),
+        'modified_time': modified_time,
         'map_url': reverse('index') + '?place=' + feature.key,
         'gallery_url': _gallery_url(place=feature.key)}
     context['jsonld'] = schema.place(request, context)
@@ -386,22 +448,59 @@ def media(request, media_path):
 @require_safe
 def sitemap(request):
     """sitemap.xml вручную (django.contrib.sitemaps тянет фреймворк sites):
-    все индексируемые страницы в обеих языковых версиях с hreflang-парами."""
-    paths = [reverse('index'), reverse('gallery'), reverse('method')]
-    for f in Feature.objects.filter(object_type__in=('site', 'unplaced')).order_by('key'):
-        paths.append(reverse('place', args=[place_slug(f)]))
-    for pid in Photo.objects.order_by('id').values_list('id', flat=True):
-        paths.append(reverse('photo', args=[pid]))
+    все индексируемые страницы в обеих языковых версиях с hreflang-парами,
+    стабильными датами изменения и image-sitemap для страниц с изображениями."""
+    scene_modified = _scene_modified()
+    photos = list(Photo.objects.order_by('id'))
+    covers = list(PlaceCover.objects.order_by('feature_key', 'year'))
+    photos_by_feature = {}
+    covers_by_feature = {}
+    for photo in photos:
+        photos_by_feature.setdefault(photo.feature_key, []).append(photo)
+    for cover in covers:
+        covers_by_feature.setdefault(cover.feature_key, []).append(cover)
+
+    latest_photo = max((p.modified for p in photos), default=None)
+    gallery_dates = [value for value in (scene_modified, latest_photo) if value]
+    entries = [
+        (reverse('index'), scene_modified, []),
+        (reverse('gallery'), max(gallery_dates) if gallery_dates else None, []),
+        (reverse('method'), scene_modified, []),
+    ]
+    for feature in Feature.objects.filter(object_type__in=('site', 'unplaced')).order_by('key'):
+        feature_photos = photos_by_feature.get(feature.key, [])
+        feature_covers = covers_by_feature.get(feature.key, [])
+        dates = [value for value in [scene_modified,
+                 *(p.modified for p in feature_photos),
+                 *(c.modified for c in feature_covers)] if value]
+        images = [settings.MEDIA_URL + cover_relative_paths(c.sha256, c.ext)['original']
+                  for c in feature_covers]
+        images += [settings.MEDIA_URL + relative_paths(p.sha256, p.ext)['original']
+                   for p in feature_photos]
+        if not images:
+            images = [settings.STATIC_URL + 'atlas/og-map.jpg']
+        entries.append((reverse('place', args=[place_slug(feature)]),
+                        max(dates) if dates else None, images))
+    for photo in photos:
+        entries.append((reverse('photo', args=[photo.id]), photo.modified,
+                        [settings.MEDIA_URL + relative_paths(photo.sha256, photo.ext)['original']]))
+
     items = []
-    for path in paths:
+    for path, modified, image_paths in entries:
         en, ru = request.build_absolute_uri(path), request.build_absolute_uri(translate_url(path, 'ru'))
-        alternates = (f'<xhtml:link rel="alternate" hreflang="en" href="{en}"/>'
-                      f'<xhtml:link rel="alternate" hreflang="ru" href="{ru}"/>'
-                      f'<xhtml:link rel="alternate" hreflang="x-default" href="{en}"/>')
-        items += [f'<url><loc>{en}</loc>{alternates}</url>', f'<url><loc>{ru}</loc>{alternates}</url>']
+        alternates = (f'<xhtml:link rel="alternate" hreflang="en" href="{escape(en)}"/>'
+                      f'<xhtml:link rel="alternate" hreflang="ru" href="{escape(ru)}"/>'
+                      f'<xhtml:link rel="alternate" hreflang="x-default" href="{escape(en)}"/>')
+        lastmod = f'<lastmod>{modified.isoformat()}</lastmod>' if modified else ''
+        images = ''.join(f'<image:image><image:loc>{escape(request.build_absolute_uri(image_path))}'
+                         f'</image:loc></image:image>' for image_path in image_paths)
+        items += [f'<url><loc>{escape(en)}</loc>{lastmod}{alternates}{images}</url>',
+                  f'<url><loc>{escape(ru)}</loc>{lastmod}{alternates}{images}</url>']
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
-           'xmlns:xhtml="http://www.w3.org/1999/xhtml">' + ''.join(items) + '</urlset>\n')
+           'xmlns:xhtml="http://www.w3.org/1999/xhtml" '
+           'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'
+           + ''.join(items) + '</urlset>\n')
     return HttpResponse(xml, content_type='application/xml')
 
 
