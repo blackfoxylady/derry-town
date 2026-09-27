@@ -55,7 +55,7 @@ class SeoTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/xml')
         body = response.content.decode()
-        for path in ('/', '/ru/', '/photos/', '/method/', '/ru/method/',
+        for path in ('/', '/ru/', '/places/', '/ru/places/', '/photos/', '/method/', '/ru/method/',
                      '/places/12-derry-public-library/', '/ru/places/12-derry-public-library/',
                      '/places/u3-tracker-brothers/', f'/photos/{photo.id}/', f'/ru/photos/{photo.id}/'):
             self.assertIn(f'http://testserver{path}</loc>', body, path)
@@ -219,7 +219,7 @@ class JsonLdTests(TestCase):
                                period='1958', geometry=point, metadata={})
 
     def test_every_page_carries_website_and_book(self):
-        for path in ('/', '/photos/', '/method/', '/places/12-derry-public-library/'):
+        for path in ('/', '/places/', '/photos/', '/method/', '/places/12-derry-public-library/'):
             data = jsonld(self.client.get(path))
             self.assertEqual(data['@context'], 'https://schema.org', path)
             website = node(data, 'WebSite')
@@ -245,6 +245,15 @@ class JsonLdTests(TestCase):
         method = node(jsonld(self.client.get('/method/')), 'WebPage')
         self.assertEqual(method['about'], {'@id': 'http://testserver/#book'})
 
+    def test_place_index_is_a_collection_and_item_list(self):
+        data = jsonld(self.client.get('/places/'))
+        collection = node(data, 'CollectionPage')
+        self.assertEqual(collection['url'], 'http://testserver/places/')
+        items = node(data, 'ItemList')
+        self.assertEqual(items['numberOfItems'], 1)
+        self.assertEqual([item['position'] for item in items['itemListElement']], [1])
+        self.assertTrue(items['itemListElement'][0]['url'].startswith('http://testserver/places/'))
+
     def test_place_page_is_article_with_breadcrumbs(self):
         data = jsonld(self.client.get('/places/12-derry-public-library/'))
         article = node(data, 'Article')
@@ -252,10 +261,11 @@ class JsonLdTests(TestCase):
         self.assertEqual(article['temporalCoverage'], '1958')
         self.assertEqual(article['about'], {'@id': 'http://testserver/#book'})
         crumbs = node(data, 'BreadcrumbList')['itemListElement']
-        self.assertEqual([c['position'] for c in crumbs], [1, 2])
+        self.assertEqual([c['position'] for c in crumbs], [1, 2, 3])
         self.assertEqual(crumbs[0]['item'], 'http://testserver/')
-        self.assertEqual(crumbs[1]['name'], 'Derry Public Library')
-        self.assertNotIn('item', crumbs[1])
+        self.assertEqual(crumbs[1]['item'], 'http://testserver/places/')
+        self.assertEqual(crumbs[2]['name'], 'Derry Public Library')
+        self.assertNotIn('item', crumbs[2])
 
     def test_photo_page_is_an_image_object(self):
         with tempfile.TemporaryDirectory() as tmp:

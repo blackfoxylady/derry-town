@@ -57,6 +57,23 @@ def gallery(request, name, description):
     return _graph(request, _page(request, ['CollectionPage', 'ImageGallery'], name, description))
 
 
+def places(request, name, description, cards):
+    collection = _page(request, 'CollectionPage', name, description)
+    collection['mainEntity'] = {'@id': request.build_absolute_uri(request.path) + '#places'}
+    item_list = {
+        '@type': 'ItemList', '@id': request.build_absolute_uri(request.path) + '#places',
+        'numberOfItems': len(cards),
+        'itemListElement': [
+            {'@type': 'ListItem', 'position': position,
+             'name': card['feature'].name,
+             'url': request.build_absolute_uri(card['url'])}
+            for position, card in enumerate(cards, 1)
+        ],
+    }
+    return _graph(request, collection, item_list,
+                  _breadcrumbs(request, ('Derry', reverse('index')), (_('Places'), '')))
+
+
 def method(request, name, description):
     return _graph(request, _page(request, 'WebPage', name, description))
 
@@ -72,7 +89,8 @@ def place(request, ctx):
     if ctx['og_photo']:
         page['image'] = request.build_absolute_uri(ctx['og_photo'])
     return _graph(request, page,
-                  _breadcrumbs(request, ('Derry', reverse('index')), (feature.name, '')))
+                  _breadcrumbs(request, ('Derry', reverse('index')),
+                               (_('Places'), reverse('places')), (feature.name, '')))
 
 
 def photo(request, ctx):

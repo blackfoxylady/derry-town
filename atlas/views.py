@@ -285,6 +285,99 @@ def _gallery_url(place='', character='', tags=(), year=''):
     return reverse('gallery') + ('?' + query if query else '')
 
 
+def _place_sort_key(feature):
+    """Stable atlas order: numbered sites first, then named unlocated entries."""
+    return (0, int(feature.key)) if feature.key.isdigit() else (1, feature.key.casefold())
+
+
+@require_safe
+def places(request):
+    """Server-rendered directory of every place, progressively enhanced with local filters."""
+    features = list(
+        Feature.objects.filter(object_type__in=('site', 'unplaced'))
+        .annotate(evidence_count=Count('evidence'))
+    )
+    features.sort(key=_place_sort_key)
+
+    photos_by_feature = {}
+    for photo in Photo.objects.exclude(feature_key='').order_by('order', 'id'):
+        photos_by_feature.setdefault(photo.feature_key, []).append(photo)
+    covers_by_feature = {}
+    for cover in PlaceCover.objects.order_by('feature_key', 'year'):
+        covers_by_feature.setdefault(cover.feature_key, []).append(cover)
+
+    cards = []
+    kinds = Counter()
+    mapped_count = 0
+    for order, feature in enumerate(features):
+        mapped = feature.object_type == 'site'
+        mapped_count += int(mapped)
+        if mapped and feature.kind:
+            kinds[feature.kind] += 1
+        feature_photos = photos_by_feature.get(feature.key, [])
+        feature_covers = covers_by_feature.get(feature.key, [])
+        localized = _feature_place_content(feature)
+        note = _feature_note(feature)
+        ru = _feature_ru(feature)
+        content_complete = bool(feature.note and feature.about and feature.confidence_explanation)
+        ru_complete = all(ru.get(field) for field in
+                          ('note', 'about', 'confidence_explanation'))
+
+        image = None
+        if feature_covers:
+            cover = _cover_context(feature_covers[0])
+            image = {'src': cover['src'], 'srcset': cover['srcset'],
+                     'alt': cover['alt'], 'width': cover['width'], 'height': cover['height']}
+        elif feature_photos:
+            photo = feature_photos[0]
+            photo_image = _card_image(photo)
+            image = {**photo_image, 'src': photo_image['thumb'],
+                     'alt': _photo_alt(photo, feature),
+                     'width': photo.width, 'height': photo.height}
+
+        search_text = ' '.join(filter(None, (
+            feature.key, feature.name, feature.short, feature.kind, feature.period,
+            note, localized['about'], localized['confidence_explanation'],
+        )))
+        cards.append({
+            'feature': feature,
+            'number': f'{int(feature.key):02d}' if feature.key.isdigit() else feature.key.upper(),
+            'url': reverse('place', args=[place_slug(feature)]),
+            'map_url': reverse('index') + '?place=' + feature.key if mapped else '',
+            'gallery_url': _gallery_url(place=feature.key) if feature_photos else '',
+            'mapped': mapped, 'note': note,
+            'confidence_label': CONFIDENCE.get(feature.confidence, ''),
+            'photo_count': len(feature_photos), 'cover_count': len(feature_covers),
+            'evidence_count': feature.evidence_count, 'image': image,
+            'content_complete': content_complete, 'ru_complete': ru_complete,
+            'search_text': search_text, 'order': order,
+        })
+
+    place_count = len(cards)
+    unlocated_count = place_count - mapped_count
+    kind_order = ('Homes', 'Civic', 'Barrens', 'Encounters', 'Historical', 'Outlying')
+    kind_names = [kind for kind in kind_order if kinds[kind]]
+    kind_names += sorted(kind for kind in kinds if kind not in kind_order)
+    page_title = _('Places in Derry, Maine — Stephen King’s IT Literary Atlas')
+    meta_description = ngettext(
+        'Browse %(count)s place in Derry, Maine, reconstructed from Stephen King’s IT. '
+        'Search by name, category and mapping confidence, with sources and photographs.',
+        'Browse %(count)s places in Derry, Maine, reconstructed from Stephen King’s IT. '
+        'Search by name, category and mapping confidence, with sources and photographs.',
+        place_count) % {'count': place_count}
+    context = {
+        'cards': cards, 'kinds': [(kind, kinds[kind]) for kind in kind_names],
+        'place_count': place_count, 'mapped_count': mapped_count,
+        'unlocated_count': unlocated_count,
+        'confidence_counts': Counter(feature.confidence for feature in features),
+        'page_title': page_title, 'meta_description': meta_description,
+    }
+    context['jsonld'] = schema.places(request, page_title, meta_description, cards)
+    response = render(request, 'atlas/places.html', context)
+    response['Cache-Control'] = 'no-cache'
+    return response
+
+
 @require_safe
 def gallery(request):
     """Фильтры в query-параметрах: place/character/year — одно значение,
@@ -482,6 +575,7 @@ def place_page(request, slug):
         'og_image_width': og_width, 'og_image_height': og_height,
         'published_time': _feature_published(feature.key, scene_modified),
         'modified_time': modified_time,
+        'places_url': reverse('places'),
         'map_url': reverse('index') + '?place=' + feature.key,
         'gallery_url': _gallery_url(place=feature.key)}
     context['jsonld'] = schema.place(request, context)
@@ -551,9 +645,12 @@ def sitemap(request):
         covers_by_feature.setdefault(cover.feature_key, []).append(cover)
 
     latest_photo = max((p.modified for p in photos), default=None)
+    latest_cover = max((c.modified for c in covers), default=None)
     gallery_dates = [value for value in (scene_modified, latest_photo) if value]
+    place_index_dates = [value for value in (scene_modified, latest_photo, latest_cover) if value]
     entries = [
         (reverse('index'), scene_modified, []),
+        (reverse('places'), max(place_index_dates) if place_index_dates else None, []),
         (reverse('gallery'), max(gallery_dates) if gallery_dates else None, []),
         (reverse('method'), scene_modified, []),
     ]

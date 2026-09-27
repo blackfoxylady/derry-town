@@ -83,3 +83,71 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
 .source p{font-size:12px;margin:5px 0;color:#586b59}
 .method p{max-width:640px;font-size:13px}
 .help{color:var(--muted);font-size:11px;margin-top:16px}
+
+/* Searchable place directory. The full list stays in the HTML; JS only filters and sorts it. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.places-hero{max-width:780px;padding:8px 0 23px}
+.places-hero h1{font:700 38px/1.12 Georgia,serif;margin:5px 0 12px}
+.places-hero>p{max-width:720px;margin:0 0 13px;font-size:15px;line-height:1.65}
+.places-summary{color:var(--muted);font-size:12px!important;letter-spacing:.15px}
+.places-summary b{color:var(--ink)}
+.places-hero-links{display:flex;gap:8px;padding-top:3px}
+.place-tools{position:relative;border:1px solid var(--line);border-radius:8px;background:#faf8f1;padding:12px 15px;margin-bottom:22px}
+.place-search-row{display:flex;gap:8px;padding-bottom:10px;border-bottom:1px solid #e4e5dc}
+.place-search{flex:1}
+.place-search input{width:100%;height:41px;border:1px solid #bcc6b8;border-radius:5px;background:#fff;color:var(--ink);padding:8px 12px;font:14px/1.2 inherit}
+.place-search input:focus{outline:3px solid rgba(168,135,70,.35);border-color:#8e784a}
+.clear-places{cursor:pointer;white-space:nowrap}
+.place-filter-row{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid #e4e5dc}
+.place-filter-row .chip{font:inherit;cursor:pointer}
+.audit-filters{border-bottom:1px solid #e4e5dc}
+.audit-filters>summary{cursor:pointer;padding:8px 0;color:var(--muted);font-size:11px;font-weight:650;letter-spacing:.3px}
+.audit-filters .place-filter-row{border:0;padding-top:1px}
+.place-tool-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-top:10px;color:var(--muted);font-size:11px}
+.place-result-count b{color:var(--ink);font-size:13px}
+.place-display-controls{display:flex;align-items:center;gap:13px}
+.place-display-controls label{display:flex;align-items:center;gap:6px}
+.place-display-controls select{border:1px solid #c7cebf;border-radius:4px;background:#fff;color:var(--ink);padding:5px 26px 5px 8px;font:12px inherit}
+.view-switch{display:inline-flex;border:1px solid #c7cebf;border-radius:5px;overflow:hidden;background:#fff}
+.view-switch button{border:0;background:transparent;color:var(--ink);padding:6px 10px;font:12px inherit;cursor:pointer}
+.view-switch button+button{border-left:1px solid #c7cebf}
+.view-switch button.on{background:#315e5a;color:#fff}
+.places-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.place-card{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:start;border:1px solid var(--line);border-radius:7px;background:#faf8f1;padding:15px 16px}
+.place-card[hidden]{display:none}
+.place-number{font:700 20px/1 Georgia,serif;color:#6d7a70;padding-top:4px;letter-spacing:.5px}
+.place-card-title{display:flex;align-items:center;gap:9px;min-width:0}
+.place-card-title h2{font:650 20px/1.25 Georgia,serif;margin:0;min-width:0}
+.place-card-title h2 a{color:var(--ink);text-decoration:none}
+.place-card-title h2 a:hover{text-decoration:underline}
+.confidence-badge{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:25px;height:22px;border:1px solid #b7c6ac;border-radius:4px;background:#f6f6ec;font-size:10px;font-weight:750}
+.confidence-a{background:#dfeadc}.confidence-b{background:#edf0d9}.confidence-c{background:#f3e4d1}.confidence-u{background:#eeeae2;color:#766e63}
+.place-card-meta{margin:3px 0 0;color:#576a57;font-size:10px;text-transform:uppercase;letter-spacing:.55px}
+.place-card-excerpt{max-width:690px;margin:9px 0 7px;font-size:13px;line-height:1.5;color:#394d47;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.place-card-facts{display:flex;flex-wrap:wrap;gap:5px 13px;margin:8px 0 0;color:var(--muted);font-size:10px}
+.data-warning{color:#9b4a35;font-weight:650}
+.place-card-links{display:flex;flex-wrap:wrap;gap:6px 16px;margin:10px 0 0;font-size:11px}
+.place-thumb{display:block;width:112px;height:78px;border:1px solid var(--line);border-radius:5px;overflow:hidden;background:#e8e4d4}
+.place-thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.places-catalog.compact .places-list{gap:4px}
+.places-catalog.compact .place-card{padding:8px 11px;grid-template-columns:45px minmax(0,1fr)}
+.places-catalog.compact .place-number{font-size:15px;padding-top:3px}
+.places-catalog.compact .place-card-title h2{font:650 14px/1.25 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.places-catalog.compact .place-card-meta{display:inline;margin-right:10px}
+.places-catalog.compact .place-card-facts{display:inline-flex;margin:3px 0 0}
+.places-catalog.compact .place-card-excerpt,.places-catalog.compact .place-card-links,.places-catalog.compact .place-thumb{display:none}
+.places-catalog.compact .confidence-badge{width:22px;height:19px}
+
+@media(max-width:700px){
+ .places-hero h1{font-size:31px}.places-hero>p{font-size:14px}
+ .place-tools{margin-left:-1px;margin-right:-1px;padding:11px}
+ .place-filter-row{flex-wrap:wrap;gap:4px 8px}.place-filter-row .fname{flex-basis:100%}
+ .place-tool-footer{align-items:flex-start}.place-display-controls{align-items:flex-end;flex-direction:column;gap:7px}
+ .place-card{grid-template-columns:42px minmax(0,1fr);gap:10px;padding:13px 12px}
+ .place-thumb{display:none}.place-card-title h2{font-size:18px}
+}
+@media(max-width:440px){
+ .place-search-row{align-items:stretch}.clear-places{padding-left:9px;padding-right:9px}
+ .places-hero-links{flex-wrap:wrap}.place-card-links{gap:5px 12px}
+ .view-switch button{padding:6px 8px}
+}

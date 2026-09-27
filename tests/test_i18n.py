@@ -7,7 +7,8 @@ from django.test import TestCase, override_settings
     'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'}})
 class I18nRoutingTests(TestCase):
     def test_pages_exist_in_both_languages(self):
-        for path, lang in (('/', 'en'), ('/ru/', 'ru'), ('/photos/', 'en'), ('/ru/photos/', 'ru')):
+        for path, lang in (('/', 'en'), ('/ru/', 'ru'), ('/places/', 'en'),
+                           ('/ru/places/', 'ru'), ('/photos/', 'en'), ('/ru/photos/', 'ru')):
             response = self.client.get(path)
             self.assertEqual(response.status_code, 200, path)
             self.assertContains(response, f'<html lang="{lang}"')

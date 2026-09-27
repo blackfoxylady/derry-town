@@ -14,6 +14,7 @@ urlpatterns = [path('api/v1/map/', views.map_data, name='map_data'),
 urlpatterns += i18n_patterns(
     path('', views.index, name='index'), path('photos/', views.gallery, name='gallery'),
     path('photos/<int:photo_id>/', views.photo_page, name='photo'),
+    path('places/', views.places, name='places'),
     path('places/<slug:slug>/', views.place_page, name='place'),
     path('method/', views.method, name='method'),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),

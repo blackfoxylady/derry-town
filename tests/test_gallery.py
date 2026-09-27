@@ -129,7 +129,7 @@ class GalleryTests(TestCase):
         self.assertContains(response, '?place=road:02')  # фильтр галереи остаётся
         self.assertNotContains(response, 'Show on the map')  # у дороги нет маркера на карте
         response = self.client.get(f'/photos/{self.loose.id}/')
-        self.assertNotContains(response, 'Place')  # без привязки нет и блока места
+        self.assertNotContains(response, '<dt>Place</dt>')  # без привязки нет и блока места
 
     def test_missing_photo_and_write_methods(self):
         self.assertEqual(self.client.get('/photos/999/').status_code, 404)

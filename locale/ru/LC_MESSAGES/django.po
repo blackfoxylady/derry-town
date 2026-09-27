@@ -427,3 +427,142 @@ msgstr ""
 "Узнайте, как карта Дерри, штат Мэн, реконструирована по роману Стивена "
 "Кинга «Оно»: источники, свидетельства, уровни достоверности и решения по "
 "размещению объектов."
+
+#: place directory
+msgid "Breadcrumbs"
+msgstr "Хлебные крошки"
+
+msgid "Places in Derry, Maine"
+msgstr "Места Дерри, штат Мэн"
+
+msgid "A complete index of locations reconstructed from Stephen King’s <i>IT</i>. Search the atlas by name, category or mapping confidence, then open a place for its sources, photographs and location notes."
+msgstr "Полный указатель мест, реконструированных по роману Стивена Кинга <i>«Оно»</i>. Ищите в атласе по названию, категории или достоверности привязки, а затем открывайте страницу места с источниками, фотографиями и пояснениями."
+
+msgid "mapped"
+msgstr "на карте"
+
+msgid "Open the map"
+msgstr "Открыть карту"
+
+msgid "Place filters"
+msgstr "Фильтры мест"
+
+msgid "Search places"
+msgstr "Поиск мест"
+
+msgid "Search by name, description or number…"
+msgstr "Поиск по названию, описанию или номеру…"
+
+msgid "Clear all"
+msgstr "Сбросить всё"
+
+msgid "Location"
+msgstr "Расположение"
+
+msgid "All"
+msgstr "Все"
+
+msgid "Mapped"
+msgstr "На карте"
+
+msgid "Confidence"
+msgstr "Достоверность"
+
+msgid "Category"
+msgstr "Категория"
+
+msgid "Media"
+msgstr "Медиа"
+
+msgid "With photographs"
+msgstr "С фотографиями"
+
+msgid "With a cover"
+msgstr "С обложкой"
+
+msgid "Without images"
+msgstr "Без изображений"
+
+msgid "Data audit"
+msgstr "Аудит данных"
+
+msgid "Missing"
+msgstr "Отсутствует"
+
+msgid "Nothing"
+msgstr "Ничего"
+
+msgid "Cover"
+msgstr "Обложка"
+
+msgid "Descriptions"
+msgstr "Описания"
+
+msgid "Russian text"
+msgstr "Русский текст"
+
+msgid "Sources"
+msgstr "Источники"
+
+msgid "Sort"
+msgstr "Сортировка"
+
+msgid "Map number"
+msgstr "Номер на карте"
+
+msgid "Name A–Z"
+msgstr "Название А–Я"
+
+msgid "View"
+msgstr "Вид"
+
+msgid "Cards"
+msgstr "Карточки"
+
+msgid "Compact"
+msgstr "Компактно"
+
+msgid "sources"
+msgstr "источников"
+
+msgid "covers"
+msgstr "обложек"
+
+msgid "%(n)s source"
+msgid_plural "%(n)s sources"
+msgstr[0] "%(n)s источник"
+msgstr[1] "%(n)s источника"
+msgstr[2] "%(n)s источников"
+
+msgid "%(n)s photo"
+msgid_plural "%(n)s photos"
+msgstr[0] "%(n)s фотография"
+msgstr[1] "%(n)s фотографии"
+msgstr[2] "%(n)s фотографий"
+
+msgid "%(n)s cover"
+msgid_plural "%(n)s covers"
+msgstr[0] "%(n)s обложка"
+msgstr[1] "%(n)s обложки"
+msgstr[2] "%(n)s обложек"
+
+msgid "text incomplete"
+msgstr "текст не заполнен"
+
+msgid "RU incomplete"
+msgstr "RU не заполнен"
+
+msgid "About the place"
+msgstr "О месте"
+
+msgid "No places match these filters. Try a shorter search or clear some filters."
+msgstr "Нет мест, подходящих под эти фильтры. Сократите запрос или сбросьте часть фильтров."
+
+msgid "Places in Derry, Maine — Stephen King’s IT Literary Atlas"
+msgstr "Места Дерри, штат Мэн — литературный атлас «Оно» Стивена Кинга"
+
+msgid "Browse %(count)s place in Derry, Maine, reconstructed from Stephen King’s IT. Search by name, category and mapping confidence, with sources and photographs."
+msgid_plural "Browse %(count)s places in Derry, Maine, reconstructed from Stephen King’s IT. Search by name, category and mapping confidence, with sources and photographs."
+msgstr[0] "Просматривайте %(count)s место Дерри, штат Мэн, реконструированное по роману Стивена Кинга «Оно». Поиск по названию, категории и достоверности привязки, с источниками и фотографиями."
+msgstr[1] "Просматривайте %(count)s места Дерри, штат Мэн, реконструированные по роману Стивена Кинга «Оно». Поиск по названию, категории и достоверности привязки, с источниками и фотографиями."
+msgstr[2] "Просматривайте %(count)s мест Дерри, штат Мэн, реконструированных по роману Стивена Кинга «Оно». Поиск по названию, категории и достоверности привязки, с источниками и фотографиями."

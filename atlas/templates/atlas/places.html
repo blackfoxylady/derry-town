@@ -1,0 +1,68 @@
+{% extends 'atlas/gallery_base.html' %}
+{% load i18n static %}
+{% block content %}
+<nav class="crumbs" aria-label="{% trans 'Breadcrumbs' %}"><a href="{% url 'index' %}">Derry</a> · <span>{% trans "Places" %}</span></nav>
+<div class="places-hero">
+<div class="eyebrow">{% trans "The places remembered" %}</div>
+<h1>{% trans "Places in Derry, Maine" %}</h1>
+<p>{% blocktranslate %}A complete index of locations reconstructed from Stephen King’s <i>IT</i>. Search the atlas by name, category or mapping confidence, then open a place for its sources, photographs and location notes.{% endblocktranslate %}</p>
+<p class="places-summary"><b>{{ place_count }}</b> {% trans "places" %} · <b>{{ mapped_count }}</b> {% trans "mapped" %} · <b>{{ unlocated_count }}</b> {% trans "unlocated" %}</p>
+<p class="places-hero-links"><a class="quiet" href="{% url 'index' %}">{% trans "Open the map" %}</a><a class="quiet" href="{% url 'method' %}">{% trans "Sources & method" %}</a></p>
+</div>
+
+<section class="place-tools" aria-label="{% trans 'Place filters' %}">
+<div class="place-search-row">
+<label class="place-search"><span class="sr-only">{% trans "Search places" %}</span><input id="placeSearch" type="search" placeholder="{% trans 'Search by name, description or number…' %}" autocomplete="off"></label>
+<button type="button" class="quiet clear-places" id="clearPlaces">{% trans "Clear all" %}</button>
+</div>
+<div class="place-filter-row" data-filter-group="location"><span class="fname">{% trans "Location" %}</span><span class="chips">
+<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %} <span class="n">{{ place_count }}</span></button>
+<button type="button" class="chip" data-value="mapped" aria-pressed="false">{% trans "Mapped" %} <span class="n">{{ mapped_count }}</span></button>
+<button type="button" class="chip" data-value="unlocated" aria-pressed="false">{% trans "Unlocated" %} <span class="n">{{ unlocated_count }}</span></button>
+</span></div>
+<div class="place-filter-row" data-filter-group="confidence"><span class="fname">{% trans "Confidence" %}</span><span class="chips">
+<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %}</button>
+{% for value in 'ABCU' %}<button type="button" class="chip" data-value="{{ value }}" aria-pressed="false">{{ value }} <span class="n">{% if value == 'A' %}{{ confidence_counts.A }}{% elif value == 'B' %}{{ confidence_counts.B }}{% elif value == 'C' %}{{ confidence_counts.C }}{% else %}{{ confidence_counts.U }}{% endif %}</span></button>{% endfor %}
+</span></div>
+{% if kinds %}<div class="place-filter-row" data-filter-group="kind"><span class="fname">{% trans "Category" %}</span><span class="chips">
+<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %}</button>
+{% for kind, count in kinds %}<button type="button" class="chip" data-value="{{ kind }}" aria-pressed="false">{{ kind }} <span class="n">{{ count }}</span></button>{% endfor %}
+</span></div>{% endif %}
+<div class="place-filter-row" data-filter-group="media"><span class="fname">{% trans "Media" %}</span><span class="chips">
+<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %}</button>
+<button type="button" class="chip" data-value="photos" aria-pressed="false">{% trans "With photographs" %}</button>
+<button type="button" class="chip" data-value="cover" aria-pressed="false">{% trans "With a cover" %}</button>
+<button type="button" class="chip" data-value="none" aria-pressed="false">{% trans "Without images" %}</button>
+</span></div>
+<details class="audit-filters"><summary>{% trans "Data audit" %}</summary><div class="place-filter-row" data-filter-group="audit"><span class="fname">{% trans "Missing" %}</span><span class="chips">
+<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "Nothing" %}</button>
+<button type="button" class="chip" data-value="photos" aria-pressed="false">{% trans "Photographs" %}</button>
+<button type="button" class="chip" data-value="cover" aria-pressed="false">{% trans "Cover" %}</button>
+<button type="button" class="chip" data-value="content" aria-pressed="false">{% trans "Descriptions" %}</button>
+<button type="button" class="chip" data-value="ru" aria-pressed="false">{% trans "Russian text" %}</button>
+<button type="button" class="chip" data-value="sources" aria-pressed="false">{% trans "Sources" %}</button>
+</span></div></details>
+<div class="place-tool-footer">
+<span id="placeResultCount" class="place-result-count" aria-live="polite"><b>{{ place_count }}</b> / {{ place_count }}</span>
+<span class="place-display-controls"><label>{% trans "Sort" %} <select id="placeSort"><option value="number">{% trans "Map number" %}</option><option value="name">{% trans "Name A–Z" %}</option></select></label><span class="view-switch" role="group" aria-label="{% trans 'View' %}"><button type="button" data-view="cards" class="on" aria-pressed="true">{% trans "Cards" %}</button><button type="button" data-view="compact" aria-pressed="false">{% trans "Compact" %}</button></span></span>
+</div>
+</section>
+
+<section id="placesCatalog" class="places-catalog" data-total="{{ place_count }}">
+<ul id="placesList" class="places-list">
+{% for c in cards %}<li class="place-card{% if c.image %} has-image{% endif %}" data-order="{{ c.order }}" data-name="{{ c.feature.name }}" data-search="{{ c.search_text }}" data-location="{% if c.mapped %}mapped{% else %}unlocated{% endif %}" data-confidence="{{ c.feature.confidence }}" data-kind="{{ c.feature.kind }}" data-photos="{{ c.photo_count }}" data-covers="{{ c.cover_count }}" data-content-complete="{{ c.content_complete|yesno:'1,0' }}" data-ru-complete="{{ c.ru_complete|yesno:'1,0' }}" data-sources="{{ c.evidence_count }}">
+<div class="place-number">{{ c.number }}</div>
+<div class="place-card-body">
+<div class="place-card-title"><h2><a href="{{ c.url }}">{{ c.feature.name }}</a></h2><span class="confidence-badge confidence-{{ c.feature.confidence|lower }}" title="{{ c.confidence_label }}">{{ c.feature.confidence }}</span></div>
+<p class="place-card-meta">{% if c.feature.kind %}{{ c.feature.kind }}{% else %}{% trans "Unlocated" %}{% endif %}{% if c.feature.period %} · {{ c.feature.period }}{% endif %}</p>
+{% if c.note %}<p class="place-card-excerpt">{{ c.note }}</p>{% endif %}
+<p class="place-card-facts"><span title="{% trans 'Sources' %}">{% blocktranslate count n=c.evidence_count %}{{ n }} source{% plural %}{{ n }} sources{% endblocktranslate %}</span><span title="{% trans 'Photographs' %}">{% blocktranslate count n=c.photo_count %}{{ n }} photo{% plural %}{{ n }} photos{% endblocktranslate %}</span><span title="{% trans 'Covers' %}">{% blocktranslate count n=c.cover_count %}{{ n }} cover{% plural %}{{ n }} covers{% endblocktranslate %}</span>{% if not c.content_complete %}<span class="data-warning">{% trans "text incomplete" %}</span>{% endif %}{% if not c.ru_complete %}<span class="data-warning">{% trans "RU incomplete" %}</span>{% endif %}</p>
+<p class="place-card-links"><a href="{{ c.url }}">{% trans "About the place" %}</a>{% if c.map_url %}<a href="{{ c.map_url }}">{% trans "Show on the map" %}</a>{% endif %}{% if c.gallery_url %}<a href="{{ c.gallery_url }}">{% trans "Photographs" %}</a>{% endif %}</p>
+</div>
+{% if c.image %}<a class="place-thumb" href="{{ c.url }}" tabindex="-1" aria-hidden="true"><img src="{{ c.image.src }}" srcset="{{ c.image.srcset }}" sizes="112px" alt="" width="{{ c.image.width }}" height="{{ c.image.height }}" loading="lazy" decoding="async"></a>{% endif %}
+</li>{% endfor %}
+</ul>
+<p id="placesEmpty" class="empty" hidden>{% trans "No places match these filters. Try a shorter search or clear some filters." %}</p>
+</section>
+<script src="{% static 'atlas/places.js' %}" defer></script>
+{% endblock %}
