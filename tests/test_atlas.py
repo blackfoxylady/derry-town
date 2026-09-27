@@ -25,9 +25,9 @@ class AtlasTests(TestCase):
         return out.getvalue()
 
     def test_original_identifiers_and_evidence(self):
-        self.assertEqual(set(Feature.objects.filter(object_type='site').values_list('key',flat=True)), {str(i) for i in range(1,84)})
-        self.assertEqual(set(Feature.objects.filter(object_type='unplaced').values_list('key',flat=True)), {'U'+str(i) for i in range(1,10)})
-        self.assertEqual(Feature.objects.filter(object_type='site',evidence__isnull=False).distinct().count(),83)
+        self.assertEqual(set(Feature.objects.filter(object_type='site').values_list('key',flat=True)), {str(i) for i in range(1,85)})
+        self.assertEqual(set(Feature.objects.filter(object_type='unplaced').values_list('key',flat=True)), {'U'+str(i) for i in range(1,10) if i != 5})
+        self.assertEqual(Feature.objects.filter(object_type='site',evidence__isnull=False).distinct().count(),84)
 
     def test_edit_restart_and_seed_preserve_changes(self):
         self.cmd('edit','12','--name','Library corrected','--x','-1490','--y','-505','--author','dev','--reason','test')
@@ -87,13 +87,13 @@ class AtlasTests(TestCase):
             self.assertGreater(Revision.objects.count(),3)
 
     def test_add_delete_feature_and_sources(self):
-        changes=[{'op':'add','table':'geometry','key':'g:84','values':{'shape':{'type':'point','x':0,'y':0}}},
-            {'op':'add','table':'feature','key':'84','values':{'object_type':'site','name':'Review example','short':'Example','kind':'Historical','confidence':'C','geometry_id':'g:84'}},
-            {'op':'add','table':'evidence','key':'e:84:0','values':{'feature_id':'84','source_id':'novel','reference':'Developer review'}}]
+        changes=[{'op':'add','table':'geometry','key':'g:85','values':{'shape':{'type':'point','x':0,'y':0}}},
+            {'op':'add','table':'feature','key':'85','values':{'object_type':'site','name':'Review example','short':'Example','kind':'Historical','confidence':'C','geometry_id':'g:85'}},
+            {'op':'add','table':'evidence','key':'e:85:0','values':{'feature_id':'85','source_id':'novel','reference':'Developer review'}}]
         ds.commit(lambda d:ds.patch(d,changes),'dev','add')
-        self.assertTrue(Feature.objects.filter(pk='84').exists())
-        self.cmd('delete','84','--author','dev','--reason','remove')
-        self.assertFalse(Feature.objects.filter(pk='84').exists())
+        self.assertTrue(Feature.objects.filter(pk='85').exists())
+        self.cmd('delete','85','--author','dev','--reason','remove')
+        self.assertFalse(Feature.objects.filter(pk='85').exists())
 
     def test_explicit_short_label_and_exact_snapshot_restore(self):
         original_short = Feature.objects.get(pk='12').short
@@ -112,7 +112,7 @@ class AtlasTests(TestCase):
         with tempfile.TemporaryDirectory() as td, override_settings(ARTIFACT_ROOT=Path(td)):
             response=self.client.get('/api/v1/map/')
             self.assertEqual(response.status_code,200)
-            self.assertEqual(len(response.json()['data']['sites']),83)
+            self.assertEqual(len(response.json()['data']['sites']),84)
             etag=response['ETag']
             self.assertEqual(self.client.get('/api/v1/map/',HTTP_IF_NONE_MATCH=etag).status_code,304)
             self.cmd('edit','12','--description','Updated evidence','--author','dev','--reason','update')

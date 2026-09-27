@@ -322,8 +322,8 @@
       {
         "key": "provenance",
         "value": {
-          "baseline_sites": 83,
-          "baseline_unplaced": 9,
+          "baseline_sites": 84,
+          "baseline_unplaced": 8,
           "baseline_scene_elements": 3070,
           "texture": "Preserved generated woodland, marsh, buildings and minor landforms; each is editable vector geometry. They are illustrative, not surveyed.",
           "terrain": "Deterministic conceptual surface. No measured elevations."
@@ -335,8 +335,8 @@
         "key": "g:1",
         "shape": {
           "type": "point",
-          "x": -1120,
-          "y": -1120
+          "x": -1180,
+          "y": -1210
         }
       },
       {
@@ -495,8 +495,8 @@
         "key": "g:21",
         "shape": {
           "type": "point",
-          "x": -500,
-          "y": 870
+          "x": -1250,
+          "y": 680
         }
       },
       {
@@ -983,8 +983,8 @@
         "key": "g:82",
         "shape": {
           "type": "point",
-          "x": -4780,
-          "y": -760
+          "x": -4930,
+          "y": -610
         }
       },
       {
@@ -993,6 +993,14 @@
           "type": "point",
           "x": -5380,
           "y": -2135
+        }
+      },
+      {
+        "key": "g:84",
+        "shape": {
+          "type": "point",
+          "x": 650,
+          "y": 600
         }
       },
       {
@@ -38739,7 +38747,7 @@
         "confidence": "A",
         "rank": 1,
         "period": "1957-58",
-        "note": "High on Witcham Street, near the hill crest. The address number, plot and orientation of the house are unspecified. Georgie's room and Bill's garage workshop are included here.",
+        "note": "High on Witcham Street, near the hill crest. The address number, plot and orientation of the house are unspecified. Georgie's room is included here; Zack Denbrough's workshop is associated with this feature, but the text does not independently locate it.",
         "geometry_id": "g:1",
         "metadata": {}
       },
@@ -38908,7 +38916,7 @@
         "confidence": "A",
         "rank": 2,
         "period": "1958",
-        "note": "Near the other junction of Costello Avenue and Kansas Street. Eddie's arm is broken outside the shop. Costello is drawn as a loop, as described.",
+        "note": "At the other junction of semicircular Costello Avenue and Kansas Street. Henry's group confronts Eddie outside the market; his arm is broken after a chase up Costello, just before Kansas. The storefront footprint is illustrative.",
         "geometry_id": "g:14",
         "metadata": {}
       },
@@ -39810,6 +39818,19 @@
         "metadata": {}
       },
       {
+        "key": "84",
+        "object_type": "site",
+        "name": "Cycle Shoppe",
+        "short": "Cycle Shoppe",
+        "kind": "Civic",
+        "confidence": "A",
+        "rank": 3,
+        "period": "1958",
+        "note": "On Center Street; the block, frontage side and building footprint are unspecified. Bill buys Silver here. This original bicycle shop is distinct from Secondhand Rose, where the bicycle is rediscovered in 1985.",
+        "geometry_id": "g:84",
+        "metadata": {}
+      },
+      {
         "key": "U1",
         "object_type": "unplaced",
         "name": "John Markson house",
@@ -39862,19 +39883,6 @@
         "metadata": {}
       },
       {
-        "key": "U5",
-        "object_type": "unplaced",
-        "name": "Cycle Shoppe",
-        "short": "Cycle Shoppe",
-        "kind": "",
-        "confidence": "U",
-        "rank": 3,
-        "period": "1958",
-        "note": "Bill buys Silver here before its later rediscovery at Secondhand Rose. The original bicycle shop is a distinct business; its street position is not established.",
-        "geometry_id": null,
-        "metadata": {}
-      },
-      {
         "key": "U6",
         "object_type": "unplaced",
         "name": "Veronica Grogan storm drain",
@@ -39896,7 +39904,7 @@
         "confidence": "U",
         "rank": 3,
         "period": "Patrick's childhood",
-        "note": "Site of Avery's death and Patrick's domestic history. The Engstrom home stands one block over and behind it, but no usable town position is given.",
+        "note": "Site of Avery's death and Patrick's domestic history. Wind crossing McCarron Park reaches the upstairs windows, but no side, direction or distance is stated. The Engstrom home is one block over and almost directly behind. No secure coordinate can be assigned.",
         "geometry_id": null,
         "metadata": {}
       },
@@ -65934,6 +65942,14 @@
         "order": 1
       },
       {
+        "key": "e:1:2",
+        "feature_id": "1",
+        "source_id": "novel",
+        "reference": "Ch. 13 - The Apocalyptic Rockfight / 4",
+        "note": "",
+        "order": 2
+      },
+      {
         "key": "e:2:0",
         "feature_id": "2",
         "source_id": "novel",
@@ -65964,14 +65980,6 @@
         "reference": "Ch. 21 - Under the City / 8",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:3:1",
-        "feature_id": "3",
-        "source_id": "novel",
-        "reference": "Ch. 21 - Under the City / 8",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:4:0",
@@ -66030,14 +66038,6 @@
         "order": 0
       },
       {
-        "key": "e:6:1",
-        "feature_id": "6",
-        "source_id": "novel",
-        "reference": "Ch. 4 - Ben Hanscom Takes a Fall / 11",
-        "note": "",
-        "order": 1
-      },
-      {
         "key": "e:6:2",
         "feature_id": "6",
         "source_id": "novel",
@@ -66062,28 +66062,12 @@
         "order": 1
       },
       {
-        "key": "e:7:2",
-        "feature_id": "7",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 3",
-        "note": "",
-        "order": 2
-      },
-      {
         "key": "e:8:0",
         "feature_id": "8",
         "source_id": "novel",
         "reference": "Ch. 8 - Georgie's Room and the House on Neibolt Street / 11",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:8:1",
-        "feature_id": "8",
-        "source_id": "novel",
-        "reference": "Ch. 8 - Georgie's Room and the House on Neibolt Street / 11",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:8:2",
@@ -66121,7 +66105,7 @@
         "key": "e:10:1",
         "feature_id": "10",
         "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 2",
+        "reference": "Ch. 19 - In the Watches of the Night / 12",
         "note": "",
         "order": 1
       },
@@ -66140,6 +66124,14 @@
         "reference": "Ch. 6 - One of the Missing: A Tale from the Summer of '58 / 4",
         "note": "",
         "order": 1
+      },
+      {
+        "key": "e:11:2",
+        "feature_id": "11",
+        "source_id": "novel",
+        "reference": "Ch. 11 - Walking Tours / 6",
+        "note": "",
+        "order": 2
       },
       {
         "key": "e:12:0",
@@ -66212,14 +66204,6 @@
         "reference": "Ch. 16 - Eddie's Bad Break / 3",
         "note": "",
         "order": 2
-      },
-      {
-        "key": "e:14:3",
-        "feature_id": "14",
-        "source_id": "novel",
-        "reference": "Ch. 16 - Eddie's Bad Break / 3",
-        "note": "",
-        "order": 3
       },
       {
         "key": "e:15:0",
@@ -66318,20 +66302,20 @@
         "order": 3
       },
       {
+        "key": "e:18:4",
+        "feature_id": "18",
+        "source_id": "novel",
+        "reference": "Ch. 23 - Out / 3",
+        "note": "",
+        "order": 4
+      },
+      {
         "key": "e:19:0",
         "feature_id": "19",
         "source_id": "novel",
         "reference": "Ch. 9 - Cleaning Up / 5",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:19:1",
-        "feature_id": "19",
-        "source_id": "novel",
-        "reference": "Ch. 9 - Cleaning Up / 5",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:19:2",
@@ -66358,36 +66342,12 @@
         "order": 1
       },
       {
-        "key": "e:20:2",
-        "feature_id": "20",
-        "source_id": "novel",
-        "reference": "Ch. 19 - In the Watches of the Night / 9",
-        "note": "",
-        "order": 2
-      },
-      {
         "key": "e:21:0",
         "feature_id": "21",
         "source_id": "novel",
         "reference": "Ch. 10 - The Reunion / 1",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:21:1",
-        "feature_id": "21",
-        "source_id": "novel",
-        "reference": "Ch. 10 - The Reunion / 1",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:21:2",
-        "feature_id": "21",
-        "source_id": "novel",
-        "reference": "Ch. 10 - The Reunion / 1",
-        "note": "",
-        "order": 2
       },
       {
         "key": "e:22:0",
@@ -66406,14 +66366,6 @@
         "order": 1
       },
       {
-        "key": "e:22:2",
-        "feature_id": "22",
-        "source_id": "novel",
-        "reference": "Ch. 6 - One of the Missing: A Tale from the Summer of '58 / 5",
-        "note": "",
-        "order": 2
-      },
-      {
         "key": "e:22:3",
         "feature_id": "22",
         "source_id": "novel",
@@ -66428,22 +66380,6 @@
         "reference": "Ch. 11 - Walking Tours / 4",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:23:1",
-        "feature_id": "23",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 4",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:23:2",
-        "feature_id": "23",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 4",
-        "note": "",
-        "order": 2
       },
       {
         "key": "e:24:0",
@@ -66526,22 +66462,6 @@
         "order": 0
       },
       {
-        "key": "e:27:1",
-        "feature_id": "27",
-        "source_id": "novel",
-        "reference": "Ch. 2 - After the Festival (1984) / 11",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:27:2",
-        "feature_id": "27",
-        "source_id": "novel",
-        "reference": "Ch. 2 - After the Festival (1984) / 11",
-        "note": "",
-        "order": 2
-      },
-      {
         "key": "e:27:3",
         "feature_id": "27",
         "source_id": "novel",
@@ -66566,14 +66486,6 @@
         "order": 1
       },
       {
-        "key": "e:28:2",
-        "feature_id": "28",
-        "source_id": "novel",
-        "reference": "Ch. 2 - After the Festival (1984) / 11",
-        "note": "",
-        "order": 2
-      },
-      {
         "key": "e:29:0",
         "feature_id": "29",
         "source_id": "novel",
@@ -66588,14 +66500,6 @@
         "reference": "Ch. 2 - After the Festival (1984) / 11",
         "note": "",
         "order": 1
-      },
-      {
-        "key": "e:29:2",
-        "feature_id": "29",
-        "source_id": "novel",
-        "reference": "Ch. 2 - After the Festival (1984) / 11",
-        "note": "",
-        "order": 2
       },
       {
         "key": "e:30:0",
@@ -66630,14 +66534,6 @@
         "order": 0
       },
       {
-        "key": "e:31:1",
-        "feature_id": "31",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 5",
-        "note": "",
-        "order": 1
-      },
-      {
         "key": "e:31:2",
         "feature_id": "31",
         "source_id": "novel",
@@ -66654,44 +66550,12 @@
         "order": 0
       },
       {
-        "key": "e:32:1",
-        "feature_id": "32",
-        "source_id": "novel",
-        "reference": "Ch. 19 - In the Watches of the Night / 2",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:32:2",
-        "feature_id": "32",
-        "source_id": "novel",
-        "reference": "Ch. 19 - In the Watches of the Night / 2",
-        "note": "",
-        "order": 2
-      },
-      {
-        "key": "e:32:3",
-        "feature_id": "32",
-        "source_id": "novel",
-        "reference": "Ch. 19 - In the Watches of the Night / 2",
-        "note": "",
-        "order": 3
-      },
-      {
         "key": "e:33:0",
         "feature_id": "33",
         "source_id": "novel",
         "reference": "Ch. 9 - Cleaning Up / 9",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:33:1",
-        "feature_id": "33",
-        "source_id": "novel",
-        "reference": "Ch. 9 - Cleaning Up / 9",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:33:2",
@@ -66742,22 +66606,6 @@
         "order": 0
       },
       {
-        "key": "e:35:1",
-        "feature_id": "35",
-        "source_id": "novel",
-        "reference": "Second Interlude",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:35:2",
-        "feature_id": "35",
-        "source_id": "novel",
-        "reference": "Second Interlude",
-        "note": "",
-        "order": 2
-      },
-      {
         "key": "e:35:3",
         "feature_id": "35",
         "source_id": "novel",
@@ -66772,14 +66620,6 @@
         "reference": "Second Interlude",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:36:1",
-        "feature_id": "36",
-        "source_id": "novel",
-        "reference": "Second Interlude",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:37:0",
@@ -66870,14 +66710,6 @@
         "order": 0
       },
       {
-        "key": "e:40:1",
-        "feature_id": "40",
-        "source_id": "novel",
-        "reference": "Ch. 7 - The Dam in the Barrens / 6",
-        "note": "",
-        "order": 1
-      },
-      {
         "key": "e:40:2",
         "feature_id": "40",
         "source_id": "novel",
@@ -66894,60 +66726,12 @@
         "order": 0
       },
       {
-        "key": "e:41:1",
-        "feature_id": "41",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 2",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:41:2",
-        "feature_id": "41",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 2",
-        "note": "",
-        "order": 2
-      },
-      {
-        "key": "e:41:3",
-        "feature_id": "41",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 2",
-        "note": "",
-        "order": 3
-      },
-      {
         "key": "e:42:0",
         "feature_id": "42",
         "source_id": "novel",
         "reference": "Ch. 11 - Walking Tours / 2",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:42:1",
-        "feature_id": "42",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 2",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:42:2",
-        "feature_id": "42",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 2",
-        "note": "",
-        "order": 2
-      },
-      {
-        "key": "e:42:3",
-        "feature_id": "42",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 2",
-        "note": "",
-        "order": 3
       },
       {
         "key": "e:43:0",
@@ -66980,14 +66764,6 @@
         "reference": "Ch. 20 - The Circle Closes / 6",
         "note": "",
         "order": 3
-      },
-      {
-        "key": "e:43:4",
-        "feature_id": "43",
-        "source_id": "novel",
-        "reference": "Ch. 20 - The Circle Closes / 6",
-        "note": "",
-        "order": 4
       },
       {
         "key": "e:44:0",
@@ -67038,14 +66814,6 @@
         "order": 2
       },
       {
-        "key": "e:45:3",
-        "feature_id": "45",
-        "source_id": "novel",
-        "reference": "Ch. 20 - The Circle Closes / 6",
-        "note": "",
-        "order": 3
-      },
-      {
         "key": "e:46:0",
         "feature_id": "46",
         "source_id": "novel",
@@ -67054,44 +66822,12 @@
         "order": 0
       },
       {
-        "key": "e:46:1",
-        "feature_id": "46",
-        "source_id": "novel",
-        "reference": "Ch. 4 - Ben Hanscom Takes a Fall / 9",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:46:2",
-        "feature_id": "46",
-        "source_id": "novel",
-        "reference": "Ch. 4 - Ben Hanscom Takes a Fall / 9",
-        "note": "",
-        "order": 2
-      },
-      {
-        "key": "e:46:3",
-        "feature_id": "46",
-        "source_id": "novel",
-        "reference": "Ch. 4 - Ben Hanscom Takes a Fall / 9",
-        "note": "",
-        "order": 3
-      },
-      {
         "key": "e:47:0",
         "feature_id": "47",
         "source_id": "novel",
         "reference": "Ch. 19 - In the Watches of the Night / 12",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:47:1",
-        "feature_id": "47",
-        "source_id": "novel",
-        "reference": "Ch. 19 - In the Watches of the Night / 12",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:47:2",
@@ -67142,28 +66878,12 @@
         "order": 0
       },
       {
-        "key": "e:49:1",
-        "feature_id": "49",
-        "source_id": "novel",
-        "reference": "Ch. 17 - Another One of the Missing: The Death of Patrick Hockstetter / 2",
-        "note": "",
-        "order": 1
-      },
-      {
         "key": "e:49:2",
         "feature_id": "49",
         "source_id": "novel",
         "reference": "Ch. 17 - Another One of the Missing: The Death of Patrick Hockstetter / 6",
         "note": "",
         "order": 2
-      },
-      {
-        "key": "e:49:3",
-        "feature_id": "49",
-        "source_id": "novel",
-        "reference": "Ch. 17 - Another One of the Missing: The Death of Patrick Hockstetter / 6",
-        "note": "",
-        "order": 3
       },
       {
         "key": "e:50:0",
@@ -67190,14 +66910,6 @@
         "order": 2
       },
       {
-        "key": "e:50:3",
-        "feature_id": "50",
-        "source_id": "novel",
-        "reference": "Ch. 13 - The Apocalyptic Rockfight / 7",
-        "note": "",
-        "order": 3
-      },
-      {
         "key": "e:51:0",
         "feature_id": "51",
         "source_id": "novel",
@@ -67217,7 +66929,7 @@
         "key": "e:52:0",
         "feature_id": "52",
         "source_id": "novel",
-        "reference": "Ch. 23 - Out / 9",
+        "reference": "Ch. 23 - Out / 8",
         "note": "",
         "order": 0
       },
@@ -67230,44 +66942,12 @@
         "order": 1
       },
       {
-        "key": "e:52:2",
-        "feature_id": "52",
-        "source_id": "novel",
-        "reference": "Ch. 23 - Out / 9",
-        "note": "",
-        "order": 2
-      },
-      {
-        "key": "e:52:3",
-        "feature_id": "52",
-        "source_id": "novel",
-        "reference": "Ch. 23 - Out / 9",
-        "note": "",
-        "order": 3
-      },
-      {
         "key": "e:53:0",
         "feature_id": "53",
         "source_id": "novel",
         "reference": "Ch. 4 - Ben Hanscom Takes a Fall / 11",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:53:1",
-        "feature_id": "53",
-        "source_id": "novel",
-        "reference": "Ch. 4 - Ben Hanscom Takes a Fall / 11",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:53:2",
-        "feature_id": "53",
-        "source_id": "novel",
-        "reference": "Ch. 4 - Ben Hanscom Takes a Fall / 11",
-        "note": "",
-        "order": 2
       },
       {
         "key": "e:54:0",
@@ -67278,14 +66958,6 @@
         "order": 0
       },
       {
-        "key": "e:54:1",
-        "feature_id": "54",
-        "source_id": "novel",
-        "reference": "Ch. 6 - One of the Missing: A Tale from the Summer of '58 / 3",
-        "note": "",
-        "order": 1
-      },
-      {
         "key": "e:55:0",
         "feature_id": "55",
         "source_id": "novel",
@@ -67294,44 +66966,12 @@
         "order": 0
       },
       {
-        "key": "e:55:1",
-        "feature_id": "55",
-        "source_id": "novel",
-        "reference": "Third Interlude",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:55:2",
-        "feature_id": "55",
-        "source_id": "novel",
-        "reference": "Third Interlude",
-        "note": "",
-        "order": 2
-      },
-      {
         "key": "e:56:0",
         "feature_id": "56",
         "source_id": "novel",
         "reference": "Third Interlude",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:56:1",
-        "feature_id": "56",
-        "source_id": "novel",
-        "reference": "Third Interlude",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:56:2",
-        "feature_id": "56",
-        "source_id": "novel",
-        "reference": "Third Interlude",
-        "note": "",
-        "order": 2
       },
       {
         "key": "e:56:3",
@@ -67348,14 +66988,6 @@
         "reference": "Third Interlude",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:57:1",
-        "feature_id": "57",
-        "source_id": "novel",
-        "reference": "Third Interlude",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:57:2",
@@ -67390,22 +67022,6 @@
         "order": 0
       },
       {
-        "key": "e:59:1",
-        "feature_id": "59",
-        "source_id": "novel",
-        "reference": "Fourth Interlude",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:59:2",
-        "feature_id": "59",
-        "source_id": "novel",
-        "reference": "Fourth Interlude",
-        "note": "",
-        "order": 2
-      },
-      {
         "key": "e:60:0",
         "feature_id": "60",
         "source_id": "novel",
@@ -67414,28 +67030,12 @@
         "order": 0
       },
       {
-        "key": "e:60:1",
-        "feature_id": "60",
-        "source_id": "novel",
-        "reference": "Fourth Interlude",
-        "note": "",
-        "order": 1
-      },
-      {
         "key": "e:61:0",
         "feature_id": "61",
         "source_id": "novel",
         "reference": "First Interlude",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:61:1",
-        "feature_id": "61",
-        "source_id": "novel",
-        "reference": "First Interlude",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:62:0",
@@ -67502,14 +67102,6 @@
         "order": 0
       },
       {
-        "key": "e:65:1",
-        "feature_id": "65",
-        "source_id": "novel",
-        "reference": "Ch. 4 - Ben Hanscom Takes a Fall / 4",
-        "note": "",
-        "order": 1
-      },
-      {
         "key": "e:65:2",
         "feature_id": "65",
         "source_id": "novel",
@@ -67540,14 +67132,6 @@
         "reference": "Ch. 6 - One of the Missing: A Tale from the Summer of '58 / 5",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:67:1",
-        "feature_id": "67",
-        "source_id": "novel",
-        "reference": "Ch. 6 - One of the Missing: A Tale from the Summer of '58 / 5",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:67:2",
@@ -67590,14 +67174,6 @@
         "order": 0
       },
       {
-        "key": "e:69:1",
-        "feature_id": "69",
-        "source_id": "novel",
-        "reference": "Ch. 6 - One of the Missing: A Tale from the Summer of '58 / 2",
-        "note": "",
-        "order": 1
-      },
-      {
         "key": "e:69:2",
         "feature_id": "69",
         "source_id": "novel",
@@ -67622,28 +67198,12 @@
         "order": 0
       },
       {
-        "key": "e:71:1",
-        "feature_id": "71",
-        "source_id": "novel",
-        "reference": "Ch. 18 - The Bullseye / 2",
-        "note": "",
-        "order": 1
-      },
-      {
         "key": "e:72:0",
         "feature_id": "72",
         "source_id": "novel",
         "reference": "Third Interlude",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:72:1",
-        "feature_id": "72",
-        "source_id": "novel",
-        "reference": "Third Interlude",
-        "note": "",
-        "order": 1
       },
       {
         "key": "e:73:0",
@@ -67726,22 +67286,6 @@
         "order": 1
       },
       {
-        "key": "e:78:2",
-        "feature_id": "78",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 2",
-        "note": "",
-        "order": 2
-      },
-      {
-        "key": "e:78:3",
-        "feature_id": "78",
-        "source_id": "novel",
-        "reference": "Ch. 11 - Walking Tours / 2",
-        "note": "",
-        "order": 3
-      },
-      {
         "key": "e:78:4",
         "feature_id": "78",
         "source_id": "novel",
@@ -67780,22 +67324,6 @@
         "reference": "Ch. 17 - Another One of the Missing: The Death of Patrick Hockstetter / 6",
         "note": "",
         "order": 0
-      },
-      {
-        "key": "e:80:1",
-        "feature_id": "80",
-        "source_id": "novel",
-        "reference": "Ch. 17 - Another One of the Missing: The Death of Patrick Hockstetter / 6",
-        "note": "",
-        "order": 1
-      },
-      {
-        "key": "e:80:2",
-        "feature_id": "80",
-        "source_id": "novel",
-        "reference": "Ch. 17 - Another One of the Missing: The Death of Patrick Hockstetter / 6",
-        "note": "",
-        "order": 2
       },
       {
         "key": "e:81:0",
@@ -67838,6 +67366,22 @@
         "order": 0
       },
       {
+        "key": "e:84:0",
+        "feature_id": "84",
+        "source_id": "novel",
+        "reference": "Ch. 5 - Bill Denbrough Beats the Devil - I / 1",
+        "note": "",
+        "order": 0
+      },
+      {
+        "key": "e:84:1",
+        "feature_id": "84",
+        "source_id": "novel",
+        "reference": "Ch. 11 - Walking Tours / 5",
+        "note": "",
+        "order": 1
+      },
+      {
         "key": "e:U1:0",
         "feature_id": "U1",
         "source_id": "novel",
@@ -67866,14 +67410,6 @@
         "feature_id": "U4",
         "source_id": "novel",
         "reference": "Ch. 12; Ch. 19",
-        "note": "",
-        "order": 0
-      },
-      {
-        "key": "e:U5:0",
-        "feature_id": "U5",
-        "source_id": "novel",
-        "reference": "Ch. 5",
         "note": "",
         "order": 0
       },

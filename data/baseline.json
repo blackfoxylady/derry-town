@@ -1,10 +1,10 @@
 {
-  "site_count": 83,
-  "unplaced_count": 9,
+  "site_count": 84,
+  "unplaced_count": 8,
   "scene_elements": 3070,
-  "sites_sha256": "da2318328d977c791f308f2fb21f0d1991ed66090a261aad2d8ea2d0ece4f7a4",
-  "unplaced_sha256": "36889bcd255ec6f52be8cd25158448b618f37dddf4778bc4a3d8ba2ff3e7ab43",
-  "scene_sha256": "98a58ddd68bd70bc5a7e35f684f5f70e5c761261a037ecda6be2dff1838d6e87",
+  "sites_sha256": "faa0c057f8c3028f4d55adc85281599e651c0eed225d0fb067d5494186bb7931",
+  "unplaced_sha256": "424795273b33b490b01276ce40ad0feeb6e4b5a18b04bf272ec1b629836b6896",
+  "scene_sha256": "2a39f2582e0a040ec17288cef52e20e65c06e71eef69a53fb15aae393cf76cbd",
   "labels_sha256": "91924dd86e2e0ccfe7aff3b932bab6af1841749cae2f3efcb9cacc29619b47b7",
   "relief_sha256": "3c71badcb910505408f7ceab370bbaa4e62ad5e43ec909b22bfba4320a7cc741",
   "inputs": {
