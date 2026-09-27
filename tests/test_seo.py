@@ -109,8 +109,46 @@ class SeoTests(TestCase):
         self.assertContains(self.client.get('/ru/'), '<meta property="og:locale" content="ru_RU">')
         # Без фото страница места подставляет общую карту.
         response = self.client.get('/places/12-derry-public-library/')
-        self.assertContains(response, '<meta property="og:title" content="Derry Public Library · Derry">')
+        self.assertContains(response, '<meta property="og:title" content="Derry Public Library — Derry, Maine · Stephen King’s IT">')
         self.assertContains(response, 'og-map.jpg')
+
+    def test_approved_seo_templates_and_dynamic_place_count(self):
+        response = self.client.get('/')
+        self.assertContains(
+            response, '<title>Map of Derry, Maine — Stephen King’s IT Literary Atlas</title>')
+        self.assertContains(
+            response, 'with 1 mapped place, book evidence and photographs.')
+        self.assertNotContains(response, '83 mapped places')
+
+        response = self.client.get('/places/12-derry-public-library/')
+        self.assertContains(
+            response, '<title>Derry Public Library — Derry, Maine · Stephen King’s IT</title>')
+        self.assertContains(
+            response, 'Explore Derry Public Library in Derry, Maine: its location, book evidence '
+                      'and mapping confidence in this literary atlas of Stephen King’s IT.')
+
+        response = self.client.get('/photos/')
+        self.assertContains(
+            response, '<title>Photographs of Derry, Maine — Stephen King’s IT</title>')
+        self.assertContains(response, 'with filters by place, character, tag and year.')
+
+        response = self.client.get('/method/')
+        self.assertContains(
+            response,
+            '<title>Mapping Derry, Maine — Sources &amp; Method · Stephen King’s IT</title>')
+        self.assertContains(
+            response, 'including sources, evidence, confidence levels and mapping decisions.')
+
+    def test_approved_seo_templates_are_localized_in_russian(self):
+        response = self.client.get('/ru/')
+        self.assertContains(
+            response,
+            '<title>Карта Дерри, штат Мэн — литературный атлас «Оно» Стивена Кинга</title>')
+        self.assertContains(response, '1 место на карте')
+        response = self.client.get('/ru/places/12-derry-public-library/')
+        self.assertContains(
+            response,
+            '<title>Derry Public Library — Дерри, штат Мэн · «Оно» Стивена Кинга</title>')
 
     def test_photo_pages_use_the_photo_as_preview(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -120,7 +158,11 @@ class SeoTests(TestCase):
                 photo = photos.add(root / 'a.png', caption='Ben.', feature='12', year=1958)
                 response = self.client.get(f'/photos/{photo.id}/')
                 self.assertContains(response, '<meta property="og:image" content="http://testserver/media/')
-                self.assertContains(response, '<meta property="og:title" content="Ben. · Derry">')
+                self.assertContains(response, '<meta property="og:title" content="Ben. — Derry, Maine · Stephen King’s IT">')
+                self.assertContains(
+                    response,
+                    '<meta name="description" content="Ben. A photograph of Derry Public Library '
+                    'in the Derry, Maine literary atlas based on Stephen King’s IT, dated 1958.">')
                 self.assertContains(response, '<meta property="og:image:width" content="1200">')
                 self.assertContains(response, '<meta property="og:image:height" content="800">')
                 self.assertContains(response, '<meta property="article:published_time"')

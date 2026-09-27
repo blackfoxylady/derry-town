@@ -30,11 +30,11 @@ def _graph(request, *nodes):
 
 def _page(request, page_type, name, description=''):
     node = {'@type': page_type, 'url': request.build_absolute_uri(request.path),
-            'name': name, 'inLanguage': get_language() or 'en',
+            'name': str(name), 'inLanguage': get_language() or 'en',
             'isPartOf': {'@id': _root(request) + '#website'},
             'about': {'@id': _root(request) + '#book'}}
     if description:
-        node['description'] = description
+        node['description'] = str(description)
     return node
 
 
@@ -49,26 +49,16 @@ def _breadcrumbs(request, *items):
     return {'@type': 'BreadcrumbList', 'itemListElement': elements}
 
 
-def index(request):
-    # Тексты — те же msgid, что в <head> шаблона; переводы берутся из .po.
-    return _graph(request, _page(
-        request, 'Map', _('Derry · A literary atlas of IT'),
-        _('A reasoned interactive map of Derry, Maine — the fictional town of Stephen King’s IT: '
-          '83 mapped places with book evidence and photographs.')))
+def index(request, name, description):
+    return _graph(request, _page(request, 'Map', name, description))
 
 
-def gallery(request):
-    return _graph(request, _page(
-        request, ['CollectionPage', 'ImageGallery'], _('Photographs'),
-        _('Photographs from a literary atlas of Stephen King’s IT: '
-          'the places, characters and years of Derry.')))
+def gallery(request, name, description):
+    return _graph(request, _page(request, ['CollectionPage', 'ImageGallery'], name, description))
 
 
-def method(request):
-    return _graph(request, _page(
-        request, 'WebPage', _('Sources & method'),
-        _('How this map of Derry was reconstructed from the novel: '
-          'sources, confidence levels and method.')))
+def method(request, name, description):
+    return _graph(request, _page(request, 'WebPage', name, description))
 
 
 def place(request, ctx):

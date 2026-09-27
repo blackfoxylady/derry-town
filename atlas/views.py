@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, translate_url
 from django.utils._os import safe_join
 from django.utils.text import slugify
-from django.utils.translation import get_language, gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _, ngettext
 from django.views.decorators.http import require_safe
 from . import schema
 from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
@@ -21,7 +21,17 @@ from .rendering import current_payload, RENDER_VERSION
 
 @require_safe
 def index(request):
-    response = render(request, 'atlas/index.html', {'jsonld': schema.index(request)})
+    mapped_count = Feature.objects.filter(object_type='site').count()
+    page_title = _('Map of Derry, Maine — Stephen King’s IT Literary Atlas')
+    meta_description = ngettext(
+        'Explore an interactive map of Derry, Maine, reconstructed from Stephen King’s IT, '
+        'with %(count)s mapped place, book evidence and photographs.',
+        'Explore an interactive map of Derry, Maine, reconstructed from Stephen King’s IT, '
+        'with %(count)s mapped places, book evidence and photographs.',
+        mapped_count) % {'count': mapped_count}
+    context = {'page_title': page_title, 'meta_description': meta_description}
+    context['jsonld'] = schema.index(request, page_title, meta_description)
+    response = render(request, 'atlas/index.html', context)
     response['Cache-Control'] = 'no-cache'
     return response
 
@@ -295,10 +305,15 @@ def gallery(request):
                       'place_label': f.name if f else p.feature_key,
                       'place_url': _gallery_url(place=p.feature_key) if p.feature_key else '',
                       'year_url': _gallery_url(year=str(p.year)) if p.year else ''})
+    page_title = _('Photographs of Derry, Maine — Stephen King’s IT')
+    meta_description = _(
+        'Browse photographs of Derry, Maine places from a literary atlas of Stephen King’s IT, '
+        'with filters by place, character, tag and year.')
     response = render(request, 'atlas/gallery.html', {
         'groups': groups, 'cards': cards, 'clear_url': reverse('gallery'),
         'filtered': bool(place or character or tags or year),
-        'jsonld': schema.gallery(request)})
+        'page_title': page_title, 'meta_description': meta_description,
+        'jsonld': schema.gallery(request, page_title, meta_description)})
     response['Cache-Control'] = 'no-cache'
     return response
 
@@ -314,10 +329,23 @@ def photo_page(request, photo_id):
     urls = _media_urls(photo)
     caption = _caption(photo)
     alt = _photo_alt(photo, feature)
+    heading = caption or alt
+    place_label = feature.name if feature else photo.feature_key or _('Derry')
+    page_title = _('%(subject)s — Derry, Maine · Stephen King’s IT') % {'subject': heading}
+    description_subject = heading if heading.endswith(('.', '!', '?')) else heading + '.'
+    if photo.year:
+        meta_description = _(
+            '%(subject)s A photograph of %(place)s in the Derry, Maine literary atlas based on '
+            'Stephen King’s IT, dated %(year)s.') % {
+                'subject': description_subject, 'place': place_label, 'year': photo.year}
+    else:
+        meta_description = _(
+            '%(subject)s A photograph of %(place)s in the Derry, Maine literary atlas based on '
+            'Stephen King’s IT.') % {'subject': description_subject, 'place': place_label}
     og_width, og_height = _fitted_dimensions(photo.width, photo.height, MEDIUM_SIZE)
     context = {
         'photo': photo, 'urls': urls, 'caption': caption, 'alt': alt,
-        'page_title': caption or alt,
+        'heading': heading, 'page_title': page_title, 'meta_description': meta_description,
         'srcset': _fitted_srcset(photo.width, photo.height,
                                  [(urls['medium'], MEDIUM_SIZE),
                                   (urls['original'], max(photo.width, photo.height))]),
@@ -376,6 +404,10 @@ def place_page(request, slug):
     modified_candidates = [value for value in (scene_modified, latest_photo, latest_cover) if value]
     modified_time = max(modified_candidates) if modified_candidates else None
     place_content = _feature_place_content(feature)
+    page_title = _('%(name)s — Derry, Maine · Stephen King’s IT') % {'name': feature.name}
+    meta_description = _(
+        'Explore %(name)s in Derry, Maine: its location, book evidence and mapping confidence '
+        'in this literary atlas of Stephen King’s IT.') % {'name': feature.name}
     cards = [{'photo': p, **_card_image(p), 'caption': _caption(p),
               'alt': _photo_alt(p, feature)} for p in photos]
     if covers:
@@ -388,6 +420,7 @@ def place_page(request, slug):
         og_width = og_height = None
     context = {
         'feature': feature, 'note': _feature_note(feature),
+        'page_title': page_title, 'meta_description': meta_description,
         'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
         'place_about': place_content['about'],
         'confidence_explanation': place_content['confidence_explanation'],
@@ -424,8 +457,14 @@ def method(request):
         ru = (s.metadata or {}).get('ru', {}) if _is_ru() and isinstance(s.metadata, dict) else {}
         sources.append({'key': s.key, 'url': s.url, 'title': ru.get('title') or s.title,
                         'role': ru.get('role') or s.role})
-    response = render(request, 'atlas/method.html', {'method_geometry': geometry, 'sources': sources,
-                                                     'jsonld': schema.method(request)})
+    page_title = _('Mapping Derry, Maine — Sources & Method · Stephen King’s IT')
+    meta_description = _(
+        'Learn how the map of Derry, Maine was reconstructed from Stephen King’s IT, including '
+        'sources, evidence, confidence levels and mapping decisions.')
+    response = render(request, 'atlas/method.html', {
+        'method_geometry': geometry, 'sources': sources,
+        'page_title': page_title, 'meta_description': meta_description,
+        'jsonld': schema.method(request, page_title, meta_description)})
     response['Cache-Control'] = 'no-cache'
     return response
 

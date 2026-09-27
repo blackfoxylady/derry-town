@@ -37,6 +37,9 @@ msgstr "Год"
 msgid "Photographs"
 msgstr "Фотографии"
 
+msgid "Derry"
+msgstr "Дерри"
+
 msgid "Photographs from a literary atlas of Stephen King’s <i>IT</i>"
 msgstr "Фотографии из литературного атласа романа Стивена Кинга <i>«Оно»</i>"
 
@@ -180,33 +183,7 @@ msgstr ""
 "канонические дорожные расстояния. Escape сбрасывает измерение и закрывает "
 "карточку места."
 
-#: meta descriptions
-msgid ""
-"Photographs from a literary atlas of Stephen King’s IT: the places, "
-"characters and years of Derry."
-msgstr ""
-"Фотографии из литературного атласа романа Стивена Кинга «Оно»: места, "
-"персонажи и годы Дерри."
-
-msgid ""
-"A reasoned interactive map of Derry, Maine — the fictional town of Stephen "
-"King’s IT: 83 mapped places with book evidence and photographs."
-msgstr ""
-"Осмысленная интерактивная карта Дерри, штат Мэн — вымышленного города из "
-"романа Стивена Кинга «Оно»: 83 места на карте с книжными свидетельствами и "
-"фотографиями."
-
-msgid ""
-"How this map of Derry was reconstructed from the novel: sources, confidence "
-"levels and method."
-msgstr ""
-"Как эта карта Дерри реконструирована по роману: источники, уровни "
-"достоверности и метод."
-
 #: index.html
-msgid "Derry · A literary atlas of IT"
-msgstr "Дерри · Литературный атлас романа «Оно»"
-
 msgid "A literary atlas of Stephen King’s <i>IT</i>"
 msgstr "Литературный атлас романа Стивена Кинга <i>«Оно»</i>"
 
@@ -330,3 +307,75 @@ msgstr ""
 
 msgid "Badges by the markers (zoom in) show the type of place:"
 msgstr "Значки у маркеров (при приближении) показывают тип места:"
+
+#: SEO titles and descriptions
+msgid "Map of Derry, Maine — Stephen King’s IT Literary Atlas"
+msgstr "Карта Дерри, штат Мэн — литературный атлас «Оно» Стивена Кинга"
+
+msgid ""
+"Explore an interactive map of Derry, Maine, reconstructed from Stephen "
+"King’s IT, with %(count)s mapped place, book evidence and photographs."
+msgid_plural ""
+"Explore an interactive map of Derry, Maine, reconstructed from Stephen "
+"King’s IT, with %(count)s mapped places, book evidence and photographs."
+msgstr[0] ""
+"Исследуйте интерактивную карту Дерри, штат Мэн, реконструированную по "
+"роману Стивена Кинга «Оно»: %(count)s место на карте, книжные свидетельства "
+"и фотографии."
+msgstr[1] ""
+"Исследуйте интерактивную карту Дерри, штат Мэн, реконструированную по "
+"роману Стивена Кинга «Оно»: %(count)s места на карте, книжные свидетельства "
+"и фотографии."
+msgstr[2] ""
+"Исследуйте интерактивную карту Дерри, штат Мэн, реконструированную по "
+"роману Стивена Кинга «Оно»: %(count)s мест на карте, книжные свидетельства "
+"и фотографии."
+
+msgid "Photographs of Derry, Maine — Stephen King’s IT"
+msgstr "Фотографии Дерри, штат Мэн — «Оно» Стивена Кинга"
+
+msgid ""
+"Browse photographs of Derry, Maine places from a literary atlas of Stephen "
+"King’s IT, with filters by place, character, tag and year."
+msgstr ""
+"Просматривайте фотографии мест Дерри, штат Мэн, из литературного атласа "
+"романа Стивена Кинга «Оно» с фильтрами по месту, персонажу, тегу и году."
+
+msgid "%(subject)s — Derry, Maine · Stephen King’s IT"
+msgstr "%(subject)s — Дерри, штат Мэн · «Оно» Стивена Кинга"
+
+msgid ""
+"%(subject)s A photograph of %(place)s in the Derry, Maine literary atlas "
+"based on Stephen King’s IT, dated %(year)s."
+msgstr ""
+"%(subject)s Фотография места «%(place)s» в литературном атласе Дерри, штат "
+"Мэн, по роману Стивена Кинга «Оно»; дата съёмки — %(year)s год."
+
+msgid ""
+"%(subject)s A photograph of %(place)s in the Derry, Maine literary atlas "
+"based on Stephen King’s IT."
+msgstr ""
+"%(subject)s Фотография места «%(place)s» в литературном атласе Дерри, штат "
+"Мэн, по роману Стивена Кинга «Оно»."
+
+msgid "%(name)s — Derry, Maine · Stephen King’s IT"
+msgstr "%(name)s — Дерри, штат Мэн · «Оно» Стивена Кинга"
+
+msgid ""
+"Explore %(name)s in Derry, Maine: its location, book evidence and mapping "
+"confidence in this literary atlas of Stephen King’s IT."
+msgstr ""
+"Узнайте о месте %(name)s в Дерри, штат Мэн: его положении, книжных "
+"свидетельствах и достоверности привязки в литературном атласе романа "
+"Стивена Кинга «Оно»."
+
+msgid "Mapping Derry, Maine — Sources & Method · Stephen King’s IT"
+msgstr "Картография Дерри, штат Мэн — источники и метод · «Оно» Стивена Кинга"
+
+msgid ""
+"Learn how the map of Derry, Maine was reconstructed from Stephen King’s IT, "
+"including sources, evidence, confidence levels and mapping decisions."
+msgstr ""
+"Узнайте, как карта Дерри, штат Мэн, реконструирована по роману Стивена "
+"Кинга «Оно»: источники, свидетельства, уровни достоверности и решения по "
+"размещению объектов."
