@@ -67,6 +67,46 @@ class PlacePageTests(TestCase):
         self.assertContains(response, 'About Derry Public Library')
         self.assertNotContains(response, 'Why this location is marked B')
 
+    def test_related_places_are_ranked_and_not_duplicated(self):
+        book = Source.objects.get(pk='novel')
+
+        def place(key, x):
+            geometry = Geometry.objects.create(
+                key=f'g:{key}', shape={'type': 'point', 'x': x, 'y': 0})
+            return Feature.objects.create(
+                key=key, object_type='site', name=f'Place {key}', kind='Civic',
+                confidence='B', geometry=geometry, metadata={})
+
+        nearby_shared = place('13', 10)
+        place('14', 20)
+        place('15', 30)
+        place('16', 40)
+        exact_section = place('17', 100)
+        same_chapter = place('18', 110)
+        bare_reference = place('19', 120)
+        Evidence.objects.create(key='e13', feature=nearby_shared, source=book,
+                                reference='Ch. 4 - Ben Hanscom / 2')
+        Evidence.objects.create(key='e17', feature=exact_section, source=book,
+                                reference='Ch. 4 - Ben Hanscom / 1')
+        Evidence.objects.create(key='e18', feature=same_chapter, source=book,
+                                reference='Ch. 4 - Ben Hanscom / 9')
+        Evidence.objects.create(key='e19', feature=bare_reference, source=book,
+                                reference='[1771]')
+
+        response = self.client.get('/places/12-derry-public-library/')
+        nearby = response.context['nearby_places']
+        chapters = response.context['same_chapter_places']
+        self.assertEqual([item['feature'].key for item in nearby], ['13', '14', '15', '16'])
+        self.assertEqual(nearby[0]['chapter'], 'Ch. 4 - Ben Hanscom')
+        self.assertEqual([item['feature'].key for item in chapters], ['17', '18'])
+        self.assertNotIn('distance', nearby[0])
+        self.assertContains(response, 'Explore related places')
+        self.assertContains(response, 'href="/places/17-place-17/"')
+        self.assertNotContains(response, 'Place 19')
+        russian = self.client.get('/ru/places/12-derry-public-library/')
+        self.assertContains(russian, 'Исследуйте связанные места')
+        self.assertContains(russian, 'Места рядом на карте')
+
     def test_stale_or_bare_slug_redirects_to_canonical(self):
         for path in ('/places/12/', '/places/12-old-name/'):
             response = self.client.get(path)
@@ -122,3 +162,5 @@ class PlacePageTests(TestCase):
                 photo = photos.add(root / 'a.png', caption='Ben at the library.', feature='12', year=1958)
                 response = self.client.get(f'/photos/{photo.id}/')
                 self.assertContains(response, '/places/12-derry-public-library/')
+                self.assertContains(response, 'Photographs from here')
+                self.assertNotContains(response, 'target="_blank"')

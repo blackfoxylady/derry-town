@@ -100,6 +100,21 @@ msgstr "Все фотографии этого места"
 msgid "Sources & evidence"
 msgstr "Источники и свидетельства"
 
+msgid "Explore related places"
+msgstr "Исследуйте связанные места"
+
+msgid "Nearby on the map"
+msgstr "Места рядом на карте"
+
+msgid "View this area on the map"
+msgstr "Показать этот район на карте"
+
+msgid "Also referenced in the same chapters"
+msgstr "Другие места из тех же глав"
+
+msgid "Photographs from here"
+msgstr "Фотографии этого места"
+
 #: method.html
 msgid "Sources & method"
 msgstr "Источники и метод"
@@ -314,9 +329,6 @@ msgstr "Дома"
 
 msgid "Civic"
 msgstr "Городские места"
-
-msgid "Barrens"
-msgstr "Пустошь"
 
 msgid "Encounters"
 msgstr "Встречи"

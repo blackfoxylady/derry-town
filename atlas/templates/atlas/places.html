@@ -1,7 +1,7 @@
 {% extends 'atlas/gallery_base.html' %}
 {% load i18n static %}
 {% block content %}
-<nav class="crumbs" aria-label="{% trans 'Breadcrumbs' %}"><a href="{% url 'index' %}">Derry</a> · <span>{% trans "Places" %}</span></nav>
+{% include 'atlas/breadcrumbs.html' with section='places' only %}
 <div class="places-hero">
 <div class="eyebrow">{% trans "The places remembered" %}</div>
 <h1>{% trans "Places in Derry, Maine" %}</h1>

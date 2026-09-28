@@ -1,5 +1,6 @@
 from collections import Counter
 from pathlib import Path
+import re
 from urllib.parse import urlencode
 from xml.sax.saxutils import escape
 from django.conf import settings
@@ -290,6 +291,136 @@ def _place_sort_key(feature):
     return (0, int(feature.key)) if feature.key.isdigit() else (1, feature.key.casefold())
 
 
+def _place_number(feature):
+    return f'{int(feature.key):02d}' if feature.key.isdigit() else feature.key.upper()
+
+
+def _kind_label(feature):
+    if feature.object_type == 'unplaced':
+        return _('Unlocated')
+    return {
+        'Homes': _('Homes'), 'Civic': _('Civic'), 'Barrens': _('Barrens'),
+        'Encounters': _('Encounters'), 'Historical': _('Historical'),
+        'Outlying': _('Outlying'),
+    }.get(feature.kind, feature.kind)
+
+
+_CHAPTER = re.compile(r'^Ch\.\s*\d+\s*-\s*.+$', re.IGNORECASE)
+_INTERLUDE = re.compile(r'^(?:First|Second|Third|Fourth|Fifth)\s+Interlude$', re.IGNORECASE)
+_REFERENCE_SECTION = re.compile(r'\s*/\s*\d+\s*$')
+
+
+def _chapter_reference(reference):
+    """Return a stable key and display label for a novel chapter reference.
+
+    Evidence stores editorial strings such as ``Ch. 11 - Walking Tours / 4``.
+    The trailing section is intentionally removed so related places are joined
+    by chapter. Bare page/location references such as ``[1771]`` are ignored.
+    """
+    label = _REFERENCE_SECTION.sub('', ' '.join(reference.split()))
+    if not (_CHAPTER.fullmatch(label) or _INTERLUDE.fullmatch(label)):
+        return None
+    return label.casefold(), label
+
+
+def _reference_key(reference):
+    return ' '.join(reference.split()).casefold()
+
+
+def _related_place_card(feature, chapter=''):
+    return {
+        'feature': feature,
+        'number': _place_number(feature),
+        'url': reverse('place', args=[place_slug(feature)]),
+        'kind': _kind_label(feature),
+        'chapter': chapter,
+    }
+
+
+def _related_places(feature, current_evidence, limit=4):
+    """Build geographical and textual links for a place page.
+
+    Distances rank reconstructed map points but are deliberately not exposed:
+    they are navigation hints, not claims about surveyed real-world geography.
+    Textual candidates favour the same exact section, then the greatest number
+    of shared chapters. A place already shown as nearby is not repeated in the
+    second panel; its shared chapter is attached to the nearby card instead.
+    """
+    nearby = []
+    if feature.object_type == 'site' and feature.geometry_id:
+        shape = feature.geometry.shape
+        if shape.get('type') == 'point':
+            x, y = shape.get('x'), shape.get('y')
+            if isinstance(x, (int, float)) and isinstance(y, (int, float)):
+                distances = []
+                candidates = (Feature.objects.filter(object_type='site')
+                              .exclude(pk=feature.pk).select_related('geometry'))
+                for candidate in candidates:
+                    candidate_shape = candidate.geometry.shape
+                    if candidate_shape.get('type') != 'point':
+                        continue
+                    cx, cy = candidate_shape.get('x'), candidate_shape.get('y')
+                    if not isinstance(cx, (int, float)) or not isinstance(cy, (int, float)):
+                        continue
+                    distances.append(((cx - x) ** 2 + (cy - y) ** 2, candidate))
+                distances.sort(key=lambda item: (item[0], _place_sort_key(item[1])))
+                nearby = [_related_place_card(candidate) for _, candidate in distances[:limit]]
+
+    current_exact = {_reference_key(e.reference) for e in current_evidence}
+    current_chapters = {}
+    reference_chapters = {}
+    for evidence in current_evidence:
+        parsed = _chapter_reference(evidence.reference)
+        if parsed:
+            key, label = parsed
+            current_chapters.setdefault(key, label)
+            reference_chapters[_reference_key(evidence.reference)] = key
+
+    semantic = {}
+    if current_chapters:
+        evidence_rows = (Evidence.objects.filter(
+            feature__object_type__in=('site', 'unplaced')).exclude(feature=feature)
+            .select_related('feature').order_by('feature_id', 'order', 'key'))
+        for evidence in evidence_rows:
+            parsed = _chapter_reference(evidence.reference)
+            if not parsed or parsed[0] not in current_chapters:
+                continue
+            entry = semantic.setdefault(evidence.feature_id, {
+                'feature': evidence.feature, 'references': set(), 'chapters': set(),
+            })
+            entry['references'].add(_reference_key(evidence.reference))
+            entry['chapters'].add(parsed[0])
+
+    def primary_chapter(entry):
+        exact = current_exact & entry['references']
+        for reference in current_evidence:
+            reference_key = _reference_key(reference.reference)
+            chapter_key = reference_chapters.get(reference_key)
+            if reference_key in exact and chapter_key in entry['chapters']:
+                return current_chapters[chapter_key]
+        return next(current_chapters[key] for key in current_chapters
+                    if key in entry['chapters'])
+
+    nearby_keys = {card['feature'].key for card in nearby}
+    for card in nearby:
+        entry = semantic.get(card['feature'].key)
+        if entry:
+            card['chapter'] = primary_chapter(entry)
+
+    candidates = [entry for key, entry in semantic.items() if key not in nearby_keys]
+    candidates.sort(key=lambda entry: (
+        -len(current_exact & entry['references']),
+        -len(entry['chapters']),
+        entry['feature'].rank,
+        _place_sort_key(entry['feature']),
+    ))
+    same_chapters = [
+        _related_place_card(entry['feature'], primary_chapter(entry))
+        for entry in candidates[:limit]
+    ]
+    return nearby, same_chapters
+
+
 @require_safe
 def places(request):
     """Server-rendered directory of every place, progressively enhanced with local filters."""
@@ -341,7 +472,7 @@ def places(request):
         )))
         cards.append({
             'feature': feature,
-            'number': f'{int(feature.key):02d}' if feature.key.isdigit() else feature.key.upper(),
+            'number': _place_number(feature),
             'url': reverse('place', args=[place_slug(feature)]),
             'map_url': reverse('index') + '?place=' + feature.key if mapped else '',
             'gallery_url': _gallery_url(place=feature.key) if feature_photos else '',
@@ -444,10 +575,15 @@ def gallery(request):
     cards = []
     for p in photos:
         f = features.get(p.feature_key)
+        place_page_url = (reverse('place', args=[place_slug(f)])
+                          if f and f.object_type in ('site', 'unplaced') else '')
+        place_gallery_url = _gallery_url(place=p.feature_key) if p.feature_key else ''
         cards.append({'photo': p, **_card_image(p), 'caption': _caption(p),
                       'alt': _photo_alt(p, f),
                       'place_label': f.name if f else p.feature_key,
-                      'place_url': _gallery_url(place=p.feature_key) if p.feature_key else '',
+                      'place_url': place_page_url or place_gallery_url,
+                      'place_gallery_url': (place_gallery_url
+                                            if place_page_url and place != p.feature_key else ''),
                       'year_url': _gallery_url(year=str(p.year)) if p.year else ''})
     page_title = _('Photographs of Derry, Maine — Stephen King’s IT')
     meta_description = _(
@@ -497,7 +633,7 @@ def photo_page(request, photo_id):
         'published_time': photo.created, 'modified_time': photo.modified,
         'place_page_url': reverse('place', args=[place_slug(feature)]) if on_map else '',
         'place_label': feature.name if feature else photo.feature_key,
-        'place_url': _gallery_url(place=photo.feature_key) if photo.feature_key else '',
+        'place_gallery_url': _gallery_url(place=photo.feature_key) if photo.feature_key else '',
         'map_url': map_url,
         'year_url': _gallery_url(year=str(photo.year)) if photo.year else '',
         'characters': [{'name': c.name, 'url': _gallery_url(character=c.slug)}
@@ -532,7 +668,8 @@ def place_page(request, slug):
     notes_ru = (_feature_ru(feature).get('evidence') or {}) if _is_ru() else {}
     # Цитаты группируются по референсу, как в карточке на карте.
     refs = []
-    for e in Evidence.objects.filter(feature=feature).order_by('order', 'key'):
+    evidence = list(Evidence.objects.filter(feature=feature).order_by('order', 'key'))
+    for e in evidence:
         note = notes_ru.get(e.key) or e.note
         group = next((r for r in refs if r['reference'] == e.reference), None)
         if group is None:
@@ -548,6 +685,7 @@ def place_page(request, slug):
     modified_candidates = [value for value in (scene_modified, latest_photo, latest_cover) if value]
     modified_time = max(modified_candidates) if modified_candidates else None
     place_content = _feature_place_content(feature)
+    nearby_places, same_chapter_places = _related_places(feature, evidence)
     page_title = _('%(name)s — Derry, Maine · Stephen King’s IT') % {'name': feature.name}
     meta_description = _(
         'Explore %(name)s in Derry, Maine: its location, book evidence and mapping confidence '
@@ -568,6 +706,8 @@ def place_page(request, slug):
         'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
         'place_about': place_content['about'],
         'confidence_explanation': place_content['confidence_explanation'],
+        'nearby_places': nearby_places,
+        'same_chapter_places': same_chapter_places,
         'covers': covers, 'cards': cards,
         # Превью для соцсетей: заглавное фото, иначе первое фото места;
         # совсем без фото шаблон подставит общую карту.

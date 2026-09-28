@@ -54,7 +54,8 @@ def index(request, name, description):
 
 
 def gallery(request, name, description):
-    return _graph(request, _page(request, ['CollectionPage', 'ImageGallery'], name, description))
+    return _graph(request, _page(request, ['CollectionPage', 'ImageGallery'], name, description),
+                  _breadcrumbs(request, ('Derry', reverse('index')), (_('Photographs'), '')))
 
 
 def places(request, name, description, cards):

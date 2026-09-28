@@ -239,9 +239,14 @@ class JsonLdTests(TestCase):
         self.assertEqual(page['inLanguage'], 'ru')
 
     def test_gallery_and_method_pages(self):
-        gallery = node(jsonld(self.client.get('/photos/')), 'ImageGallery')
+        gallery_data = jsonld(self.client.get('/photos/'))
+        gallery = node(gallery_data, 'ImageGallery')
         self.assertEqual(gallery['url'], 'http://testserver/photos/')
         self.assertIn('CollectionPage', gallery['@type'])
+        crumbs = node(gallery_data, 'BreadcrumbList')['itemListElement']
+        self.assertEqual([crumb['name'] for crumb in crumbs], ['Derry', 'Photographs'])
+        self.assertEqual(crumbs[0]['item'], 'http://testserver/')
+        self.assertNotIn('item', crumbs[1])
         method = node(jsonld(self.client.get('/method/')), 'WebPage')
         self.assertEqual(method['about'], {'@id': 'http://testserver/#book'})
 

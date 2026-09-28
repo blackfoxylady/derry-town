@@ -5,7 +5,7 @@
 {% block article_meta %}{% if published_time %}<meta property="article:published_time" content="{{ published_time|date:'c' }}">{% endif %}{% if modified_time %}<meta property="article:modified_time" content="{{ modified_time|date:'c' }}">{% endif %}{% endblock %}
 {% block content %}
 <article class="place">
-<nav class="crumbs" aria-label="{% trans 'Breadcrumbs' %}"><a href="{% url 'index' %}">Derry</a> · <a href="{{ places_url }}">{% trans "Places" %}</a> · <span>{{ feature.name }}</span></nav>
+{% include 'atlas/breadcrumbs.html' with section='places' current=feature.name only %}
 <div class="eyebrow">{% if feature.object_type == 'site' %}{% blocktranslate with number=feature.key %}Place {{ number }}{% endblocktranslate %}{% else %}{% trans "Unlocated place" %}{% endif %}</div>
 <h1>{{ feature.name }}</h1>
 {% if feature.period %}<p class="period">{{ feature.period }}</p>{% endif %}
@@ -57,6 +57,26 @@ imgs.forEach(function(im){im.classList.toggle('on',im.dataset.year===b.dataset.y
 <p>{{ confidence_explanation }}</p>
 {% endif %}
 </section>
+{% endif %}
+{% if nearby_places or same_chapter_places %}
+<aside class="related-places" aria-labelledby="related-places-title">
+<h2 id="related-places-title">{% trans "Explore related places" %}</h2>
+<div class="related-panels">
+{% if nearby_places %}<section class="related-panel">
+<h3>{% trans "Nearby on the map" %}</h3>
+<ul>{% for related in nearby_places %}<li>
+<span class="related-number">{{ related.number }}</span><span class="related-copy"><a href="{{ related.url }}">{{ related.feature.name }}</a><small>{{ related.kind }}{% if related.chapter %} · {{ related.chapter }}{% endif %}</small></span>
+</li>{% endfor %}</ul>
+<a class="related-map-link" href="{{ map_url }}">{% trans "View this area on the map" %} →</a>
+</section>{% endif %}
+{% if same_chapter_places %}<section class="related-panel">
+<h3>{% trans "Also referenced in the same chapters" %}</h3>
+<ul>{% for related in same_chapter_places %}<li>
+<span class="related-number">{{ related.number }}</span><span class="related-copy"><a href="{{ related.url }}">{{ related.feature.name }}</a><small>{{ related.chapter }}</small></span>
+</li>{% endfor %}</ul>
+</section>{% endif %}
+</div>
+</aside>
 {% endif %}
 </article>
 {% endblock %}

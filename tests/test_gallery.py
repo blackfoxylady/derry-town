@@ -56,6 +56,8 @@ class GalleryTests(TestCase):
         self.assertContains(response, photos.relative_paths(self.ben.sha256, self.ben.ext)['thumb'])
         self.assertContains(response, f'/photos/{self.ben.id}/')
         self.assertContains(response, 'Derry Public Library')
+        self.assertContains(response, 'href="/places/12-derry-public-library/"')
+        self.assertContains(response, 'Photographs from here')
         self.assertContains(response, 'Ben Hanscom')
         self.assertContains(response, '4 photographs')
         # Год показан: в наборе два разных года.
@@ -76,6 +78,9 @@ class GalleryTests(TestCase):
         response = self.client.get('/photos/', {'place': '12'})
         self.assertEqual(self.captions(response), ['Ben at the library.', 'The library building.'])
         self.assertContains(response, 'Clear filters')
+        # The place title remains canonical, while a redundant self-filter link is omitted.
+        self.assertContains(response, 'href="/places/12-derry-public-library/"')
+        self.assertNotContains(response, 'Photographs from here')
         response = self.client.get('/photos/', {'place': 'road:02'})
         self.assertEqual(self.captions(response), ['Bill races Silver.'])
         # Ключ дороги в собранных ссылках остаётся читабельным.
@@ -123,6 +128,7 @@ class GalleryTests(TestCase):
         self.assertContains(response, '?place=12')
         self.assertContains(response, '?year=1958')
         self.assertContains(response, '/?place=12')  # место-точка: есть переход на карту
+        self.assertContains(response, 'href="/places/12-derry-public-library/"')
 
     def test_photo_page_map_link_only_for_sites(self):
         response = self.client.get(f'/photos/{self.bill.id}/')

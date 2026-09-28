@@ -104,15 +104,22 @@ const path=require('node:path');
   assert.match(placeHref,/^\/places\/12(-|\/)/);
   await page.goto(url+placeHref,{waitUntil:'networkidle'});
   assert.match(await page.locator('.place h1').innerText(),/\S/);
+  assert.equal(await page.locator('.crumbs li').count(),3);
+  assert.equal(await page.locator('.related-panel').count(),2);
+  const relatedHrefs=await page.locator('.related-panel li a').evaluateAll(links=>links.map(a=>a.getAttribute('href')));
+  assert.equal(relatedHrefs.length,8);
+  assert.equal(new Set(relatedHrefs).size,relatedHrefs.length);
   // The Russian version serves the same map under /ru/.
   await page.goto(url+'/ru/',{waitUntil:'networkidle'});
   await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
   assert.equal(await page.locator('html').getAttribute('lang'),'ru');
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
+  assert.equal(await page.locator('.crumbs li').count(),2);
   assert.match(await page.locator('.status').innerText(),/\d+ photographs?/);
   if(await page.locator('.card').count()){
    await page.locator('.card .pic').first().click();
    await page.waitForURL(/\/photos\/\d+\/$/);
+   assert.equal(await page.locator('.crumbs li').count(),3);
    assert(await page.locator('.facts').isVisible());
    const toMap=page.locator('a:has-text("Show on the map")');
    if(await toMap.count()){await toMap.first().click();await page.waitForFunction(()=>typeof window.DerryAtlas?.view.selected==='number',{timeout:120000})}
