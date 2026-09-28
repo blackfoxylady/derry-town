@@ -53,9 +53,14 @@ def index(request, name, description):
     return _graph(request, _page(request, 'Map', name, description))
 
 
-def gallery(request, name, description):
+def gallery(request, name, description, current=''):
+    crumbs = [('Derry', reverse('index'))]
+    if current:
+        crumbs += [(_('Photographs'), reverse('gallery')), (current, '')]
+    else:
+        crumbs.append((_('Photographs'), ''))
     return _graph(request, _page(request, ['CollectionPage', 'ImageGallery'], name, description),
-                  _breadcrumbs(request, ('Derry', reverse('index')), (_('Photographs'), '')))
+                  _breadcrumbs(request, *crumbs))
 
 
 def places(request, name, description, cards):
@@ -114,7 +119,7 @@ def photo(request, ctx):
         image['caption'] = caption
     if p.year:
         image['temporalCoverage'] = str(p.year)
-    keywords = [c['name'] for c in ctx['characters']] + [t['slug'] for t in ctx['tags']]
+    keywords = [c['name'] for c in ctx['characters']] + [t['name'] for t in ctx['tags']]
     if keywords:
         image['keywords'] = ', '.join(keywords)
     crumbs = _breadcrumbs(request, ('Derry', reverse('index')),

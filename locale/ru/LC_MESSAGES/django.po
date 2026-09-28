@@ -68,6 +68,55 @@ msgstr "Под эти фильтры не подходит ни одна фот�
 msgid "Show all photographs"
 msgstr "Показать все фотографии"
 
+msgid "Photographs of %(name)s"
+msgstr "Фотографии места %(name)s"
+
+msgid "%(name)s photographs — Derry, Maine · Stephen King’s IT"
+msgstr "%(name)s — фотографии Дерри, штат Мэн · «Оно» Стивена Кинга"
+
+msgid ""
+"Browse photographs connected to %(name)s in this novel-based reconstruction "
+"of Derry, Maine."
+msgstr ""
+"Посмотрите фотографии, связанные с %(name)s, в реконструкции Дерри, штат "
+"Мэн, по роману."
+
+msgid "%(name)s in Derry photographs"
+msgstr "%(name)s на фотографиях Дерри"
+
+msgid ""
+"Browse photographs featuring %(name)s in this literary atlas of Stephen "
+"King’s IT."
+msgstr ""
+"Посмотрите фотографии с персонажем %(name)s в литературном атласе романа "
+"Стивена Кинга «Оно»."
+
+msgid "%(name)s photographs"
+msgstr "Фотографии: %(name)s"
+
+msgid "%(name)s photographs of Derry, Maine · Stephen King’s IT"
+msgstr "%(name)s — фотографии Дерри, штат Мэн · «Оно» Стивена Кинга"
+
+msgid ""
+"Browse Derry photographs grouped under the %(name)s theme in this literary "
+"atlas of Stephen King’s IT."
+msgstr ""
+"Посмотрите фотографии Дерри по теме «%(name)s» в литературном атласе романа "
+"Стивена Кинга «Оно»."
+
+msgid "Derry photographs from %(year)s"
+msgstr "Фотографии Дерри в %(year)s году"
+
+msgid "Derry photographs from %(year)s — Stephen King’s IT"
+msgstr "Фотографии Дерри в %(year)s году — «Оно» Стивена Кинга"
+
+msgid ""
+"Browse photographs representing Derry in %(year)s in this literary atlas of "
+"Stephen King’s IT."
+msgstr ""
+"Посмотрите фотографии Дерри в %(year)s году в литературном атласе романа "
+"Стивена Кинга «Оно»."
+
 #: photo.html
 msgid "All photographs"
 msgstr "Все фотографии"

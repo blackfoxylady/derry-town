@@ -68,7 +68,7 @@ class PlaceIndexTests(TestCase):
         self.assertNotContains(response, '/media/photos/thumb/')
         self.assertContains(response, 'data-photos="1"')
         self.assertContains(response, 'data-covers="1"')
-        self.assertContains(response, '/photos/?place=4')
+        self.assertContains(response, '/photos/place/4-derry-elementary-school/')
 
     def test_russian_page_uses_localized_copy_and_search_data(self):
         response = self.client.get('/ru/places/')

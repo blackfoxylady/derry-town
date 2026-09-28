@@ -13,7 +13,7 @@
 {% if photo.year %}<dt>{% trans "Year" %}</dt><dd><a href="{{ year_url }}">{{ photo.year }}</a></dd>{% endif %}
 {% if place_label %}<dt>{% trans "Place" %}</dt><dd>{% if place_page_url %}<a href="{{ place_page_url }}">{{ place_label }}</a>{% else %}<a href="{{ place_gallery_url }}">{{ place_label }}</a>{% endif %}{% if place_page_url %} · <a href="{{ place_gallery_url }}">{% trans "Photographs from here" %}</a>{% endif %}{% if map_url %} · <a href="{{ map_url }}">{% trans "Show on the map" %}</a>{% endif %}</dd>{% endif %}
 {% if characters %}<dt>{% trans "Characters" %}</dt><dd>{% for c in characters %}<a href="{{ c.url }}">{{ c.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd>{% endif %}
-{% if tags %}<dt>{% trans "Tags" %}</dt><dd class="chips">{% for t in tags %}<a class="chip" href="{{ t.url }}">{{ t.slug }}</a>{% endfor %}</dd>{% endif %}
+{% if tags %}<dt>{% trans "Tags" %}</dt><dd class="chips">{% for t in tags %}<a class="chip" href="{{ t.url }}">{{ t.name }}</a>{% endfor %}</dd>{% endif %}
 <dt>{% trans "Original" %}</dt><dd><a href="{{ urls.original }}">{{ photo.width }} × {{ photo.height }} px · {{ photo.ext|upper }}</a></dd>
 </dl>
 </article>

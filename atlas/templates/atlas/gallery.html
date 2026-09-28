@@ -1,8 +1,9 @@
 {% extends 'atlas/gallery_base.html' %}
 {% load i18n %}
 {% block content %}
-{% include 'atlas/breadcrumbs.html' with section='photos' only %}
-<h1 class="gallery-title">{% trans "Photographs" %}</h1>
+{% include 'atlas/breadcrumbs.html' with section='photos' current=gallery_breadcrumb only %}
+<h1 class="gallery-title">{{ gallery_heading }}</h1>
+{% if gallery_intro %}<p class="gallery-intro">{{ gallery_intro }}</p>{% endif %}
 <section class="filters" aria-label="{% trans 'Photograph filters' %}">
 {% for g in groups %}{% if g.options %}<div class="frow"><span class="fname">{{ g.title }}</span><span class="chips">{% for o in g.options %}<a class="chip{% if o.active %} on{% endif %}" href="{{ o.url }}">{{ o.label }}{% if o.count %}<span class="n">{{ o.count }}</span>{% endif %}</a>{% endfor %}</span></div>{% endif %}{% endfor %}
 <div class="frow status"><span>{% blocktranslate count n=cards|length %}{{ n }} photograph{% plural %}{{ n }} photographs{% endblocktranslate %}</span>{% if filtered %}<a class="clear" href="{{ clear_url }}">{% trans "Clear filters" %} ×</a>{% endif %}</div>

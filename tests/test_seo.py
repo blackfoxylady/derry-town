@@ -50,14 +50,18 @@ class SeoTests(TestCase):
             root = Path(tmp)
             with override_settings(MEDIA_ROOT=root / 'media'):
                 make_image(root / 'a.png', color=(10, 20, 30))
-                photo = photos.add(root / 'a.png', caption='Ben.', feature='12', year=1958)
+                photo = photos.add(root / 'a.png', caption='Ben.', feature='12', year=1958,
+                                   characters=['ben-hanscom'], tags=['library'])
                 response = self.client.get('/sitemap.xml')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/xml')
         body = response.content.decode()
         for path in ('/', '/ru/', '/places/', '/ru/places/', '/photos/', '/method/', '/ru/method/',
                      '/places/12-derry-public-library/', '/ru/places/12-derry-public-library/',
-                     '/places/u3-tracker-brothers/', f'/photos/{photo.id}/', f'/ru/photos/{photo.id}/'):
+                     '/places/u3-tracker-brothers/', f'/photos/{photo.id}/', f'/ru/photos/{photo.id}/',
+                     '/photos/place/12-derry-public-library/',
+                     '/photos/character/ben-hanscom/', '/photos/tag/library/',
+                     '/photos/year/1958/', '/ru/photos/year/1958/'):
             self.assertIn(f'http://testserver{path}</loc>', body, path)
         self.assertIn('hreflang="ru" href="http://testserver/ru/places/12-derry-public-library/"', body)
         self.assertIn('hreflang="x-default"', body)
@@ -68,7 +72,11 @@ class SeoTests(TestCase):
         indexed = {item.find('s:loc', namespaces).text: item for item in root.findall('s:url', namespaces)}
         self.assertEqual(body.count('<lastmod>'), len(indexed))
         for url in (f'http://testserver/photos/{photo.id}/',
-                    'http://testserver/places/12-derry-public-library/'):
+                    'http://testserver/places/12-derry-public-library/',
+                    'http://testserver/photos/place/12-derry-public-library/',
+                    'http://testserver/photos/character/ben-hanscom/',
+                    'http://testserver/photos/tag/library/',
+                    'http://testserver/photos/year/1958/'):
             image = indexed[url].find('image:image/image:loc', namespaces)
             self.assertIsNotNone(image, url)
             self.assertIn('/media/photos/original/', image.text)
@@ -250,6 +258,22 @@ class JsonLdTests(TestCase):
         method = node(jsonld(self.client.get('/method/')), 'WebPage')
         self.assertEqual(method['about'], {'@id': 'http://testserver/#book'})
 
+    def test_gallery_landing_jsonld_has_its_own_url_and_breadcrumb(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            with override_settings(MEDIA_ROOT=root / 'media'):
+                make_image(root / 'a.png', color=(10, 20, 30))
+                photos.add(root / 'a.png', caption='Ben.', feature='12', tags=['library'])
+                data = jsonld(self.client.get('/photos/tag/library/'))
+        gallery = node(data, 'ImageGallery')
+        self.assertEqual(gallery['url'], 'http://testserver/photos/tag/library/')
+        self.assertEqual(gallery['name'], 'Library photographs of Derry, Maine · Stephen King’s IT')
+        crumbs = node(data, 'BreadcrumbList')['itemListElement']
+        self.assertEqual([crumb['name'] for crumb in crumbs],
+                         ['Derry', 'Photographs', 'Library photographs'])
+        self.assertEqual(crumbs[1]['item'], 'http://testserver/photos/')
+        self.assertNotIn('item', crumbs[2])
+
     def test_place_index_is_a_collection_and_item_list(self):
         data = jsonld(self.client.get('/places/'))
         collection = node(data, 'CollectionPage')
@@ -290,7 +314,7 @@ class JsonLdTests(TestCase):
         self.assertEqual(image['creator'], {'@type': 'Organization', 'name': 'Derry',
                                             'url': 'http://testserver/'})
         self.assertEqual(image['creditText'], 'Derry')
-        self.assertEqual(image['keywords'], 'Ben, library')
+        self.assertEqual(image['keywords'], 'Ben, Library')
         crumbs = node(data, 'BreadcrumbList')['itemListElement']
         self.assertEqual(crumbs[1]['item'], 'http://testserver/photos/')
         self.assertEqual(crumbs[2]['name'], 'Ben & Bill.')

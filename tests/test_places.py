@@ -136,7 +136,7 @@ class PlacePageTests(TestCase):
                 response = self.client.get('/places/12-derry-public-library/')
                 self.assertContains(response, 'Ben at the library.')
                 self.assertContains(response, f'/photos/{photo.id}/')
-                self.assertContains(response, '/photos/?place=12')
+                self.assertContains(response, '/photos/place/12-derry-public-library/')
 
     def test_method_page(self):
         response = self.client.get('/method/')

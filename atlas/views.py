@@ -16,7 +16,7 @@ from . import schema
 from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
 from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
                      Revision, Setting, Source, Tag)
-from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
+from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths, slug_name
 from .rendering import current_payload, RENDER_VERSION
 
 
@@ -278,9 +278,29 @@ def photo_data(request):
     return response
 
 
-def _gallery_url(place='', character='', tags=(), year=''):
-    """URL галереи; запятая и двоеточие не экранируются, чтобы ссылками
-    вида ?place=road:02&tag=library,summer было удобно делиться."""
+def gallery_place_slug(feature):
+    """Readable photo-landing slug for every Feature type, including roads."""
+    return slugify(f'{feature.key}-{feature.name}')
+
+
+def _gallery_url(place='', character='', tags=(), year='', place_feature=None):
+    """Canonical landing URL for one filter; query URL for combinations.
+
+    Query strings remain useful for combined filters, while every valid single
+    dimension has a crawlable, self-canonical path.
+    """
+    active = sum((bool(place), bool(character), bool(tags), bool(year)))
+    if active == 1:
+        if place:
+            feature = place_feature or Feature.objects.filter(pk=place).first()
+            if feature:
+                return reverse('gallery_place', args=[gallery_place_slug(feature)])
+        elif character:
+            return reverse('gallery_character', args=[character])
+        elif len(tags) == 1:
+            return reverse('gallery_tag', args=[tags[0]])
+        elif year and str(year).isdigit():
+            return reverse('gallery_year', args=[year])
     pairs = [('place', place), ('character', character), ('tag', ','.join(tags)), ('year', year)]
     query = urlencode([(k, v) for k, v in pairs if v], safe=',:')
     return reverse('gallery') + ('?' + query if query else '')
@@ -475,7 +495,8 @@ def places(request):
             'number': _place_number(feature),
             'url': reverse('place', args=[place_slug(feature)]),
             'map_url': reverse('index') + '?place=' + feature.key if mapped else '',
-            'gallery_url': _gallery_url(place=feature.key) if feature_photos else '',
+            'gallery_url': (_gallery_url(place=feature.key, place_feature=feature)
+                            if feature_photos else ''),
             'mapped': mapped, 'note': note,
             'confidence_label': CONFIDENCE.get(feature.confidence, ''),
             'photo_count': len(feature_photos), 'cover_count': len(feature_covers),
@@ -510,16 +531,75 @@ def places(request):
 
 
 @require_safe
-def gallery(request):
-    """Фильтры в query-параметрах: place/character/year — одно значение,
-    tag — несколько через запятую, «хотя бы один из»; измерения сочетаются как И."""
-    place = request.GET.get('place', '').strip()
-    character = request.GET.get('character', '').strip()
-    year = request.GET.get('year', '').strip()
+def gallery(request, filter_type='', filter_slug='', filter_year=None):
+    """Photograph gallery and crawlable single-filter landing pages.
+
+    One valid filter has a readable path. Combined filters stay in the query
+    string and canonicalize to the main gallery. Tags remain OR within their
+    dimension; the other dimensions combine with them as AND.
+    """
+    place_counts = Counter(Photo.objects.exclude(feature_key='').values_list('feature_key', flat=True))
+    features = Feature.objects.in_bulk(place_counts)
+    characters = list(Character.objects.filter(photo__isnull=False)
+                      .annotate(n=Count('photo')).order_by('name'))
+    tag_rows = list(Tag.objects.filter(photo__isnull=False)
+                    .annotate(n=Count('photo')).order_by('slug'))
+    year_counts = Counter(Photo.objects.exclude(year=None).values_list('year', flat=True))
+    characters_by_slug = {character.slug: character for character in characters}
+    tags_by_slug = {tag.slug: tag for tag in tag_rows}
+
+    place = character = year = ''
     tags = []
-    for t in request.GET.get('tag', '').split(','):
-        if (t := t.strip()) and t not in tags:
-            tags.append(t)
+    landing = None
+    if filter_type == 'place':
+        feature = next((candidate for candidate in features.values()
+                        if gallery_place_slug(candidate) == filter_slug), None)
+        if feature is None:
+            raise Http404
+        place = feature.key
+        landing = {'type': 'place', 'label': feature.name}
+    elif filter_type == 'character':
+        character_object = characters_by_slug.get(filter_slug)
+        if character_object is None:
+            raise Http404
+        character = character_object.slug
+        landing = {'type': 'character', 'label': character_object.name}
+    elif filter_type == 'tag':
+        tag = tags_by_slug.get(filter_slug)
+        if tag is None:
+            raise Http404
+        tags = [tag.slug]
+        landing = {'type': 'tag', 'label': slug_name(tag.slug)}
+    elif filter_type == 'year':
+        if filter_year not in year_counts:
+            raise Http404
+        year = str(filter_year)
+        landing = {'type': 'year', 'label': year}
+    elif filter_type:
+        raise Http404
+    else:
+        place = request.GET.get('place', '').strip()
+        character = request.GET.get('character', '').strip()
+        year = request.GET.get('year', '').strip()
+        for value in request.GET.get('tag', '').split(','):
+            if (value := value.strip()) and value not in tags:
+                tags.append(value)
+
+        # Old, valid single-filter query URLs permanently converge on the
+        # crawlable landing. Invalid values keep the existing empty-result UX.
+        known_parameters = {'place', 'character', 'tag', 'year'}
+        dimensions = sum((bool(place), bool(character), bool(tags), bool(year)))
+        valid_single = (
+            (place in place_counts if place else False)
+            or (character in characters_by_slug if character else False)
+            or (len(tags) == 1 and tags[0] in tags_by_slug)
+            or (year.isdigit() and int(year) in year_counts)
+        )
+        if (dimensions == 1 and valid_single and set(request.GET) <= known_parameters
+                and (not tags or len(tags) == 1)):
+            return redirect(_gallery_url(
+                place, character, tags, year, place_feature=features.get(place)), permanent=True)
+
     photos = Photo.objects.prefetch_related('characters', 'tags')
     if place:
         photos = photos.filter(feature_key=place)
@@ -530,70 +610,117 @@ def gallery(request):
     if year:
         photos = photos.filter(year=int(year)) if year.isdigit() else photos.none()
 
-    place_counts = Counter(Photo.objects.exclude(feature_key='').values_list('feature_key', flat=True))
-    features = Feature.objects.in_bulk(set(place_counts) | ({place} if place else set()))
-
     def option(label, count, active, url):
         return {'label': label, 'count': count, 'active': active, 'url': url}
 
     def single(values, current, build):
-        """Опции одиночного измерения: клик по активной снимает фильтр.
-        Значение из URL, которого нет среди опций, добавляется, чтобы его
-        было видно и можно было снять."""
-        options = [option(label, n, v == current, build('' if v == current else v)) for v, label, n in values]
-        if current and all(v != current for v, _, _ in values):
+        """Clicking the active option clears it; an invalid query value stays removable."""
+        options = [option(label, n, value == current,
+                          build('' if value == current else value))
+                   for value, label, n in values]
+        if current and all(value != current for value, _, _ in values):
             options.append(option(current, 0, True, build('')))
         return options
 
-    place_values = sorted(((k, features[k].name if k in features else k, n) for k, n in place_counts.items()),
-                          key=lambda t: t[1])
-    character_values = [(c.slug, c.name, c.n) for c in
-                        Character.objects.filter(photo__isnull=False).annotate(n=Count('photo')).order_by('name')]
-    tag_values = [(t.slug, t.slug, t.n) for t in
-                  Tag.objects.filter(photo__isnull=False).annotate(n=Count('photo')).order_by('slug')]
-    year_values = [(str(y), str(y), n) for y, n in
-                   sorted(Counter(Photo.objects.exclude(year=None).values_list('year', flat=True)).items())]
+    place_values = sorted(
+        ((key, features[key].name if key in features else key, count)
+         for key, count in place_counts.items()), key=lambda item: item[1])
+    character_values = [(item.slug, item.name, item.n) for item in characters]
+    tag_values = [(item.slug, slug_name(item.slug), item.n) for item in tag_rows]
+    year_values = [(str(value), str(value), count)
+                   for value, count in sorted(year_counts.items())]
 
     groups = [
-        {'title': _('Place'), 'options': single(place_values, place, lambda v: _gallery_url(v, character, tags, year))},
-        {'title': _('Character'), 'options': single(character_values, character,
-                                                 lambda v: _gallery_url(place, v, tags, year))},
-        {'title': _('Tags'), 'options':
-            [option(label, n, v in tags,
-                    _gallery_url(place, character,
-                                 [t for t in tags if t != v] if v in tags else tags + [v], year))
-             for v, label, n in tag_values] +
-            [option(t, 0, True, _gallery_url(place, character, [x for x in tags if x != t], year))
-             for t in tags if all(v != t for v, _, _ in tag_values)]},
+        {'title': _('Place'), 'options': single(
+            place_values, place, lambda value: _gallery_url(
+                value, character, tags, year, place_feature=features.get(value)))},
+        {'title': _('Character'), 'options': single(
+            character_values, character,
+            lambda value: _gallery_url(place, value, tags, year,
+                                       place_feature=features.get(place)))},
+        {'title': _('Tags'), 'options': [
+            option(label, count, value in tags, _gallery_url(
+                place, character,
+                [tag for tag in tags if tag != value] if value in tags else tags + [value],
+                year, place_feature=features.get(place)))
+            for value, label, count in tag_values
+        ] + [
+            option(slug_name(value), 0, True, _gallery_url(
+                place, character, [tag for tag in tags if tag != value], year,
+                place_feature=features.get(place)))
+            for value in tags if value not in tags_by_slug
+        ]},
     ]
-    # Год появляется в панели, только когда лет больше одного (или в URL
-    # пришёл год, которого нет среди фото, — иначе его нечем снять).
-    if len(year_values) > 1 or (year and all(v != year for v, _, _ in year_values)):
-        groups.append({'title': _('Year'), 'options': single(year_values, year,
-                                                          lambda v: _gallery_url(place, character, tags, v))})
+    if len(year_values) > 1 or (year and all(value != year for value, _, _ in year_values)):
+        groups.append({'title': _('Year'), 'options': single(
+            year_values, year, lambda value: _gallery_url(
+                place, character, tags, value, place_feature=features.get(place)))})
 
     cards = []
-    for p in photos:
-        f = features.get(p.feature_key)
-        place_page_url = (reverse('place', args=[place_slug(f)])
-                          if f and f.object_type in ('site', 'unplaced') else '')
-        place_gallery_url = _gallery_url(place=p.feature_key) if p.feature_key else ''
-        cards.append({'photo': p, **_card_image(p), 'caption': _caption(p),
-                      'alt': _photo_alt(p, f),
-                      'place_label': f.name if f else p.feature_key,
-                      'place_url': place_page_url or place_gallery_url,
-                      'place_gallery_url': (place_gallery_url
-                                            if place_page_url and place != p.feature_key else ''),
-                      'year_url': _gallery_url(year=str(p.year)) if p.year else ''})
+    for photo in photos:
+        feature = features.get(photo.feature_key)
+        place_page_url = (reverse('place', args=[place_slug(feature)])
+                          if feature and feature.object_type in ('site', 'unplaced') else '')
+        place_gallery_url = (_gallery_url(place=photo.feature_key, place_feature=feature)
+                             if photo.feature_key else '')
+        cards.append({
+            'photo': photo, **_card_image(photo), 'caption': _caption(photo),
+            'alt': _photo_alt(photo, feature),
+            'place_label': feature.name if feature else photo.feature_key,
+            'place_url': place_page_url or place_gallery_url,
+            'place_gallery_url': (place_gallery_url
+                                  if place_page_url and place != photo.feature_key else ''),
+            'year_url': _gallery_url(year=str(photo.year)) if photo.year else '',
+        })
+
+    gallery_heading = _('Photographs')
+    gallery_intro = ''
     page_title = _('Photographs of Derry, Maine — Stephen King’s IT')
     meta_description = _(
         'Browse photographs of Derry, Maine places from a literary atlas of Stephen King’s IT, '
         'with filters by place, character, tag and year.')
+    if landing:
+        label = landing['label']
+        if landing['type'] == 'place':
+            gallery_heading = _('Photographs of %(name)s') % {'name': label}
+            page_title = _('%(name)s photographs — Derry, Maine · Stephen King’s IT') % {
+                'name': label}
+            meta_description = _(
+                'Browse photographs connected to %(name)s in this novel-based reconstruction '
+                'of Derry, Maine.') % {'name': label}
+        elif landing['type'] == 'character':
+            gallery_heading = _('%(name)s in Derry photographs') % {'name': label}
+            page_title = _('%(name)s photographs — Derry, Maine · Stephen King’s IT') % {
+                'name': label}
+            meta_description = _(
+                'Browse photographs featuring %(name)s in this literary atlas of '
+                'Stephen King’s IT.') % {'name': label}
+        elif landing['type'] == 'tag':
+            gallery_heading = _('%(name)s photographs') % {'name': label}
+            page_title = _('%(name)s photographs of Derry, Maine · Stephen King’s IT') % {
+                'name': label}
+            meta_description = _(
+                'Browse Derry photographs grouped under the %(name)s theme in this literary '
+                'atlas of Stephen King’s IT.') % {'name': label}
+        else:
+            gallery_heading = _('Derry photographs from %(year)s') % {'year': label}
+            page_title = _('Derry photographs from %(year)s — Stephen King’s IT') % {
+                'year': label}
+            meta_description = _(
+                'Browse photographs representing Derry in %(year)s in this literary atlas of '
+                'Stephen King’s IT.') % {'year': label}
+        gallery_intro = meta_description
+
     response = render(request, 'atlas/gallery.html', {
         'groups': groups, 'cards': cards, 'clear_url': reverse('gallery'),
         'filtered': bool(place or character or tags or year),
+        'landing': landing, 'gallery_heading': gallery_heading,
+        'gallery_breadcrumb': gallery_heading if landing else '',
+        'gallery_intro': gallery_intro,
         'page_title': page_title, 'meta_description': meta_description,
-        'jsonld': schema.gallery(request, page_title, meta_description)})
+        'jsonld': schema.gallery(
+            request, page_title, meta_description, gallery_heading if landing else ''),
+    })
     response['Cache-Control'] = 'no-cache'
     return response
 
@@ -633,12 +760,14 @@ def photo_page(request, photo_id):
         'published_time': photo.created, 'modified_time': photo.modified,
         'place_page_url': reverse('place', args=[place_slug(feature)]) if on_map else '',
         'place_label': feature.name if feature else photo.feature_key,
-        'place_gallery_url': _gallery_url(place=photo.feature_key) if photo.feature_key else '',
+        'place_gallery_url': (_gallery_url(place=photo.feature_key, place_feature=feature)
+                              if photo.feature_key else ''),
         'map_url': map_url,
         'year_url': _gallery_url(year=str(photo.year)) if photo.year else '',
         'characters': [{'name': c.name, 'url': _gallery_url(character=c.slug)}
                        for c in photo.characters.order_by('name')],
-        'tags': [{'slug': t.slug, 'url': _gallery_url(tags=[t.slug])} for t in photo.tags.order_by('slug')]}
+        'tags': [{'slug': t.slug, 'name': slug_name(t.slug),
+                  'url': _gallery_url(tags=[t.slug])} for t in photo.tags.order_by('slug')]}
     context['jsonld'] = schema.photo(request, context)
     response = render(request, 'atlas/photo.html', context)
     response['Cache-Control'] = 'no-cache'
@@ -717,7 +846,7 @@ def place_page(request, slug):
         'modified_time': modified_time,
         'places_url': reverse('places'),
         'map_url': reverse('index') + '?place=' + feature.key,
-        'gallery_url': _gallery_url(place=feature.key)}
+        'gallery_url': _gallery_url(place=feature.key, place_feature=feature)}
     context['jsonld'] = schema.place(request, context)
     response = render(request, 'atlas/place.html', context)
     response['Cache-Control'] = 'no-cache'
@@ -775,7 +904,7 @@ def sitemap(request):
     все индексируемые страницы в обеих языковых версиях с hreflang-парами,
     стабильными датами изменения и image-sitemap для страниц с изображениями."""
     scene_modified = _scene_modified()
-    photos = list(Photo.objects.order_by('id'))
+    photos = list(Photo.objects.prefetch_related('characters', 'tags').order_by('id'))
     covers = list(PlaceCover.objects.order_by('feature_key', 'year'))
     photos_by_feature = {}
     covers_by_feature = {}
@@ -794,6 +923,40 @@ def sitemap(request):
         (reverse('gallery'), max(gallery_dates) if gallery_dates else None, []),
         (reverse('method'), scene_modified, []),
     ]
+
+    def add_photo_landing(path, landing_photos):
+        entries.append((
+            path,
+            max(photo.modified for photo in landing_photos),
+            [settings.MEDIA_URL + relative_paths(photo.sha256, photo.ext)['original']
+             for photo in landing_photos],
+        ))
+
+    features_with_photos = Feature.objects.in_bulk(
+        key for key in photos_by_feature if key)
+    for key, feature_photos in sorted(photos_by_feature.items()):
+        feature = features_with_photos.get(key)
+        if feature:
+            add_photo_landing(
+                reverse('gallery_place', args=[gallery_place_slug(feature)]), feature_photos)
+
+    photos_by_character = {}
+    photos_by_tag = {}
+    photos_by_year = {}
+    for photo in photos:
+        for character in photo.characters.all():
+            photos_by_character.setdefault(character.slug, []).append(photo)
+        for tag in photo.tags.all():
+            photos_by_tag.setdefault(tag.slug, []).append(photo)
+        if photo.year:
+            photos_by_year.setdefault(photo.year, []).append(photo)
+    for slug, landing_photos in sorted(photos_by_character.items()):
+        add_photo_landing(reverse('gallery_character', args=[slug]), landing_photos)
+    for slug, landing_photos in sorted(photos_by_tag.items()):
+        add_photo_landing(reverse('gallery_tag', args=[slug]), landing_photos)
+    for year, landing_photos in sorted(photos_by_year.items()):
+        add_photo_landing(reverse('gallery_year', args=[year]), landing_photos)
+
     for feature in Feature.objects.filter(object_type__in=('site', 'unplaced')).order_by('key'):
         feature_photos = photos_by_feature.get(feature.key, [])
         feature_covers = covers_by_feature.get(feature.key, [])

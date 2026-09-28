@@ -61,7 +61,8 @@ class GalleryTests(TestCase):
         self.assertContains(response, 'Ben Hanscom')
         self.assertContains(response, '4 photographs')
         # Год показан: в наборе два разных года.
-        self.assertContains(response, '?year=1985')
+        self.assertContains(response, '/photos/year/1985/')
+        self.assertContains(response, '>Architecture<')
 
     def test_gallery_cards_offer_responsive_sources(self):
         response = self.client.get('/photos/')
@@ -75,19 +76,27 @@ class GalleryTests(TestCase):
         self.assertContains(response, f'{rel["medium"]} 1200w')
 
     def test_place_filter_and_readable_url(self):
-        response = self.client.get('/photos/', {'place': '12'})
+        self.assertRedirects(
+            self.client.get('/photos/', {'place': '12'}),
+            '/photos/place/12-derry-public-library/', status_code=301)
+        response = self.client.get('/photos/place/12-derry-public-library/')
         self.assertEqual(self.captions(response), ['Ben at the library.', 'The library building.'])
         self.assertContains(response, 'Clear filters')
         # The place title remains canonical, while a redundant self-filter link is omitted.
         self.assertContains(response, 'href="/places/12-derry-public-library/"')
         self.assertNotContains(response, 'Photographs from here')
-        response = self.client.get('/photos/', {'place': 'road:02'})
+        self.assertRedirects(
+            self.client.get('/photos/', {'place': 'road:02'}),
+            '/photos/place/road02-main-street/', status_code=301)
+        response = self.client.get('/photos/place/road02-main-street/')
         self.assertEqual(self.captions(response), ['Bill races Silver.'])
-        # Ключ дороги в собранных ссылках остаётся читабельным.
-        self.assertContains(self.client.get('/photos/'), '?place=road:02')
+        self.assertContains(self.client.get('/photos/'), '/photos/place/road02-main-street/')
 
     def test_character_filter(self):
-        response = self.client.get('/photos/', {'character': 'ben-hanscom'})
+        self.assertRedirects(
+            self.client.get('/photos/', {'character': 'ben-hanscom'}),
+            '/photos/character/ben-hanscom/', status_code=301)
+        response = self.client.get('/photos/character/ben-hanscom/')
         self.assertEqual(self.captions(response), ['Ben at the library.'])
 
     def test_tags_are_any_of_and_deduplicated(self):
@@ -99,12 +108,18 @@ class GalleryTests(TestCase):
         response = self.client.get('/photos/', {'tag': 'library,interior'})
         self.assertContains(response, '2 photographs')
         # Ссылка-переключатель второго тега дописывает его через запятую.
-        response = self.client.get('/photos/', {'tag': 'library'})
+        self.assertRedirects(
+            self.client.get('/photos/', {'tag': 'library'}),
+            '/photos/tag/library/', status_code=301)
+        response = self.client.get('/photos/tag/library/')
         self.assertContains(response, '?tag=library,interior')
 
     def test_dimensions_combine_as_and(self):
         response = self.client.get('/photos/', {'place': '12', 'tag': 'interior', 'year': '1958'})
         self.assertEqual(self.captions(response), ['Ben at the library.'])
+        self.assertContains(response, '<link rel="canonical" href="http://testserver/photos/">')
+        self.assertContains(response, '<h1 class="gallery-title">Photographs</h1>')
+        self.assertNotContains(response, 'class="gallery-intro"')
         response = self.client.get('/photos/', {'place': '12', 'character': 'bill-denbrough'})
         self.assertEqual(self.captions(response), [])
 
@@ -115,6 +130,32 @@ class GalleryTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'No photographs match')
             self.assertContains(response, 'Clear filters')
+        for path in ('/photos/place/not-a-place/', '/photos/character/nobody/',
+                     '/photos/tag/not-a-tag/', '/photos/year/1999/'):
+            self.assertEqual(self.client.get(path).status_code, 404, path)
+
+    def test_landing_pages_have_unique_copy_canonical_and_breadcrumbs(self):
+        cases = (
+            ('/photos/place/12-derry-public-library/', 'Photographs of Derry Public Library'),
+            ('/photos/character/ben-hanscom/', 'Ben Hanscom in Derry photographs'),
+            ('/photos/tag/library/', 'Library photographs'),
+            ('/photos/year/1958/', 'Derry photographs from 1958'),
+        )
+        for path, heading in cases:
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200, path)
+            self.assertContains(response, f'<h1 class="gallery-title">{heading}</h1>')
+            self.assertContains(response, f'<link rel="canonical" href="http://testserver{path}">')
+            self.assertContains(response, f'hreflang="ru" href="http://testserver/ru{path}"')
+            self.assertContains(response, 'class="gallery-intro"')
+            self.assertContains(response, 'class="crumbs"')
+
+        russian = self.client.get('/ru/photos/year/1958/')
+        self.assertContains(russian, 'Фотографии Дерри в 1958 году')
+        self.assertContains(russian, 'hreflang="en" href="http://testserver/photos/year/1958/"')
+        self.assertRedirects(
+            self.client.get('/ru/photos/', {'tag': 'library'}),
+            '/ru/photos/tag/library/', status_code=301)
 
     def test_photo_page_shows_attributes_as_filter_links(self):
         response = self.client.get(f'/photos/{self.ben.id}/')
@@ -123,16 +164,17 @@ class GalleryTests(TestCase):
         self.assertContains(response, rel['medium'])
         self.assertContains(response, rel['original'])
         self.assertContains(response, 'Ben at the library.')
-        self.assertContains(response, '?character=ben-hanscom')
-        self.assertContains(response, '?tag=library')
-        self.assertContains(response, '?place=12')
-        self.assertContains(response, '?year=1958')
+        self.assertContains(response, '/photos/character/ben-hanscom/')
+        self.assertContains(response, '/photos/tag/library/')
+        self.assertContains(response, '/photos/place/12-derry-public-library/')
+        self.assertContains(response, '/photos/year/1958/')
+        self.assertContains(response, '>Library<')
         self.assertContains(response, '/?place=12')  # место-точка: есть переход на карту
         self.assertContains(response, 'href="/places/12-derry-public-library/"')
 
     def test_photo_page_map_link_only_for_sites(self):
         response = self.client.get(f'/photos/{self.bill.id}/')
-        self.assertContains(response, '?place=road:02')  # фильтр галереи остаётся
+        self.assertContains(response, '/photos/place/road02-main-street/')
         self.assertNotContains(response, 'Show on the map')  # у дороги нет маркера на карте
         response = self.client.get(f'/photos/{self.loose.id}/')
         self.assertNotContains(response, '<dt>Place</dt>')  # без привязки нет и блока места
