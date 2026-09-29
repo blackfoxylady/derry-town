@@ -12,8 +12,8 @@ const path=require('node:path');
   page.on('pageerror',e=>errors.push(e.message));
   page.on('response',r=>{if(r.url().startsWith(process.env.DERRY_URL||'http://127.0.0.1:8765')&&r.status()>=400)errors.push(r.status()+' '+r.url())});
   await page.goto(process.env.DERRY_URL||'http://127.0.0.1:8765',{waitUntil:'networkidle'});
-  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
-  assert.equal(await page.evaluate(()=>DerryAtlas.unlocatedCount),9);
+  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
+  assert.equal(await page.evaluate(()=>DerryAtlas.unlocatedCount),8);
   // The crawlable directory is present independently of the JS-built sidebar.
   assert.equal(await page.locator('.place-directory-list a').count(),92);
   assert.equal(await page.locator('.place-directory-list a[href="/places/12-derry-public-library/"]').count(),1);
@@ -90,7 +90,7 @@ const path=require('node:path');
   assert.equal(await page.locator('.place-card:visible').filter({hasText:'Derry Public Library'}).count(),1);
   await page.locator('#clearPlaces').click();
   await page.locator('[data-filter-group="location"] [data-value="unlocated"]').click();
-  assert.equal(await page.locator('.place-card:visible').count(),9);
+  assert.equal(await page.locator('.place-card:visible').count(),8);
   await page.locator('[data-view="compact"]').click();
   assert.equal(await page.locator('#placesCatalog').evaluate(n=>n.classList.contains('compact')),true);
   assert.match(page.url(),/location=unlocated/);
@@ -111,7 +111,7 @@ const path=require('node:path');
   assert.equal(new Set(relatedHrefs).size,relatedHrefs.length);
   // The Russian version serves the same map under /ru/.
   await page.goto(url+'/ru/',{waitUntil:'networkidle'});
-  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
+  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
   assert.equal(await page.locator('html').getAttribute('lang'),'ru');
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
   assert.equal(await page.locator('.crumbs li').count(),2);
@@ -125,7 +125,7 @@ const path=require('node:path');
    if(await toMap.count()){await toMap.first().click();await page.waitForFunction(()=>typeof window.DerryAtlas?.view.selected==='number',{timeout:120000})}
   }
   assert.deepEqual(errors,[]);
-  reports.push({viewport:name,dimensions:size,checks:'map, 83+9 counts, server-rendered place directories, catalog search and filters, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, method page, place page, ru version, gallery deep links',errors});
+  reports.push({viewport:name,dimensions:size,checks:'map, 84+8 counts, server-rendered place directories, catalog search and filters, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, method page, place page, ru version, gallery deep links',errors});
   await context.close();
  }
  // Responsive regression: with a plain (non-mobile) viewport the layout viewport cannot
@@ -136,16 +136,17 @@ const path=require('node:path');
   const page=await context.newPage();
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
   const photoHref=await page.locator('.card .pic').count()?await page.locator('.card .pic').first().getAttribute('href'):null;
-  const pages=['/','/places/','/photos/','/method/','/places/12-derry-public-library/'];
+  const pages=['/','/places/','/photos/','/method/','/places/12-derry-public-library/',
+   '/is-derry-maine-real/','/how-bangor-inspired-derry-maine/','/books-set-in-derry-maine/'];
   if(photoHref)pages.push(photoHref);
   for(const lang of ['','/ru'])for(const p of pages){
    await page.goto(url+lang+p,{waitUntil:'networkidle'});
-   if(p==='/')await page.waitForFunction(()=>window.DerryAtlas?.siteCount===83,{timeout:120000});
+   if(p==='/')await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
    const m=await page.evaluate(()=>{const r=document.querySelector('.lang').getBoundingClientRect();return{over:document.documentElement.scrollWidth-window.innerWidth,langIn:r.left>=0&&r.right<=window.innerWidth}});
    assert.equal(m.over<=0,true,(lang+p)+' overflows horizontally by '+m.over+'px at 390px');
    assert.equal(m.langIn,true,(lang+p)+' clips the language switcher at 390px');
   }
-  reports.push({viewport:'narrow-390',dimensions:{width:390,height:844},checks:'no horizontal overflow, language switcher reachable (en+ru: map, place directory, gallery, photo, place, method)',errors:[]});
+  reports.push({viewport:'narrow-390',dimensions:{width:390,height:844},checks:'no horizontal overflow, language switcher reachable (en+ru: map, place directory, gallery, photo, place, method, editorial hubs)',errors:[]});
   await context.close();
  }
  fs.writeFileSync(path.join(out,'browser-report.json'),JSON.stringify({browser:browser.version(),reports},null,2));

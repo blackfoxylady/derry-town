@@ -1,0 +1,171 @@
+{% extends 'atlas/gallery_base.html' %}
+{% load i18n %}
+{% block og_type %}article{% endblock %}
+{% block article_meta %}<meta property="article:published_time" content="{{ published_time }}"><meta property="article:modified_time" content="{{ published_time }}">{% endblock %}
+{% block content %}
+{% include 'atlas/breadcrumbs.html' with current=breadcrumb only %}
+<article class="editorial editorial-wide">
+{% if LANGUAGE_CODE == 'ru' %}
+<div class="eyebrow">Маршрут чтения без крупных спойлеров</div>
+<h1>Книги Стивена Кинга о Дерри, штат Мэн</h1>
+<p class="editorial-deck">Дерри известен прежде всего как место действия <i>«Оно»</i>, но Кинг возвращается к городу и в других произведениях. В одних Дерри становится полноценной сценой, в других — важным эпизодом или связью с общей литературной вселенной.</p>
+
+<aside class="answer-box" aria-label="С чего начать">
+<b>С чего начать</b>
+<p>Если нужен сам город, начинайте с <i>«Оно»</i>, затем переходите к <i>«Бессоннице»</i>. <i>«Ловец снов»</i> и <i>«11/22/63»</i> возвращаются к Дерри лишь на часть повествования, но позволяют увидеть его с другой стороны.</p>
+</aside>
+
+<h2>Книги и рассказы, где Дерри — основное место действия</h2>
+<div class="book-list">
+<section class="book-entry">
+<div><span class="book-year">1986</span><span class="book-role">Главная книга о Дерри</span></div>
+<h3><i>«Оно»</i> (IT)</h3>
+<p>Самый полный портрет города. Две временные линии показывают улицы, дома, школы, Barrens, общественные здания и подземную инфраструктуру, а исторические интерлюдии придают Дерри память, выходящую далеко за рамки основной истории. Именно этот роман служит единственным литературным источником карты на сайте.</p>
+</section>
+<section class="book-entry">
+<div><span class="book-year">1994</span><span class="book-role">Дерри после <i>«Оно»</i></span></div>
+<h3><i>«Бессонница»</i> (Insomnia)</h3>
+<p>Роман вновь делает Дерри полноценным местом действия, но смотрит на него глазами пожилого героя и в более поздний период. Знакомый город остаётся узнаваемым, хотя история и круг персонажей самостоятельны. Это естественное продолжение знакомства с Дерри, а не прямой сюжетный сиквел <i>«Оно»</i>.</p>
+</section>
+<section class="book-entry">
+<div><span class="book-year">2010</span><span class="book-role">Рассказ в Дерри</span></div>
+<h3><i>«На выгодных условиях»</i> (Fair Extension)</h3>
+<p>Короткое произведение из сборника <i>Full Dark, No Stars</i> переносит в Дерри новую историю. В авторской заметке Кинг связывает её исходную реальную дорогу в Бангоре с решением вновь использовать вымышленный город. Это компактный пример того, как Дерри работает за пределами знакомого состава персонажей.</p>
+</section>
+</div>
+
+<h2>Книги, которые возвращаются в Дерри</h2>
+<div class="book-list">
+<section class="book-entry">
+<div><span class="book-year">2001</span><span class="book-role">Прошлое героев связано с городом</span></div>
+<h3><i>«Ловец снов»</i> (Dreamcatcher)</h3>
+<p>Основная история развивается в другом месте, однако детство центральных героев связано с Дерри. Город становится частью их общей памяти и личной истории. Книгу стоит выбирать не ради подробной прогулки по знакомым улицам, а ради ещё одного варианта темы дружбы, взросления и возвращающегося прошлого.</p>
+</section>
+<section class="book-entry">
+<div><span class="book-year">2011</span><span class="book-role">Значимый эпизод</span></div>
+<h3><i>«11/22/63»</i></h3>
+<p>Роман о путешествии во времени ненадолго приходит в Дерри конца 1950-х. Для читателя <i>«Оно»</i> этот фрагмент узнаваем, но не требует подробного знания сюжета и не превращает всю книгу в историю о городе. Это осмысленное возвращение к определённому времени и настроению Дерри.</p>
+</section>
+</div>
+
+<h2>Более дальние связи</h2>
+<div class="book-list">
+<section class="book-entry">
+<div><span class="book-year">1998</span><span class="book-role">Связь с общей географией</span></div>
+<h3><i>«Мешок с костями»</i> (Bag of Bones)</h3>
+<p>Основное действие происходит не в Дерри, а у озера в западном Мэне. Дерри входит в более широкую географию и биографические связи произведения. Это не следующий пункт для читателя, который ищет подробности именно о городе, но пример того, как вымышленные места Кинга существуют в общем мире.</p>
+</section>
+<section class="book-entry">
+<div><span class="book-year">2022</span><span class="book-role">Поздняя связь</span></div>
+<h3><i>«Последнее дело Гвенди»</i> (Gwendy’s Final Task)</h3>
+<p>Роман Стивена Кинга и Ричарда Чизмара соединяет несколько знакомых точек авторской вселенной, включая Дерри. Город здесь не становится главным предметом книги, поэтому это скорее маршрут для читателя, изучающего перекрёстные связи, чем продолжение городского портрета из <i>«Оно»</i>.</p>
+</section>
+</div>
+
+<h2>В каком порядке читать?</h2>
+<ol class="reading-order">
+<li><b><i>«Оно»</i></b> — исходный и самый подробный образ Дерри.</li>
+<li><b><i>«Бессонница»</i></b> — новая самостоятельная история в том же городе.</li>
+<li><b><i>«Ловец снов»</i></b> или <b><i>«11/22/63»</i></b> — возвращение к городу через память или путешествие.</li>
+<li><b><i>«На выгодных условиях»</i></b> — короткая поздняя история для дополнительного штриха.</li>
+<li><b><i>«Мешок с костями»</i></b> и <b><i>«Последнее дело Гвенди»</i></b> — более дальние связи общей вселенной.</li>
+</ol>
+<p class="editorial-note">Это практический маршрут, а не исчерпывающий перечень каждого упоминания слова Derry во всех произведениях Кинга. Случайная реплика или адрес не делает книгу произведением о городе.</p>
+
+<section class="editorial-sources" aria-labelledby="sources-title">
+<h2 id="sources-title">Источники и официальные страницы книг</h2>
+<ul>
+<li><a href="https://www.simonandschuster.com/p/stephen-king-derry-books" target="_blank" rel="noopener noreferrer">Simon &amp; Schuster — подборка книг, связанных с Дерри</a></li>
+<li><a href="https://stephenking.com/works/novel/it.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>IT</i></a></li>
+<li><a href="https://stephenking.com/works/novel/insomnia.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Insomnia</i></a></li>
+<li><a href="https://stephenking.com/works/novel/dreamcatcher.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Dreamcatcher</i></a></li>
+<li><a href="https://stephenking.com/works/novel/11-22-63.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>11/22/63</i></a></li>
+<li><a href="https://stephenking.com/works/short/fair-extension.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>«На выгодных условиях»</i> (Fair Extension)</a></li>
+<li><a href="https://stephenking.com/works/novel/bag-of-bones.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Bag of Bones</i></a></li>
+<li><a href="https://stephenking.com/works/novel/gwendys-final-task.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>«Последнее дело Гвенди»</i> (Gwendy’s Final Task)</a></li>
+</ul>
+</section>
+{% else %}
+<div class="eyebrow">A spoiler-light reading path</div>
+<h1>Stephen King books set in Derry, Maine</h1>
+<p class="editorial-deck">Derry is best known as the setting of <i>IT</i>, but King returns to the city in other work. Sometimes Derry is the full stage; elsewhere it supplies an important passage or a connection within his larger fictional universe.</p>
+
+<aside class="answer-box" aria-label="Where to begin">
+<b>Where to begin</b>
+<p>If the city itself is what interests you, begin with <i>IT</i> and continue with <i>Insomnia</i>. <i>Dreamcatcher</i> and <i>11/22/63</i> revisit Derry for only part of their stories, but reveal it from different angles.</p>
+</aside>
+
+<h2>Books and stories in which Derry is a principal setting</h2>
+<div class="book-list">
+<section class="book-entry">
+<div><span class="book-year">1986</span><span class="book-role">The central Derry novel</span></div>
+<h3><i>IT</i></h3>
+<p>The fullest portrait of the city. Two principal periods reveal streets, homes, schools, the Barrens, civic buildings and underground infrastructure, while historical interludes give Derry a memory extending far beyond the main story. This is the sole literary source used for the map on this site.</p>
+</section>
+<section class="book-entry">
+<div><span class="book-year">1994</span><span class="book-role">Derry after <i>IT</i></span></div>
+<h3><i>Insomnia</i></h3>
+<p>The novel makes Derry a full setting again, now viewed through an older protagonist and in a later period. The city remains recognizable while the story and cast stand on their own. It is the natural next book for exploring Derry, but it is not a direct plot sequel to <i>IT</i>.</p>
+</section>
+<section class="book-entry">
+<div><span class="book-year">2010</span><span class="book-role">A Derry short story</span></div>
+<h3><i>Fair Extension</i></h3>
+<p>This short work, collected in <i>Full Dark, No Stars</i>, brings a new story to Derry. In his inspiration note, King connects a real road in Bangor with his decision to use the fictional city again. It is a compact example of how Derry works beyond its best-known characters.</p>
+</section>
+</div>
+
+<h2>Books that return to Derry</h2>
+<div class="book-list">
+<section class="book-entry">
+<div><span class="book-year">2001</span><span class="book-role">The characters’ past is tied to the city</span></div>
+<h3><i>Dreamcatcher</i></h3>
+<p>Most of the present-day story unfolds elsewhere, but Derry belongs to the central characters’ shared childhood. The city becomes part of their memory and personal history. Choose this book not for an extended tour of familiar streets, but for another treatment of friendship, growing up and the persistence of the past.</p>
+</section>
+<section class="book-entry">
+<div><span class="book-year">2011</span><span class="book-role">A significant passage</span></div>
+<h3><i>11/22/63</i></h3>
+<p>King’s time-travel novel briefly enters Derry in the late 1950s. The passage is recognizable to a reader of <i>IT</i>, yet it does not require a detailed memory of that plot or turn the whole book into a Derry story. It is a purposeful return to one period and mood of the city.</p>
+</section>
+</div>
+
+<h2>More distant connections</h2>
+<div class="book-list">
+<section class="book-entry">
+<div><span class="book-year">1998</span><span class="book-role">A link in the wider geography</span></div>
+<h3><i>Bag of Bones</i></h3>
+<p>The main action takes place at a lake in western Maine, not in Derry. Derry belongs to the book’s wider geography and biographical connections. This is not the next choice for a reader seeking a detailed city portrait, but it shows how King’s invented places coexist in a larger world.</p>
+</section>
+<section class="book-entry">
+<div><span class="book-year">2022</span><span class="book-role">A late connection</span></div>
+<h3><i>Gwendy’s Final Task</i></h3>
+<p>Stephen King and Richard Chizmar’s novel connects several familiar points in the fictional universe, including Derry. The city is not the book’s main subject, making this a route for readers following cross-connections rather than a continuation of the city portrait established in <i>IT</i>.</p>
+</section>
+</div>
+
+<h2>What order should you read them in?</h2>
+<ol class="reading-order">
+<li><b><i>IT</i></b> — the original and most extensive version of Derry.</li>
+<li><b><i>Insomnia</i></b> — a new, self-contained story in the same city.</li>
+<li><b><i>Dreamcatcher</i></b> or <b><i>11/22/63</i></b> — a return through memory or travel.</li>
+<li><b><i>Fair Extension</i></b> — a shorter, later story for another glimpse.</li>
+<li><b><i>Bag of Bones</i></b> and <b><i>Gwendy’s Final Task</i></b> — looser connections across the shared universe.</li>
+</ol>
+<p class="editorial-note">This is a practical reading path, not an exhaustive index of every use of the word Derry across King’s bibliography. A passing address or reference does not make a book a Derry story.</p>
+
+<section class="editorial-sources" aria-labelledby="sources-title">
+<h2 id="sources-title">Sources and official book pages</h2>
+<ul>
+<li><a href="https://www.simonandschuster.com/p/stephen-king-derry-books" target="_blank" rel="noopener noreferrer">Simon &amp; Schuster — books connected to Derry</a></li>
+<li><a href="https://stephenking.com/works/novel/it.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>IT</i></a></li>
+<li><a href="https://stephenking.com/works/novel/insomnia.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Insomnia</i></a></li>
+<li><a href="https://stephenking.com/works/novel/dreamcatcher.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Dreamcatcher</i></a></li>
+<li><a href="https://stephenking.com/works/novel/11-22-63.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>11/22/63</i></a></li>
+<li><a href="https://stephenking.com/works/short/fair-extension.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Fair Extension</i></a></li>
+<li><a href="https://stephenking.com/works/novel/bag-of-bones.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Bag of Bones</i></a></li>
+<li><a href="https://stephenking.com/works/novel/gwendys-final-task.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Gwendy’s Final Task</i></a></li>
+</ul>
+</section>
+{% endif %}
+{% include 'atlas/derry_explore.html' with current_hub='books' %}
+</article>
+{% endblock %}

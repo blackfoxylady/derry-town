@@ -1,4 +1,5 @@
 from collections import Counter
+from datetime import date
 from pathlib import Path
 import re
 from urllib.parse import urlencode
@@ -18,6 +19,98 @@ from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
                      Revision, Setting, Source, Tag)
 from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths, slug_name
 from .rendering import current_payload, RENDER_VERSION
+
+
+HUB_LASTMOD = date(2026, 9, 29)
+HUB_PAGES = {
+    'real': {
+        'template': 'atlas/derry_real.html',
+        'title': {
+            'en': 'Is Derry, Maine Real? Stephen King’s Fictional Town Explained',
+            'ru': 'Существует ли Дерри, штат Мэн? Город Стивена Кинга',
+        },
+        'description': {
+            'en': ('Derry, Maine is fictional. Learn where Stephen King places it, how Bangor '
+                   'inspired the town, what the novel says about its size, and what this atlas '
+                   'reconstructs.'),
+            'ru': ('Дерри, штат Мэн, — вымышленный город. Где Стивен Кинг его размещает, как '
+                   'Бангор повлиял на образ города и что реконструирует этот атлас.'),
+        },
+        'breadcrumb': {'en': 'Is Derry, Maine real?', 'ru': 'Существует ли Дерри, штат Мэн?'},
+    },
+    'bangor': {
+        'template': 'atlas/derry_bangor.html',
+        'title': {
+            'en': 'How Bangor Inspired Derry, Maine — Stephen King’s IT',
+            'ru': 'Как Бангор вдохновил Дерри, штат Мэн — «Оно» Стивена Кинга',
+        },
+        'description': {
+            'en': ('Compare fictional Derry with Bangor, Maine: the canal, Kenduskeag Stream, '
+                   'Thomas Hill Standpipe, library and other real-world echoes behind IT.'),
+            'ru': ('Сравнение вымышленного Дерри с Бангором: канал, Kenduskeag Stream, '
+                   'Thomas Hill Standpipe, библиотека и другие реальные истоки романа «Оно».'),
+        },
+        'breadcrumb': {'en': 'How Bangor inspired Derry', 'ru': 'Как Бангор вдохновил Дерри'},
+    },
+    'books': {
+        'template': 'atlas/derry_books.html',
+        'title': {
+            'en': 'Stephen King Books Set in Derry, Maine — A Spoiler-Light Guide',
+            'ru': 'Книги Стивена Кинга о Дерри, штат Мэн — гид без спойлеров',
+        },
+        'description': {
+            'en': ('A spoiler-light guide to Stephen King books set in or connected to Derry, '
+                   'Maine, from IT and Insomnia to 11/22/63 and Dreamcatcher.'),
+            'ru': ('Гид без крупных спойлеров по книгам Стивена Кинга, действие которых '
+                   'происходит в Дерри или связано с ним: от «Оно» до «Бессонницы» и «11/22/63».'),
+        },
+        'breadcrumb': {'en': 'Books set in Derry', 'ru': 'Книги о Дерри'},
+    },
+}
+
+
+def _hub_page(request, key):
+    """Render a static editorial hub in either complete editorial language version."""
+    config = HUB_PAGES[key]
+    language = 'ru' if _is_ru() else 'en'
+    page_title = config['title'][language]
+    meta_description = config['description'][language]
+    breadcrumb = config['breadcrumb'][language]
+    context = {
+        'page_title': page_title,
+        'meta_description': meta_description,
+        'breadcrumb': breadcrumb,
+        'published_time': HUB_LASTMOD.isoformat(),
+    }
+    context['jsonld'] = schema.editorial(
+        request, page_title, meta_description, breadcrumb, HUB_LASTMOD)
+    response = render(request, config['template'], context)
+    response['Cache-Control'] = 'no-cache'
+    return response
+
+
+@require_safe
+def derry_real(request):
+    return _hub_page(request, 'real')
+
+
+@require_safe
+def derry_bangor(request):
+    return _hub_page(request, 'bangor')
+
+
+@require_safe
+def derry_books(request):
+    return _hub_page(request, 'books')
+
+
+def _ru_plural(number, one, few, many):
+    """Russian noun form for editorial strings kept outside the gettext catalogue."""
+    if number % 10 == 1 and number % 100 != 11:
+        return one
+    if number % 10 in (2, 3, 4) and number % 100 not in (12, 13, 14):
+        return few
+    return many
 
 
 @require_safe
@@ -70,12 +163,19 @@ def index(request):
     directory_stats = _('%(mapped)s mapped · %(unlocated)s unlocated') % {
         'mapped': mapped_count, 'unlocated': unlocated_count}
     page_title = _('Map of Derry, Maine — Stephen King’s IT Literary Atlas')
-    meta_description = ngettext(
-        'Explore an interactive map of Derry, Maine, reconstructed from Stephen King’s IT, '
-        'with %(count)s mapped place, book evidence and photographs.',
-        'Explore an interactive map of Derry, Maine, reconstructed from Stephen King’s IT, '
-        'with %(count)s mapped places, book evidence and photographs.',
-        mapped_count) % {'count': mapped_count}
+    if _is_ru():
+        mapped_noun = _ru_plural(mapped_count, 'место', 'места', 'мест')
+        meta_description = (
+            'Исследуйте интерактивную карту вымышленного города Дерри, штат Мэн, из романа '
+            f'Стивена Кинга «Оно»: {mapped_count} {mapped_noun} на карте, книжные '
+            'свидетельства и фотографии.')
+    else:
+        meta_description = ngettext(
+            'Explore an interactive map of Derry, Maine, the fictional town in Stephen King’s IT, '
+            'with %(count)s mapped place, book evidence and photographs.',
+            'Explore an interactive map of Derry, Maine, the fictional town in Stephen King’s IT, '
+            'with %(count)s mapped places, book evidence and photographs.',
+            mapped_count) % {'count': mapped_count}
     context = {
         'page_title': page_title, 'meta_description': meta_description,
         'mapped_count': mapped_count, 'unlocated_count': unlocated_count,
@@ -511,12 +611,20 @@ def places(request):
     kind_names = [kind for kind in kind_order if kinds[kind]]
     kind_names += sorted(kind for kind in kinds if kind not in kind_order)
     page_title = _('Places in Derry, Maine — Stephen King’s IT Literary Atlas')
-    meta_description = ngettext(
-        'Browse %(count)s place in Derry, Maine, reconstructed from Stephen King’s IT. '
-        'Search by name, category and mapping confidence, with sources and photographs.',
-        'Browse %(count)s places in Derry, Maine, reconstructed from Stephen King’s IT. '
-        'Search by name, category and mapping confidence, with sources and photographs.',
-        place_count) % {'count': place_count}
+    if _is_ru():
+        place_noun = _ru_plural(place_count, 'место и ориентир', 'места и ориентира',
+                                'мест и ориентиров')
+        meta_description = (
+            f'Просматривайте {place_count} {place_noun} вымышленного Дерри, штат Мэн, '
+            'реконструированных по роману Стивена Кинга «Оно», с книжными свидетельствами, '
+            'заметками о расположении и фотографиями.')
+    else:
+        meta_description = ngettext(
+            'Browse %(count)s place and landmark in fictional Derry, Maine, reconstructed from '
+            'Stephen King’s IT, with book evidence, location notes and photographs.',
+            'Browse %(count)s places and landmarks in fictional Derry, Maine, reconstructed from '
+            'Stephen King’s IT, with book evidence, location notes and photographs.',
+            place_count) % {'count': place_count}
     context = {
         'cards': cards, 'kinds': [(kind, kinds[kind]) for kind in kind_names],
         'place_count': place_count, 'mapped_count': mapped_count,
@@ -922,6 +1030,9 @@ def sitemap(request):
         (reverse('places'), max(place_index_dates) if place_index_dates else None, []),
         (reverse('gallery'), max(gallery_dates) if gallery_dates else None, []),
         (reverse('method'), scene_modified, []),
+        (reverse('derry_real'), HUB_LASTMOD, []),
+        (reverse('derry_bangor'), HUB_LASTMOD, []),
+        (reverse('derry_books'), HUB_LASTMOD, []),
     ]
 
     def add_photo_landing(path, landing_photos):

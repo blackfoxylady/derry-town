@@ -1,0 +1,131 @@
+{% extends 'atlas/gallery_base.html' %}
+{% load i18n %}
+{% block og_type %}article{% endblock %}
+{% block article_meta %}<meta property="article:published_time" content="{{ published_time }}"><meta property="article:modified_time" content="{{ published_time }}">{% endblock %}
+{% block content %}
+{% include 'atlas/breadcrumbs.html' with current=breadcrumb only %}
+<article class="editorial editorial-wide">
+{% if LANGUAGE_CODE == 'ru' %}
+<div class="eyebrow">Реальный город и литературная география</div>
+<h1>Как Бангор вдохновил Дерри, штат Мэн</h1>
+<p class="editorial-deck">Дерри из романа <i>«Оно»</i> вымышлен, но его городской характер во многом вырос из Бангора. Связь подтверждена самим Стивеном Кингом; сходства заметны в водной системе, общественных ориентирах и устройстве небольшого регионального города. При этом Дерри не является точной копией Бангора.</p>
+
+<aside class="answer-box" aria-label="Главный вывод">
+<b>Главный вывод</b>
+<p>Бангор дал Кингу основу и набор узнаваемых деталей. Дерри превращает их в самостоятельное литературное пространство, поэтому сравнение полезно для понимания романа, но не для поиска адресов один к одному.</p>
+</aside>
+
+<h2>Что об этом говорил Стивен Кинг</h2>
+<p>В авторской заметке об истории <i>«Оно»</i> Кинг вспоминает, как размышлял о Бангоре, его необычном канале, тоннелях и канализации. Из идеи «тролля под мостом» постепенно вырос замысел существа под целым городом. В другой заметке, к рассказу <i>Fair Extension</i>, автор прямо называет Дерри Бангором под другим именем.</p>
+<p>Это надёжное основание считать Бангор главным прототипом. Однако сам рассказ Кинга о создании романа показывает, что образ города складывался из нескольких источников. Например, пространственная метафора библиотеки восходит к его детскому воспоминанию о библиотеке в Стратфорде, штат Коннектикут.</p>
+
+<h2>Derry vs Bangor: что похоже, а что нет</h2>
+<div class="comparison-scroll" tabindex="0" aria-label="Сравнение Дерри и Бангора">
+<table class="comparison-table">
+<thead><tr><th>Элемент</th><th>Бангор</th><th>Дерри в <i>«Оно»</i></th><th>Граница сравнения</th></tr></thead>
+<tbody>
+<tr><th>Статус</th><td>Реальный город штата Мэн.</td><td>Вымышленный город в произведениях Кинга.</td><td>У Дерри нет официальных координат или муниципальных границ.</td></tr>
+<tr><th>Водный коридор</th><td>Kenduskeag Stream проходит через центр и соединяется с Penobscot River.</td><td>Kenduskeag, канал, Barrens и водоотводы связывают многие части книжного города.</td><td>Роль воды сходна, но русло и уличная сеть не совпадают буквально.</td></tr>
+<tr><th>Standpipe</th><td>Thomas Hill Standpipe построен в 1897 году и остаётся действующим водохранилищем.</td><td>Derry Standpipe — заметный городской ориентир со своей вымышленной историей.</td><td>Реальное сооружение служит убедительным аналогом, но размеры, окружение и история в романе иные.</td></tr>
+<tr><th>Библиотека</th><td>Bangor Public Library занимает здание, открытое в 1913 году после большого пожара 1911 года.</td><td>Derry Public Library — центральное общественное место и важный узел городской памяти.</td><td>Прямое соответствие зданий не доказано; Кинг отдельно называл библиотеку в Стратфорде источником одной из идей романа.</td></tr>
+<tr><th>Paul Bunyan</th><td>В Бангоре есть крупная статуя Paul Bunyan, признанный городской ориентир.</td><td>Статуя Paul Bunyan стоит у Derry Civic Center.</td><td>Параллель заметна, но роман не превращает весь район вокруг статуи в копию реального места.</td></tr>
+<tr><th>План города</th><td>Реальная сеть улиц, участков и муниципальных границ.</td><td>Отношения между местами складываются из маршрутов и описаний в тексте.</td><td>Карту Бангора нельзя использовать как недостающий план Дерри.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>Канал, ручей и пространство под городом</h2>
+<p>Связь особенно хорошо видна в водной географии. Официальные материалы Бангора показывают Kenduskeag Stream как коридор, проходящий через центр к набережной Penobscot River. Кинг вспоминал городской канал, когда искал пространство для истории о скрытом под городом существе. В <i>«Оно»</i> вода связывает центр, Barrens и подземную инфраструктуру в единую систему.</p>
+<p>Но художественная функция важнее топографического совпадения. Книжный Kenduskeag, канал и сеть стоков должны обслуживать маршруты и темы романа. Поэтому в этом атласе реальные изгибы ручья и улицы Бангора не переносятся в Дерри автоматически.</p>
+
+<h2>Thomas Hill Standpipe и башня Дерри</h2>
+<p>Thomas Hill Standpipe — один из самых наглядных реальных аналогов. По данным Bangor Water District, сооружение построено в 1897 году для хранения воды и регулирования давления; железный резервуар заключён в высокую деревянную оболочку с прогулочной галереей. Такие особенности помогают понять, почему standpipe может быть одновременно инженерным объектом, обзорной точкой и сильным образом городского пейзажа.</p>
+<p>У башни Дерри собственные размеры, окружение и события. Совпадение типа сооружения не даёт права подменять описание в романе реальными чертежами или координатами Thomas Hill.</p>
+
+<h2>Библиотека, общественные здания и память города</h2>
+<p>Реальная Bangor Public Library и вымышленная Derry Public Library выполняют роль устойчивых общественных ориентиров. История бангорской библиотеки включает пожар 1911 года и открытие нынешнего здания в 1913-м. Эти факты помогают увидеть историческую глубину Бангора, но не доказывают, что Кинг скопировал здание или его участок для романа.</p>
+<p>То же правило относится к статуе Paul Bunyan и другим узнаваемым объектам. Сходство может быть значимым, однако Дерри собирает реальные детали заново. Надёжнее говорить об эхе и преобразовании, а не о полном соответствии.</p>
+
+<aside class="screen-note">
+<b>Коротко об экранизациях.</b> Бангор связан прежде всего с происхождением книжного Дерри. Для фильмов <i>IT</i> 2017 и 2019 годов роль города исполнял в основном Port Hope в канадской провинции Онтарио. Экранные адреса не используются в этой реконструкции романа.
+</aside>
+
+<h2>Как это сравнение используется в атласе</h2>
+<p>Бангор помогает проверить общий характер ландшафта: город у воды, лесистые окраины, общественные ориентиры, инженерная инфраструктура. Он не заполняет пробелы в тексте готовыми координатами. Если роман закрепляет улицу, соседство или маршрут, карта опирается на это; если не закрепляет, положение остаётся выводом или предложением.</p>
+
+<section class="editorial-sources" aria-labelledby="sources-title">
+<h2 id="sources-title">Источники</h2>
+<ul>
+<li><a href="https://stephenking.com/works/novel/it.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>IT</i>: история создания</a></li>
+<li><a href="https://stephenking.com/works/short/fair-extension.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Fair Extension</i>: история создания</a></li>
+<li><a href="https://www.bangormaine.gov/432/Trails" target="_blank" rel="noopener noreferrer">City of Bangor — Kenduskeag Stream Trail</a></li>
+<li><a href="https://www.bangorwater.org/thomas-hill-standpipe" target="_blank" rel="noopener noreferrer">Bangor Water District — Thomas Hill Standpipe</a></li>
+<li><a href="https://bangorpubliclibrary.org/web-agency-gb-about-us/" target="_blank" rel="noopener noreferrer">Bangor Public Library — история библиотеки</a></li>
+<li><a href="https://www.bangormaine.gov/DocumentCenter/View/1193/2022-Comprehensive-Plan-PDF" target="_blank" rel="noopener noreferrer">City of Bangor — Comprehensive Plan 2022</a></li>
+<li><a href="https://www.visitporthope.ca/en/plan-your-stay/it-walking-tour.aspx" target="_blank" rel="noopener noreferrer">Port Hope Tourism — места съёмок <i>IT</i></a></li>
+</ul>
+</section>
+{% else %}
+<div class="eyebrow">The real city and the literary geography</div>
+<h1>How Bangor inspired Derry, Maine</h1>
+<p class="editorial-deck">The Derry of <i>IT</i> is fictional, but much of its urban character grew from Bangor. Stephen King has confirmed the connection, and parallels appear in the waterways, civic landmarks and texture of a small regional city. Derry, however, is not a scale copy of Bangor.</p>
+
+<aside class="answer-box" aria-label="The central point">
+<b>The central point</b>
+<p>Bangor gave King a foundation and a set of recognizable details. Derry turns them into an independent literary place, so the comparison illuminates the novel but cannot provide one-to-one addresses.</p>
+</aside>
+
+<h2>What Stephen King has said</h2>
+<p>In his account of the inspiration for <i>IT</i>, King recalls thinking about Bangor, its unusual canal, tunnels and sewers. An idea about a troll beneath a bridge gradually became an idea about a creature beneath an entire city. In a separate note for <i>Fair Extension</i>, he makes the relationship explicit by describing Derry as Bangor under another name.</p>
+<p>That is strong evidence for treating Bangor as the principal model. King’s own account also shows that the city came from more than one source. The library as a passage between childhood and adulthood, for example, grew from his memory of a library in Stratford, Connecticut.</p>
+
+<h2>Derry vs Bangor: what matches and what does not</h2>
+<div class="comparison-scroll" tabindex="0" aria-label="Comparison of Derry and Bangor">
+<table class="comparison-table">
+<thead><tr><th>Feature</th><th>Bangor</th><th>Derry in <i>IT</i></th><th>Limit of the comparison</th></tr></thead>
+<tbody>
+<tr><th>Status</th><td>A real city in Maine.</td><td>A fictional city in King’s work.</td><td>Derry has no official coordinates or municipal boundary.</td></tr>
+<tr><th>Water corridor</th><td>The Kenduskeag Stream passes through downtown and meets the Penobscot River.</td><td>The Kenduskeag, canal, Barrens and drains connect much of the book’s city.</td><td>The role of water is similar; the channels and street grids do not literally coincide.</td></tr>
+<tr><th>Standpipe</th><td>The Thomas Hill Standpipe was built in 1897 and remains an active water-storage structure.</td><td>The Derry Standpipe is a prominent landmark with its own fictional history.</td><td>The real structure is a persuasive analogue, but its dimensions, setting and history differ.</td></tr>
+<tr><th>Library</th><td>Bangor Public Library occupies a building opened in 1913 after the great fire of 1911.</td><td>Derry Public Library is a central civic place and a storehouse of the town’s memory.</td><td>A direct building match is unproven; King separately credited a Stratford library for one of the novel’s ideas.</td></tr>
+<tr><th>Paul Bunyan</th><td>Bangor has a large Paul Bunyan statue that is a recognized city landmark.</td><td>A Paul Bunyan statue stands at the Derry Civic Center.</td><td>The parallel is visible, but the surrounding fictional district is not a copy of the real site.</td></tr>
+<tr><th>Town plan</th><td>A real network of streets, parcels and municipal boundaries.</td><td>Relationships assembled from routes and descriptions in the text.</td><td>Bangor’s map cannot serve as Derry’s missing street plan.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>The canal, the stream and the space beneath the city</h2>
+<p>The connection is clearest in the water geography. Bangor’s official materials show the Kenduskeag Stream running through downtown toward the Penobscot waterfront. King remembered the city’s canal while looking for a setting built around something hidden below. In <i>IT</i>, water links downtown, the Barrens and underground infrastructure into one system.</p>
+<p>The literary function matters more than a topographic match. The book’s Kenduskeag, canal and drains have to serve the novel’s routes and themes. This atlas therefore does not import Bangor’s actual bends and streets to complete Derry.</p>
+
+<h2>Thomas Hill Standpipe and Derry’s tower</h2>
+<p>The Thomas Hill Standpipe is one of the clearest real analogues. Bangor Water District records that it was built in 1897 for water storage and pressure regulation; its iron tank sits inside a tall wooden shell with a promenade deck. Those features show how a standpipe can be an engineering work, a lookout and a powerful part of a city skyline at once.</p>
+<p>Derry’s standpipe has its own dimensions, surroundings and history. Sharing a building type does not justify replacing the novel’s description with the Thomas Hill plans or coordinates.</p>
+
+<h2>The library, civic buildings and town memory</h2>
+<p>The real Bangor Public Library and the fictional Derry Public Library both work as durable civic anchors. Bangor’s library history includes the fire of 1911 and the opening of the present building in 1913. That history helps reveal Bangor’s depth as a city, but it does not prove that King copied the building or its parcel into the novel.</p>
+<p>The same caution applies to the Paul Bunyan statue and other recognizable features. A parallel may matter without becoming a complete equivalence. “Echo” and “transformation” are more accurate terms than “duplicate.”</p>
+
+<aside class="screen-note">
+<b>A brief screen note.</b> Bangor matters chiefly as a source for the Derry of the book. Port Hope, Ontario, supplied much of the on-screen town for the 2017 and 2019 <i>IT</i> films. Those screen locations are not used to reconstruct the novel here.
+</aside>
+
+<h2>How this comparison informs the atlas</h2>
+<p>Bangor helps test the broad character of the landscape: a city shaped by water, wooded edges, civic landmarks and municipal infrastructure. It does not fill textual gaps with ready-made coordinates. When the novel establishes a street, neighbor or route, the map follows that evidence; when it does not, the placement remains an inference or proposal.</p>
+
+<section class="editorial-sources" aria-labelledby="sources-title">
+<h2 id="sources-title">Sources</h2>
+<ul>
+<li><a href="https://stephenking.com/works/novel/it.html" target="_blank" rel="noopener noreferrer">StephenKing.com — the inspiration for <i>IT</i></a></li>
+<li><a href="https://stephenking.com/works/short/fair-extension.html" target="_blank" rel="noopener noreferrer">StephenKing.com — the inspiration for <i>Fair Extension</i></a></li>
+<li><a href="https://www.bangormaine.gov/432/Trails" target="_blank" rel="noopener noreferrer">City of Bangor — Kenduskeag Stream Trail</a></li>
+<li><a href="https://www.bangorwater.org/thomas-hill-standpipe" target="_blank" rel="noopener noreferrer">Bangor Water District — Thomas Hill Standpipe</a></li>
+<li><a href="https://bangorpubliclibrary.org/web-agency-gb-about-us/" target="_blank" rel="noopener noreferrer">Bangor Public Library — library history</a></li>
+<li><a href="https://www.bangormaine.gov/DocumentCenter/View/1193/2022-Comprehensive-Plan-PDF" target="_blank" rel="noopener noreferrer">City of Bangor — 2022 Comprehensive Plan</a></li>
+<li><a href="https://www.visitporthope.ca/en/plan-your-stay/it-walking-tour.aspx" target="_blank" rel="noopener noreferrer">Port Hope Tourism — <i>IT</i> filming locations</a></li>
+</ul>
+</section>
+{% endif %}
+{% include 'atlas/derry_explore.html' with current_hub='bangor' %}
+</article>
+{% endblock %}

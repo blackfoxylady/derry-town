@@ -84,6 +84,18 @@ def method(request, name, description):
     return _graph(request, _page(request, 'WebPage', name, description))
 
 
+def editorial(request, name, description, breadcrumb, published):
+    """Long-form, source-backed guide page with a visible Home breadcrumb."""
+    article = _page(request, 'Article', name, description)
+    article['headline'] = str(name)
+    article['author'] = {'@type': 'Organization', 'name': 'Derry', 'url': _root(request)}
+    article['publisher'] = {'@type': 'Organization', 'name': 'Derry', 'url': _root(request)}
+    article['datePublished'] = published.isoformat()
+    article['dateModified'] = published.isoformat()
+    return _graph(request, article,
+                  _breadcrumbs(request, ('Derry', reverse('index')), (breadcrumb, '')))
+
+
 def place(request, ctx):
     """Страница места из готового context'а place_page."""
     feature, note = ctx['feature'], ctx['note']

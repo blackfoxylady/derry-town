@@ -57,6 +57,10 @@ class SeoTests(TestCase):
         self.assertEqual(response['Content-Type'], 'application/xml')
         body = response.content.decode()
         for path in ('/', '/ru/', '/places/', '/ru/places/', '/photos/', '/method/', '/ru/method/',
+                     '/is-derry-maine-real/', '/ru/is-derry-maine-real/',
+                     '/how-bangor-inspired-derry-maine/',
+                     '/ru/how-bangor-inspired-derry-maine/',
+                     '/books-set-in-derry-maine/', '/ru/books-set-in-derry-maine/',
                      '/places/12-derry-public-library/', '/ru/places/12-derry-public-library/',
                      '/places/u3-tracker-brothers/', f'/photos/{photo.id}/', f'/ru/photos/{photo.id}/',
                      '/photos/place/12-derry-public-library/',
@@ -100,6 +104,13 @@ class SeoTests(TestCase):
         # Canonical галереи не тащит query-параметры фильтров.
         response = self.client.get('/photos/', {'place': '12'})
         self.assertContains(response, '<link rel="canonical" href="http://testserver/photos/">')
+        for path in ('/is-derry-maine-real/', '/how-bangor-inspired-derry-maine/',
+                     '/books-set-in-derry-maine/'):
+            response = self.client.get(path)
+            self.assertContains(response, f'<link rel="canonical" href="http://testserver{path}">')
+            self.assertContains(response, f'hreflang="ru" href="http://testserver/ru{path}"')
+            russian = self.client.get('/ru' + path)
+            self.assertContains(russian, f'hreflang="en" href="http://testserver{path}"')
 
     def test_google_verification_and_single_content_heading(self):
         verification = '<meta name="google-site-verification" content="PQSwf6jyMi2X-8WbazpZT47x4vm7KZqvt-KBrnmpiH0">'
@@ -125,7 +136,8 @@ class SeoTests(TestCase):
         self.assertContains(
             response, '<title>Map of Derry, Maine — Stephen King’s IT Literary Atlas</title>')
         self.assertContains(
-            response, 'with 1 mapped place, book evidence and photographs.')
+            response, 'the fictional town in Stephen King’s IT, with 1 mapped place, '
+                      'book evidence and photographs.')
         self.assertNotContains(response, '83 mapped places')
 
         response = self.client.get('/places/12-derry-public-library/')
@@ -146,6 +158,66 @@ class SeoTests(TestCase):
             '<title>Mapping Derry, Maine — Sources &amp; Method · Stephen King’s IT</title>')
         self.assertContains(
             response, 'including sources, evidence, confidence levels and mapping decisions.')
+
+    def test_editorial_hubs_have_approved_titles_descriptions_and_sources(self):
+        cases = (
+            ('/is-derry-maine-real/',
+             'Is Derry, Maine Real? Stephen King’s Fictional Town Explained',
+             'Derry, Maine is fictional.', 'Is Derry, Maine a real town?'),
+            ('/how-bangor-inspired-derry-maine/',
+             'How Bangor Inspired Derry, Maine — Stephen King’s IT',
+             'Compare fictional Derry with Bangor, Maine:',
+             'How Bangor inspired Derry, Maine'),
+            ('/books-set-in-derry-maine/',
+             'Stephen King Books Set in Derry, Maine — A Spoiler-Light Guide',
+             'A spoiler-light guide to Stephen King books',
+             'Stephen King books set in Derry, Maine'),
+        )
+        for path, title, description, heading in cases:
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, f'<title>{title}</title>', html=True)
+            self.assertContains(response, description)
+            self.assertContains(response, f'<h1>{heading}</h1>', html=True)
+            self.assertContains(response, '<h1', count=1)
+            self.assertContains(response, '<meta property="og:type" content="article">')
+            self.assertContains(response, '<meta property="article:published_time" content="2026-09-29">')
+            self.assertContains(response, 'target="_blank" rel="noopener noreferrer"')
+
+    def test_editorial_hubs_have_complete_russian_versions(self):
+        cases = (
+            ('/ru/is-derry-maine-real/', 'Существует ли Дерри, штат Мэн?',
+             'Дерри, штат Мэн, — вымышленный город.'),
+            ('/ru/how-bangor-inspired-derry-maine/', 'Как Бангор вдохновил Дерри, штат Мэн',
+             'Сравнение вымышленного Дерри с Бангором:'),
+            ('/ru/books-set-in-derry-maine/', 'Книги Стивена Кинга о Дерри, штат Мэн',
+             'Гид без крупных спойлеров'),
+        )
+        for path, heading, description in cases:
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, heading)
+            self.assertContains(response, description)
+            self.assertNotContains(response, '<html lang="en">')
+        books = self.client.get('/ru/books-set-in-derry-maine/')
+        self.assertContains(books, '«На выгодных условиях»')
+        self.assertContains(books, '«Последнее дело Гвенди»')
+
+    def test_town_navigation_links_hubs_and_places_but_not_homepage(self):
+        self.assertNotContains(self.client.get('/'), 'class="derry-explore"')
+        for path in ('/places/', '/places/12-derry-public-library/',
+                     '/is-derry-maine-real/', '/how-bangor-inspired-derry-maine/',
+                     '/books-set-in-derry-maine/'):
+            response = self.client.get(path)
+            self.assertContains(response, 'class="derry-explore"')
+            self.assertContains(response, 'Is Derry, Maine a real town?')
+            self.assertContains(response, 'How Bangor inspired Derry')
+            self.assertContains(response, 'Stephen King books set in Derry')
+            self.assertContains(response, 'Map of Derry')
+            self.assertContains(response, 'All places')
+        russian = self.client.get('/ru/places/')
+        self.assertContains(russian, 'Узнать больше о Дерри')
+        self.assertContains(russian, 'Книги Стивена Кинга о Дерри')
 
     def test_approved_seo_templates_are_localized_in_russian(self):
         response = self.client.get('/ru/')
@@ -174,6 +246,17 @@ class SeoTests(TestCase):
         self.assertContains(response, '1 на карте · 1 без координат')
         self.assertContains(response, 'href="/ru/places/12-derry-public-library/"')
         self.assertContains(response, 'href="/ru/places/u3-tracker-brothers/"')
+
+    def test_home_and_places_add_context_without_competing_with_primary_ui(self):
+        home = self.client.get('/').content.decode()
+        self.assertIn('A map of Derry from Stephen King’s <i>IT</i>', home)
+        self.assertGreater(home.index('class="map-context"'), home.index('class="workspace"'))
+        self.assertLess(home.index('class="map-context"'), home.index('class="place-directory"'))
+        self.assertNotIn('href="/is-derry-maine-real/"', home)
+        places = self.client.get('/places/')
+        self.assertContains(places, 'These are locations from the novel, not filming locations')
+        self.assertContains(self.client.get('/ru/places/'),
+                            'Это места книги, а не съёмочные локации экранизаций.')
 
     def test_photo_pages_use_the_photo_as_preview(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -227,7 +310,9 @@ class JsonLdTests(TestCase):
                                period='1958', geometry=point, metadata={})
 
     def test_every_page_carries_website_and_book(self):
-        for path in ('/', '/places/', '/photos/', '/method/', '/places/12-derry-public-library/'):
+        for path in ('/', '/places/', '/photos/', '/method/', '/places/12-derry-public-library/',
+                     '/is-derry-maine-real/', '/how-bangor-inspired-derry-maine/',
+                     '/books-set-in-derry-maine/'):
             data = jsonld(self.client.get(path))
             self.assertEqual(data['@context'], 'https://schema.org', path)
             website = node(data, 'WebSite')
@@ -257,6 +342,23 @@ class JsonLdTests(TestCase):
         self.assertNotIn('item', crumbs[1])
         method = node(jsonld(self.client.get('/method/')), 'WebPage')
         self.assertEqual(method['about'], {'@id': 'http://testserver/#book'})
+
+    def test_editorial_hubs_are_articles_with_breadcrumbs(self):
+        for path, heading in (
+                ('/is-derry-maine-real/', 'Is Derry, Maine a real town?'),
+                ('/how-bangor-inspired-derry-maine/', 'How Bangor inspired Derry, Maine'),
+                ('/books-set-in-derry-maine/', 'Stephen King books set in Derry, Maine')):
+            data = jsonld(self.client.get(path))
+            article = node(data, 'Article')
+            self.assertEqual(article['url'], 'http://testserver' + path)
+            self.assertEqual(article['author']['name'], 'Derry')
+            self.assertEqual(article['datePublished'], '2026-09-29')
+            self.assertEqual(article['dateModified'], '2026-09-29')
+            crumbs = node(data, 'BreadcrumbList')['itemListElement']
+            self.assertEqual(crumbs[0]['item'], 'http://testserver/')
+            self.assertNotIn('item', crumbs[-1])
+            response = self.client.get(path)
+            self.assertContains(response, heading)
 
     def test_gallery_landing_jsonld_has_its_own_url_and_breadcrumb(self):
         with tempfile.TemporaryDirectory() as tmp:

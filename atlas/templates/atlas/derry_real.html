@@ -1,0 +1,85 @@
+{% extends 'atlas/gallery_base.html' %}
+{% load i18n %}
+{% block og_type %}article{% endblock %}
+{% block article_meta %}<meta property="article:published_time" content="{{ published_time }}"><meta property="article:modified_time" content="{{ published_time }}">{% endblock %}
+{% block content %}
+{% include 'atlas/breadcrumbs.html' with current=breadcrumb only %}
+<article class="editorial">
+{% if LANGUAGE_CODE == 'ru' %}
+<div class="eyebrow">Путеводитель по книжному Дерри</div>
+<h1>Существует ли Дерри, штат Мэн?</h1>
+<p class="editorial-deck">Нет. Дерри — вымышленный город штата Мэн, созданный Стивеном Кингом. У него нет официальных координат, муниципалитета или почтового индекса, но в романе <i>«Оно»</i> он описан достаточно подробно, чтобы восприниматься как настоящий город.</p>
+
+<aside class="answer-box" aria-label="Краткий ответ">
+<b>Краткий ответ</b>
+<p>Дерри не существует как реальный город штата Мэн. Его главный реальный прообраз — Бангор, однако книжный Дерри не является переименованной копией Бангора и не совпадает с ним улица в улицу.</p>
+</aside>
+
+<h2>Где находится Дерри?</h2>
+<p>В мире произведений Кинга Дерри находится в штате Мэн и связан с сетью реальных и вымышленных дорог, рек и соседних городов. Эти указания создают убедительное положение внутри авторского Мэна, но не задают единственной точки, которую можно было бы без оговорок поставить на реальную карту. Поэтому запрос «Derry, Maine» в обычном картографическом сервисе не приведёт к городу из <i>«Оно»</i>.</p>
+<p>Реальные населённые пункты с названием Derry существуют в других штатах — самый известный находится в Нью-Гэмпшире. Это не город из романа и не его официальный аналог.</p>
+
+<h2>Бангор — это настоящий Дерри?</h2>
+<p>Бангор — важнейший источник образа Дерри. На официальном сайте Стивена Кинга автор рассказывает, что, обдумывая <i>«Оно»</i>, вспоминал Бангор и его городской канал. В заметке о рассказе <i>Fair Extension</i> он формулирует связь ещё прямее: Дерри — это Бангор «под другим именем».</p>
+<p>Но это не означает, что любой адрес Дерри можно перевести в адрес Бангора. Кинг перерабатывает реальный город для художественной задачи: меняет взаимное положение мест, соединяет разные источники и добавляет полностью вымышленные объекты. Даже идея библиотеки как перехода между детским и взрослым мирами, по словам автора, пришла из воспоминания о библиотеке в Стратфорде, штат Коннектикут. У Дерри несколько корней, а не один план-оригинал.</p>
+
+<h2>Есть ли у Дерри население, округ и почтовый индекс?</h2>
+<p>Только внутри художественного мира. Роман даёт представление о размере города, его учреждениях и роли регионального центра, однако эти сведения не превращают Дерри в муниципальную единицу. У него нет реальной переписи населения, администрации округа или ZIP-кода. Числа, встречающиеся в справочниках о вселенной Кинга, следует понимать как сведения о вымышленном городе, а не как актуальную статистику штата Мэн.</p>
+
+<h2>Можно ли посетить Дерри?</h2>
+<p>Сам Дерри — нет, но можно увидеть места, повлиявшие на его образ. В Бангоре находятся Kenduskeag Stream, Thomas Hill Standpipe, историческая библиотека и другие элементы городской среды, которые помогают понять, почему книжный город кажется узнаваемым. Это путешествие к источникам вдохновения, а не прогулка по точной декорации романа.</p>
+<p>Экранные версии создают отдельную географию. Места съёмок могут выглядеть как Дерри на экране, но они не определяют расположение улиц и зданий в книге.</p>
+
+<h2>Что показывает эта карта?</h2>
+<p>Карта на этом сайте реконструирует Дерри исключительно по роману <i>«Оно»</i>. Она объединяет основные периоды 1957–58 и 1984–85 годов и учитывает исторические эпизоды города. Названные улицы, маршруты и соседства образуют каркас; там, где текст не указывает точный участок или координату, карта прямо обозначает вывод или предположение.</p>
+<p>Это способ исследовать внутреннюю географию книги, а не претензия на канонический план и не перенесённая карта Бангора.</p>
+
+<section class="editorial-sources" aria-labelledby="sources-title">
+<h2 id="sources-title">Источники</h2>
+<ul>
+<li><a href="https://stephenking.com/works/novel/it.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>IT</i>: история создания</a></li>
+<li><a href="https://stephenking.com/works/short/fair-extension.html" target="_blank" rel="noopener noreferrer">StephenKing.com — <i>Fair Extension</i>: история создания</a></li>
+<li><a href="https://www.maine.gov/local/index.html" target="_blank" rel="noopener noreferrer">Maine.gov — справочник муниципалитетов штата</a></li>
+</ul>
+</section>
+{% else %}
+<div class="eyebrow">A guide to the Derry of the novel</div>
+<h1>Is Derry, Maine a real town?</h1>
+<p class="editorial-deck">No. Derry is a fictional Maine town created by Stephen King. It has no official coordinates, municipality or ZIP code, but <i>IT</i> describes it in enough detail to make it feel like a place that could exist.</p>
+
+<aside class="answer-box" aria-label="Short answer">
+<b>Short answer</b>
+<p>Derry is not a real town in Maine. Its strongest real-world model is Bangor, but the Derry of the novel is not simply Bangor renamed, and the two places do not match street for street.</p>
+</aside>
+
+<h2>Where is Derry supposed to be?</h2>
+<p>Within King’s fiction, Derry lies in Maine and connects to a network of real and invented roads, rivers and neighboring towns. Those references give it a convincing position inside King’s version of the state, but they do not establish one real-world point that can be marked without qualification. Searching an ordinary map for “Derry, Maine” will therefore not lead to the town in <i>IT</i>.</p>
+<p>Real communities named Derry exist elsewhere in the United States, most notably Derry, New Hampshire. They are not the town in the novel or an official counterpart to it.</p>
+
+<h2>Is Bangor the real Derry?</h2>
+<p>Bangor is the most important model for Derry. On Stephen King’s official site, King explains that while developing <i>IT</i> he thought about Bangor and the unusual canal running through the city. In his note on <i>Fair Extension</i>, he states the relationship even more directly, calling Derry “Bangor masquerading under a different name.”</p>
+<p>That does not turn every Derry address into a Bangor address. King reshaped the real city for the novel, changed spatial relationships, combined several sources and invented places of his own. Even the library-as-passage idea came, by King’s account, from a childhood library in Stratford, Connecticut. Derry has more than one real-world root and no single master plan.</p>
+
+<h2>Does Derry have a population, county or ZIP code?</h2>
+<p>Only inside the fiction. The novel conveys the scale of the city, its institutions and its role as a regional center, but these details do not make Derry a Maine municipality. It has no real census count, county government or postal code. Numbers repeated in guides to King’s universe describe an imagined city, not current Maine statistics.</p>
+
+<h2>Can you visit Derry?</h2>
+<p>You cannot visit Derry itself, but you can visit places that helped shape it. Bangor has the Kenduskeag Stream, the Thomas Hill Standpipe, a historic public library and other pieces of urban landscape that help explain why Derry feels recognizable. Such a trip visits sources of inspiration, not a precise physical version of the novel.</p>
+<p>Screen adaptations create another geography again. Their filming locations may look like Derry on screen, but they do not establish where the book’s streets and buildings belong.</p>
+
+<h2>What does this map show?</h2>
+<p>This site reconstructs Derry from the novel <i>IT</i> alone. The map combines the principal periods of 1957–58 and 1984–85 with the town’s historical interludes. Named streets, routes and neighboring landmarks provide the framework; where the text leaves an exact lot or coordinate unresolved, the atlas labels the placement as an inference or proposal.</p>
+<p>It is a way to investigate the book’s internal geography, not a claim to a canonical survey and not a transplanted map of Bangor.</p>
+
+<section class="editorial-sources" aria-labelledby="sources-title">
+<h2 id="sources-title">Sources</h2>
+<ul>
+<li><a href="https://stephenking.com/works/novel/it.html" target="_blank" rel="noopener noreferrer">StephenKing.com — the inspiration for <i>IT</i></a></li>
+<li><a href="https://stephenking.com/works/short/fair-extension.html" target="_blank" rel="noopener noreferrer">StephenKing.com — the inspiration for <i>Fair Extension</i></a></li>
+<li><a href="https://www.maine.gov/local/index.html" target="_blank" rel="noopener noreferrer">Maine.gov — state directory of local governments</a></li>
+</ul>
+</section>
+{% endif %}
+{% include 'atlas/derry_explore.html' with current_hub='real' %}
+</article>
+{% endblock %}

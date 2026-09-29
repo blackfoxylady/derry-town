@@ -5,7 +5,11 @@
 <div class="places-hero">
 <div class="eyebrow">{% trans "The places remembered" %}</div>
 <h1>{% trans "Places in Derry, Maine" %}</h1>
-<p>{% blocktranslate %}A complete index of locations reconstructed from Stephen King’s <i>IT</i>. Search the atlas by name, category or mapping confidence, then open a place for its sources, photographs and location notes.{% endblocktranslate %}</p>
+{% if LANGUAGE_CODE == 'ru' %}
+<p>Полный каталог улиц, домов, школ, общественных зданий, предприятий, водоёмов и окраинных мест, названных в романе Стивена Кинга <i>«Оно»</i>. Это места книги, а не съёмочные локации экранизаций. Каждая страница отделяет то, что прямо закреплено текстом, от реконструкции: улица или соседний ориентир могут быть известны, даже если точный участок, координата или контур здания не указаны. Используйте поиск и фильтры по категории, достоверности и наличию материалов. Места без достаточных пространственных данных сохранены в каталоге как не локализованные, а не размещены на карте произвольно.</p>
+{% else %}
+<p>A complete directory of the streets, homes, schools, civic buildings, businesses, waterways and outlying sites named in Stephen King’s <i>IT</i>. These are locations from the novel, not filming locations from screen adaptations. Each page separates what the text establishes from what the atlas reconstructs: a street or neighboring landmark may be known even when an exact lot, coordinate or building outline is not. Search and filter by category, mapping confidence and available material. Places without enough spatial evidence remain in the directory as unlocated rather than being assigned an arbitrary point.</p>
+{% endif %}
 <p class="places-summary"><b>{{ place_count }}</b> {% trans "places" %} · <b>{{ mapped_count }}</b> {% trans "mapped" %} · <b>{{ unlocated_count }}</b> {% trans "unlocated" %}</p>
 <p class="places-hero-links"><a class="quiet" href="{% url 'index' %}">{% trans "Open the map" %}</a><a class="quiet" href="{% url 'method' %}">{% trans "Sources & method" %}</a></p>
 </div>
@@ -64,5 +68,6 @@
 </ul>
 <p id="placesEmpty" class="empty" hidden>{% trans "No places match these filters. Try a shorter search or clear some filters." %}</p>
 </section>
+{% include 'atlas/derry_explore.html' with current_hub='places' %}
 <script src="{% static 'atlas/places.js' %}" defer></script>
 {% endblock %}

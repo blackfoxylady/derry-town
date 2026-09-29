@@ -58,6 +58,11 @@ a.quiet{text-decoration:none;color:inherit;display:inline-block}
 .directory-jump span{font:600 13px Georgia,"Times New Roman",serif;letter-spacing:.15px}
 .directory-jump small{color:var(--muted);font-size:10px;letter-spacing:.25px}
 .directory-jump:hover{background:#efeee4}
+.map-context{border-top:1px solid #c9cebf;background:#faf8f1}
+.map-context-inner{max-width:1180px;margin:0 auto;padding:46px 28px 48px}
+.map-context h2{max-width:760px;font:700 27px/1.18 Georgia,"Times New Roman",serif;margin:6px 0 14px}
+.map-context p{max-width:780px;margin:0 0 10px;color:#394d47;font-size:14px;line-height:1.65}
+.map-context p:last-child{margin-bottom:0}
 .place-directory{scroll-margin-top:18px;border-top:1px solid #c9cebf;background:var(--paper)}
 .place-directory-inner{max-width:1180px;margin:0 auto;padding:64px 28px 90px}
 .place-directory h2{font:700 36px/1.1 Georgia,"Times New Roman",serif;margin:0 0 14px;letter-spacing:.2px}
@@ -88,6 +93,7 @@ a.quiet{text-decoration:none;color:inherit;display:inline-block}
  .app{grid-template-rows:minmax(65px,auto) 1fr auto}
  .directory-jump{min-height:48px;gap:1px 12px;padding:6px 10px}
  .directory-jump span{font-size:12px}.directory-jump small{font-size:9px}
+ .map-context-inner{padding:36px 16px 38px}.map-context h2{font-size:24px}.map-context p{font-size:13px}
  .place-directory-inner{padding:45px 16px 64px}
  .place-directory h2{font-size:29px}
  .place-directory-intro{font-size:13px;margin-bottom:25px}
@@ -96,4 +102,4 @@ a.quiet{text-decoration:none;color:inherit;display:inline-block}
  .place-group summary{padding:17px 2px}
  .place-directory-list a{min-height:61px}
 }
-@media print{.directory-jump,.place-directory{display:none!important}}
+@media print{.directory-jump,.map-context,.place-directory{display:none!important}}

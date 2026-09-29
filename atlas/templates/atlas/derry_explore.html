@@ -1,0 +1,21 @@
+<nav class="derry-explore" aria-labelledby="derry-explore-title">
+{% if LANGUAGE_CODE == 'ru' %}
+<div class="eyebrow">О городе</div>
+<h2 id="derry-explore-title">Узнать больше о Дерри</h2>
+<ul class="derry-explore-grid">
+<li>{% if current_hub == 'real' %}<span class="derry-explore-current" aria-current="page"><b>Существует ли Дерри на самом деле?</b><small>Что в городе вымышлено и где Кинг его разместил</small></span>{% else %}<a href="{% url 'derry_real' %}"><b>Существует ли Дерри на самом деле?</b><small>Что в городе вымышлено и где Кинг его разместил</small></a>{% endif %}</li>
+<li>{% if current_hub == 'bangor' %}<span class="derry-explore-current" aria-current="page"><b>Как Бангор вдохновил Дерри</b><small>Реальные ориентиры за образом вымышленного города</small></span>{% else %}<a href="{% url 'derry_bangor' %}"><b>Как Бангор вдохновил Дерри</b><small>Реальные ориентиры за образом вымышленного города</small></a>{% endif %}</li>
+<li>{% if current_hub == 'books' %}<span class="derry-explore-current" aria-current="page"><b>Книги Стивена Кинга о Дерри</b><small>Маршрут чтения без крупных спойлеров</small></span>{% else %}<a href="{% url 'derry_books' %}"><b>Книги Стивена Кинга о Дерри</b><small>Маршрут чтения без крупных спойлеров</small></a>{% endif %}</li>
+</ul>
+<p class="derry-explore-primary"><a href="{% if map_url %}{{ map_url }}{% else %}{% url 'index' %}{% endif %}">Карта Дерри</a><span aria-hidden="true">·</span>{% if current_hub == 'places' %}<span aria-current="page">Все места</span>{% else %}<a href="{% url 'places' %}">Все места</a>{% endif %}</p>
+{% else %}
+<div class="eyebrow">About the town</div>
+<h2 id="derry-explore-title">Explore Derry</h2>
+<ul class="derry-explore-grid">
+<li>{% if current_hub == 'real' %}<span class="derry-explore-current" aria-current="page"><b>Is Derry, Maine a real town?</b><small>What is fictional and where King places the city</small></span>{% else %}<a href="{% url 'derry_real' %}"><b>Is Derry, Maine a real town?</b><small>What is fictional and where King places the city</small></a>{% endif %}</li>
+<li>{% if current_hub == 'bangor' %}<span class="derry-explore-current" aria-current="page"><b>How Bangor inspired Derry</b><small>The real landmarks behind the fictional city</small></span>{% else %}<a href="{% url 'derry_bangor' %}"><b>How Bangor inspired Derry</b><small>The real landmarks behind the fictional city</small></a>{% endif %}</li>
+<li>{% if current_hub == 'books' %}<span class="derry-explore-current" aria-current="page"><b>Stephen King books set in Derry</b><small>A spoiler-light reading path through the city</small></span>{% else %}<a href="{% url 'derry_books' %}"><b>Stephen King books set in Derry</b><small>A spoiler-light reading path through the city</small></a>{% endif %}</li>
+</ul>
+<p class="derry-explore-primary"><a href="{% if map_url %}{{ map_url }}{% else %}{% url 'index' %}{% endif %}">Map of Derry</a><span aria-hidden="true">·</span>{% if current_hub == 'places' %}<span aria-current="page">All places</span>{% else %}<a href="{% url 'places' %}">All places</a>{% endif %}</p>
+{% endif %}
+</nav>

@@ -78,5 +78,6 @@ imgs.forEach(function(im){im.classList.toggle('on',im.dataset.year===b.dataset.y
 </div>
 </aside>
 {% endif %}
+{% include 'atlas/derry_explore.html' with current_hub='places' %}
 </article>
 {% endblock %}

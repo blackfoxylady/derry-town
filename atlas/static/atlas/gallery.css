@@ -104,6 +104,62 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
 .method p{max-width:640px;font-size:13px}
 .help{color:var(--muted);font-size:11px;margin-top:16px}
 
+/* Source-backed editorial hubs. */
+.editorial{max-width:760px;padding:8px 0 30px}
+.editorial-wide{max-width:900px}
+.editorial h1{max-width:850px;font:700 42px/1.08 Georgia,serif;margin:6px 0 16px;letter-spacing:-.3px}
+.editorial h2{max-width:760px;font:650 23px/1.25 Georgia,serif;margin:36px 0 12px}
+.editorial h3{font:650 18px/1.3 Georgia,serif;margin:7px 0 8px}
+.editorial>p,.editorial-deck,.editorial-note{max-width:760px;font-size:15px;line-height:1.72;margin:0 0 15px}
+.editorial .editorial-deck{font:400 19px/1.58 Georgia,serif;color:#394d47;margin-bottom:24px}
+.answer-box,.screen-note{max-width:760px;margin:24px 0 30px;padding:17px 19px;border:1px solid #bdc8b7;border-left:4px solid #426650;border-radius:6px;background:#faf8f1}
+.answer-box>b,.screen-note>b{display:block;margin-bottom:6px;font-size:11px;letter-spacing:1.05px;text-transform:uppercase}
+.answer-box p,.screen-note{font-size:14px;line-height:1.62}
+.answer-box p{margin:0}
+.screen-note{border-left-color:#a88746;color:#394d47}
+.comparison-scroll{max-width:900px;overflow-x:auto;margin:14px 0 30px;border:1px solid var(--line);border-radius:7px;background:#faf8f1}
+.comparison-scroll:focus-visible{outline:3px solid #a88746;outline-offset:2px}
+.comparison-table{width:100%;min-width:760px;border-collapse:collapse;font-size:13px;line-height:1.5}
+.comparison-table th,.comparison-table td{padding:13px 14px;border-bottom:1px solid #dde0d5;border-right:1px solid #e3e5dc;text-align:left;vertical-align:top}
+.comparison-table th:last-child,.comparison-table td:last-child{border-right:0}
+.comparison-table tr:last-child th,.comparison-table tr:last-child td{border-bottom:0}
+.comparison-table thead th{background:#edf0e7;color:#44584e;font-size:10px;letter-spacing:.8px;text-transform:uppercase}
+.comparison-table tbody th{width:115px;font-weight:700;color:#315e5a}
+.book-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:900px}
+.book-entry{border:1px solid var(--line);border-radius:7px;background:#faf8f1;padding:17px 18px}
+.book-entry:first-child:nth-last-child(3){grid-column:span 2}
+.book-year,.book-role{display:inline-block;color:var(--muted);font-size:10px;letter-spacing:.7px;text-transform:uppercase}
+.book-year{font-weight:750;color:#315e5a;margin-right:9px}
+.book-entry p{margin:0;color:#394d47;font-size:13px;line-height:1.62}
+.reading-order{max-width:720px;margin:0 0 17px;padding-left:24px}
+.reading-order li{padding:5px 0 5px 5px;font-size:14px;line-height:1.55}
+.editorial .editorial-note{color:var(--muted);font-size:13px}
+.editorial-sources{max-width:760px;margin-top:42px;padding-top:3px;border-top:1px solid var(--line)}
+.editorial-sources h2{font-size:18px;margin-top:22px}
+.editorial-sources ul{margin:0;padding-left:20px}
+.editorial-sources li{padding:4px 0;font-size:12px;line-height:1.5}
+.derry-explore{max-width:900px;margin-top:46px;padding:25px 0 4px;border-top:1px solid var(--line)}
+.derry-explore h2{margin:5px 0 15px;font:700 23px/1.2 Georgia,serif}
+.derry-explore-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0;padding:0;list-style:none}
+.derry-explore-grid li{min-width:0}
+.derry-explore-grid a,.derry-explore-current{display:flex;height:100%;min-height:91px;box-sizing:border-box;flex-direction:column;gap:7px;padding:14px 15px;border:1px solid var(--line);border-radius:7px;background:#faf8f1;text-decoration:none}
+.derry-explore-grid a:hover{border-color:#8ca096;background:#f4f3e9}
+.derry-explore-grid b{color:var(--ink);font:650 15px/1.3 Georgia,serif}
+.derry-explore-grid small{color:var(--muted);font-size:11px;line-height:1.4}
+.derry-explore-current{background:#edeee6;border-color:#d5d8cb}
+.derry-explore-current b,.derry-explore-current small{color:#6c756d}
+.derry-explore-primary{display:flex;gap:9px;margin:13px 1px 0;color:var(--muted);font-size:12px}
+.derry-explore-primary a{font-weight:650}
+@media(max-width:700px){
+ .editorial h1{font-size:33px}.editorial h2{font-size:21px;margin-top:31px}
+ .editorial>p,.editorial-deck,.editorial-note{font-size:14px}
+ .editorial .editorial-deck{font-size:17px}
+ .answer-box,.screen-note{margin:20px 0 25px;padding:15px}
+ .book-list{grid-template-columns:1fr}.book-entry:first-child:nth-last-child(3){grid-column:auto}
+ .derry-explore{margin-top:38px;padding-top:21px}.derry-explore h2{font-size:20px;margin-top:4px}
+ .derry-explore-grid{grid-template-columns:1fr}.derry-explore-grid a,.derry-explore-current{min-height:0}
+}
+
 /* Searchable place directory. The full list stays in the HTML; JS only filters and sorts it. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .places-hero{max-width:780px;padding:8px 0 23px}
