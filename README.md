@@ -26,7 +26,7 @@ docker compose up -d --build
 | `atlas/photos.py` | Фотографии: валидация, media, производные размеры |
 | `atlas/rendering.py`, `atlas/print_engine.py` | Рельеф, сцена карты, печатные PDF/SVG |
 | `atlas/management/commands/` | Команды `atlas` (карта) и `photos` (фотографии) |
-| `data/` | Начальный снимок, контрольный baseline, патч русских переводов |
+| `data/` | Начальный снимок, baseline и версионные русские переводы текстов, имён и фотоподписей |
 | `docs/` | Архитектура, ER, словарь данных, API, эксплуатация |
 | `scripts/` | Конфигурация, обновление, backup/restore, проверка baseline |
 | `tests/` | Тесты Django, браузерный тест, приёмочный сценарий Compose |

@@ -16,6 +16,7 @@ from django.views.decorators.http import require_safe
 from . import schema
 from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
 from .localized_names import character_name, feature_name, feature_search_terms, tag_name
+from .localized_photos import photo_caption
 from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
                      Revision, Setting, Source, Tag)
 from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
@@ -210,7 +211,7 @@ def index(request):
 
 # Русские тексты живут рядом с каноническими английскими: у Feature и Source —
 # в metadata['ru'] (валидация датасета сознательно не заглядывает в metadata),
-# у Photo — в колонке caption_ru. Пустой перевод откатывается на английский.
+# у Photo — в версионном SHA-реестре с fallback на caption_ru и caption.
 
 def _is_ru():
     return get_language() == 'ru'
@@ -236,8 +237,7 @@ def _feature_place_content(feature):
 
 
 def _caption(photo, ru=None):
-    ru = _is_ru() if ru is None else ru
-    return (photo.caption_ru or photo.caption) if ru else photo.caption
+    return photo_caption(photo, _is_ru() if ru is None else ru)
 
 
 def _photo_alt(photo, feature=None):

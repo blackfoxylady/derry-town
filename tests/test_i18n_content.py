@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from atlas import dataset as ds, photos
-from atlas.models import Evidence, Feature, Geometry, MapState, Setting, Source
+from atlas.models import Evidence, Feature, Geometry, MapState, Photo, Setting, Source
 
 from .test_photos import make_image
 
@@ -16,7 +16,7 @@ from .test_photos import make_image
     'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
     'staticfiles': {'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage'}})
 class RuContentTests(TestCase):
-    """Русские тексты из metadata['ru'] и caption_ru с фолбэком на английский."""
+    """Русские тексты из metadata, реестров и БД с фолбэком на английский."""
 
     @classmethod
     def setUpTestData(cls):
@@ -93,6 +93,62 @@ class RuContentTests(TestCase):
                 # Правка перевода без пересоздания записи.
                 photos.edit(photo.id, caption_ru='Бен читает.')
                 self.assertContains(self.client.get(f'/ru/photos/{photo.id}/'), 'Бен читает.')
+
+    def test_versioned_photo_caption_replaces_mixed_database_translation_everywhere(self):
+        english = (
+            'Ben Hanscom watches Beverly Marsh run down the steps of Derry Elementary School '
+            'as summer vacation begins.')
+        mixed = (
+            'Ben Hanscom смотрит, как Beverly Marsh сбегает по ступеням школы '
+            'Derry Elementary School в начале летних каникул.')
+        translated = (
+            'Бен Хэнском смотрит, как Беверли Марш сбегает по ступеням начальной школы '
+            'Дерри в начале летних каникул.')
+        photo = Photo.objects.create(
+            sha256='e8c7247f080ee16c74e04c92c52db3edd41c3f42edc7f029c22fb70ab92ebf46',
+            ext='jpg', original_name='school.jpg', caption=english, caption_ru=mixed,
+            year=1958, feature_key='12', width=1200, height=800)
+
+        page = self.client.get(f'/ru/photos/{photo.id}/')
+        self.assertContains(page, f'<h1>{translated}</h1>')
+        self.assertContains(page, f'alt="{translated}"')
+        self.assertContains(page, '<a href="/ru/">Дерри</a>')
+        self.assertNotContains(page, mixed)
+        self.assertContains(self.client.get('/ru/photos/'), translated)
+
+        api = self.client.get('/api/v1/photos/', {'lang': 'ru'}).json()
+        api_photo = next(item for item in api['features']['12']['photos']
+                         if item['id'] == photo.id)
+        self.assertEqual(api_photo['caption'], translated)
+
+        english_page = self.client.get(f'/photos/{photo.id}/')
+        self.assertContains(english_page, f'<h1>{english}</h1>')
+        photo.refresh_from_db()
+        self.assertEqual(photo.caption_ru, mixed)  # реестр не изменяет рабочую БД
+
+    def test_published_photo_caption_registry_is_complete_and_fully_russian(self):
+        captions = json.loads(
+            (settings.BASE_DIR / 'data/photo_captions_ru.json').read_text(encoding='utf-8'))
+        self.assertEqual(len(captions), 18)
+        for sha256, caption in captions.items():
+            self.assertEqual(len(sha256), 64)
+            int(sha256, 16)
+            self.assertTrue(caption.endswith(('.', '!', '»')))
+        corpus = '\n'.join(captions.values())
+        for english_name in ('Ben Hanscom', 'Beverly Marsh', 'Bill Denbrough',
+                             'Derry Elementary School', 'Eddie Kaspbrak', 'Kenduskeag',
+                             'Mike Hanlon', 'Richie Tozier', 'Stan Uris', 'Pennywise',
+                             'Paul Bunyan', 'Adrian Mellon', 'Don Hagarty',
+                             'Main Street Bridge', 'Kleen-Kloze'):
+            self.assertNotIn(english_name, corpus)
+
+    def test_proper_name_glossary_keeps_approved_general_terms(self):
+        glossary = json.loads(
+            (settings.BASE_DIR / 'data/proper_names_ru.json').read_text(encoding='utf-8'))
+        self.assertEqual(glossary['terms']['Pennywise'], 'Пеннивайз')
+        self.assertEqual(glossary['terms']['Adrian Mellon'], 'Адриан Меллон')
+        self.assertEqual(glossary['terms']['Main Street Bridge'], 'мост на Главной улице')
+        self.assertEqual(glossary['terms']["Losers' Club"], 'Клуб Неудачников')
 
 
 @override_settings(ALLOWED_HOSTS=['testserver'], STORAGES={

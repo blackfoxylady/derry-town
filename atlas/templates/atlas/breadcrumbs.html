@@ -1,5 +1,5 @@
-{% load i18n %}<nav class="crumbs" aria-label="{% trans 'Breadcrumbs' %}">
-<ol><li><a href="{% url 'index' %}">Derry</a></li>
+{% load i18n %}{% get_current_language as current_language %}<nav class="crumbs" aria-label="{% trans 'Breadcrumbs' %}">
+<ol><li><a href="{% url 'index' %}">{% if current_language == 'ru' %}Дерри{% else %}Derry{% endif %}</a></li>
 {% if section == 'places' %}<li>{% if current %}<a href="{% url 'places' %}">{% trans "Places" %}</a>{% else %}<span aria-current="page">{% trans "Places" %}</span>{% endif %}</li>
 {% elif section == 'photos' %}<li>{% if current %}<a href="{% url 'gallery' %}">{% trans "Photographs" %}</a>{% else %}<span aria-current="page">{% trans "Photographs" %}</span>{% endif %}</li>{% endif %}
 {% if current %}<li><span aria-current="page">{{ current }}</span></li>{% endif %}</ol>

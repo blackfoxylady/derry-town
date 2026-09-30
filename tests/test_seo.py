@@ -424,6 +424,7 @@ class JsonLdTests(TestCase):
         article = node(russian, 'Article')
         self.assertEqual(article['headline'], 'Публичная библиотека Дерри')
         crumbs = node(russian, 'BreadcrumbList')['itemListElement']
+        self.assertEqual(crumbs[0]['name'], 'Дерри')
         self.assertEqual(crumbs[2]['name'], 'Публичная библиотека Дерри')
 
     def test_photo_page_is_an_image_object(self):

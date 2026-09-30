@@ -163,7 +163,7 @@ SQL имена приведены для PostgreSQL. JSONField хранится 
 | `ext` | varchar(8) | нет | Расширение оригинала: png, jpg или webp. |
 | `original_name` | varchar(255) | нет | Имя загруженного файла, для справки. |
 | `caption` | text | нет | Подпись фотографии. |
-| `caption_ru` | text | нет | Служебное поле. |
+| `caption_ru` | text | нет | Редактируемая русская подпись; пустая откатывается на английскую. Для опубликованных фотографий версионный реестр `data/photo_captions_ru.json`, привязанный по SHA-256, имеет приоритет над этим полем. |
 | `year` | smallint ≥ 0 | да | Год эпохи романа или null; справочник ALLOWED_YEARS в atlas/photos.py. |
 | `feature_key` | varchar(100) | нет | Строковый ключ Feature, намеренно без FK: commit атласа полностью заменяет строки feature, и каскад стирал бы привязки. Проверяется photos.py и `photos check`. |
 | `order` | integer ≥ 0 | нет | Порядок в галерее и карточке места. |

@@ -14,6 +14,10 @@ def _root(request):
     return request.build_absolute_uri('/')
 
 
+def _breadcrumb_root_name():
+    return 'Дерри' if get_language() == 'ru' else 'Derry'
+
+
 def _graph(request, *nodes):
     """Общая обёртка: WebSite и роман-первоисточник есть на каждой странице,
     узлы страницы ссылаются на них по @id."""
@@ -54,7 +58,7 @@ def index(request, name, description):
 
 
 def gallery(request, name, description, current=''):
-    crumbs = [('Derry', reverse('index'))]
+    crumbs = [(_breadcrumb_root_name(), reverse('index'))]
     if current:
         crumbs += [(_('Photographs'), reverse('gallery')), (current, '')]
     else:
@@ -77,7 +81,8 @@ def places(request, name, description, cards):
         ],
     }
     return _graph(request, collection, item_list,
-                  _breadcrumbs(request, ('Derry', reverse('index')), (_('Places'), '')))
+                  _breadcrumbs(request, (_breadcrumb_root_name(), reverse('index')),
+                               (_('Places'), '')))
 
 
 def method(request, name, description):
@@ -93,7 +98,8 @@ def editorial(request, name, description, breadcrumb, published):
     article['datePublished'] = published.isoformat()
     article['dateModified'] = published.isoformat()
     return _graph(request, article,
-                  _breadcrumbs(request, ('Derry', reverse('index')), (breadcrumb, '')))
+                  _breadcrumbs(request, (_breadcrumb_root_name(), reverse('index')),
+                               (breadcrumb, '')))
 
 
 def place(request, ctx):
@@ -108,7 +114,7 @@ def place(request, ctx):
     if ctx['og_photo']:
         page['image'] = request.build_absolute_uri(ctx['og_photo'])
     return _graph(request, page,
-                  _breadcrumbs(request, ('Derry', reverse('index')),
+                  _breadcrumbs(request, (_breadcrumb_root_name(), reverse('index')),
                                (_('Places'), reverse('places')), (name, '')))
 
 
@@ -135,6 +141,6 @@ def photo(request, ctx):
     keywords = [c['name'] for c in ctx['characters']] + [t['name'] for t in ctx['tags']]
     if keywords:
         image['keywords'] = ', '.join(keywords)
-    crumbs = _breadcrumbs(request, ('Derry', reverse('index')),
+    crumbs = _breadcrumbs(request, (_breadcrumb_root_name(), reverse('index')),
                           (_('Photographs'), reverse('gallery')), (name, ''))
     return _graph(request, image, crumbs)

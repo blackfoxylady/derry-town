@@ -37,6 +37,11 @@ python manage.py atlas edit 4 \
 
 Любой из четырёх текстов можно очищать пустым значением. Если оба доступных для языка текста пусты, контентный блок на странице не выводится.
 
+Новые авторские тексты мест подготавливаются сразу парами: `about` с `about_ru`
+и `confidence_explanation` с `confidence_explanation_ru`. Готовый шаблон работы —
+`D:\Projects\derry\docs\human\Промпт на тексты мест.md`. До записи в пакет
+русская версия и все новые варианты собственных имён должны быть согласованы.
+
 ## Источники и геометрия
 
 ```sh
@@ -101,6 +106,7 @@ python manage.py atlas rollback 1 --author 'Developer' --reason 'Return to initi
 docker compose cp photo.png web:/tmp/photo.png
 python manage.py photos add /tmp/photo.png \
   --caption 'Derry Public Library: the stone adult building.' \
+  --caption-ru 'Публичная библиотека Дерри: каменное здание.' \
   --feature 12 --year 1958 --character ben-hanscom --tag library
 ```
 
@@ -113,9 +119,18 @@ docker compose cp ./photos-batch web:/tmp/photos-batch
 python manage.py photos import /tmp/photos-batch   # ищет manifest.json рядом с файлами
 ```
 
-Манифест — JSON-список объектов: `file` (имя в каталоге), необязательные `caption`, `feature`, `year`, `characters`, `tags`, `order`.
+Манифест — JSON-список объектов: `file` (имя в каталоге), необязательные `caption`, `caption_ru`, `feature`, `year`, `characters`, `tags`, `order`.
 
-Просмотр и правка атрибутов (файлы не трогаются): `photos list`, `photos show 3`, `photos edit 3 --caption '...' --feature ''` (пустая строка отвязывает), `--tag`/`--character` заменяют весь набор, `--no-tags`/`--no-characters` очищают. `photos remove 3` удаляет запись вместе с файлами.
+Просмотр и правка атрибутов (файлы не трогаются): `photos list`, `photos show 3`, `photos edit 3 --caption '...' --caption-ru '...' --feature ''` (пустая строка отвязывает), `--tag`/`--character` заменяют весь набор, `--no-tags`/`--no-characters` очищают. `photos remove 3` удаляет запись вместе с файлами.
+
+Проверенные русские подписи уже опубликованных фотографий хранятся в `data/photo_captions_ru.json` по SHA-256 оригинала. Такой ключ стабилен при переносе базы и повторном импорте, в отличие от числового ID. Для русской страницы, галереи, API, SEO и JSON-LD порядок выбора текста один: запись из этого реестра → `Photo.caption_ru` → английская `Photo.caption`. Поэтому правка `caption_ru` у фотографии, уже включённой в реестр, не меняет публичный текст; сначала обновите реестр и тесты. Новые фотографии можно вести через `--caption-ru`, пока их перевод не прошёл редакционную проверку и не перенесён в реестр.
+
+Новый публикуемый материал готовится сразу в двух языковых версиях. Рабочие
+промпты и порядок обязательного согласования описаны в
+`D:\Projects\derry\docs\human\Локализация новых материалов.md`; утверждённые
+написания находятся в `data/proper_names_ru.json`. Поля
+`caption`/`caption_ru` переводятся, а `file`, `feature`, `characters`, `tags` и
+прочие технические идентификаторы — нет.
 
 После правок атласа, удаляющих места, выполните `photos check`: команда сообщит висячие привязки, отсутствующие и ничейные файлы.
 
@@ -141,6 +156,10 @@ python manage.py covers import /tmp/covers-batch   # ищет manifest.json ря
 ```
 
 Манифест — JSON-список объектов: `file` (имя в каталоге), `feature`, `year`, `alt`, необязательный `alt_ru`. Прочее: `covers list`, `covers show 1`, `covers edit 1 --alt '...'`, `covers remove 1`, а после правок атласа — `covers check`.
+
+Для нового публикуемого cover поле `alt_ru` редакционно обязательно, даже если
+формат сохраняет технический fallback на английский для старых данных. Пара
+`alt`/`alt_ru` согласуется до импорта по тем же правилам локализации.
 
 ## Обновление сайта и экспорта
 

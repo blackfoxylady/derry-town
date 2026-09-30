@@ -23,6 +23,15 @@
       "confidence": "C",
       "period": "Example only",
       "note": "Not an additional claim about the novel.",
+      "about": "Developer example overview; replace it with reviewed place content.",
+      "confidence_explanation": "Developer example confidence explanation; replace it with reviewed evidence.",
+      "metadata": {
+        "ru": {
+          "note": "Это не дополнительное утверждение о романе.",
+          "about": "Тестовая справка разработчика; замените её проверенным текстом о месте.",
+          "confidence_explanation": "Тестовое объяснение достоверности; замените его проверенными свидетельствами."
+        }
+      },
       "geometry_id": "g:84"
     }
   },
