@@ -51,6 +51,17 @@ class EditorialWorkflowTests(TestCase):
         self.assertIn('84', corpus)  # свежая установка из initial.json
         self.assertFalse(any(value['name_ru'][:1].islower() for value in corpus.values()))
 
+    def test_every_tracked_place_passes_editorial_checks(self):
+        corpus = editorial.load_corpus()['places']
+        issues = {
+            key: editorial.diagnostics(
+                entry['name_ru'], entry['note_ru'], entry['about_ru'],
+                entry['confidence_explanation_ru'],
+            )
+            for key, entry in corpus.items()
+        }
+        self.assertEqual({key: issue for key, issue in issues.items() if issue}, {})
+
     def test_sync_accepts_published_legacy_cycle_shoppe_key(self):
         document = {'tables': {'feature': [{
             'key': 'U5', 'object_type': 'unplaced', 'about': '',

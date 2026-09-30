@@ -36,6 +36,7 @@ HEADERS = (
     'Достоверность RU', 'Статус', 'Комментарий редактора', 'Диагностика',
 )
 _LATIN_WORD = re.compile(r'[A-Za-z]{2,}')
+_ROMAN_NUMERAL = re.compile(r'^[IVXLCDM]+$')
 _CELL_REF = re.compile(r'([A-Z]+)(\d+)')
 _NS = {'m': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main',
        'r': 'http://schemas.openxmlformats.org/officeDocument/2006/relationships'}
@@ -93,7 +94,8 @@ def diagnostics(name, note, about, confidence):
     first = next((char for char in name if char.isalpha()), '')
     if first and first == first.lower():
         messages.append('название со строчной буквы')
-    latin = sorted(set(_LATIN_WORD.findall('\n'.join((note, about, confidence)))),
+    latin = sorted({word for word in _LATIN_WORD.findall(
+        '\n'.join((note, about, confidence))) if not _ROMAN_NUMERAL.fullmatch(word)},
                    key=str.casefold)
     if latin:
         preview = ', '.join(latin[:8])
