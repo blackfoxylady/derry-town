@@ -1,0 +1,19 @@
+<section class="cookie-consent" id="cookieConsent" role="region" aria-labelledby="cookieConsentTitle" hidden>
+  <div class="cookie-consent__copy">
+    {% if LANGUAGE_CODE == 'ru' %}
+      <h2 id="cookieConsentTitle">Файлы cookie</h2>
+      <p>Мы используем дополнительные файлы cookie для анализа посещаемости сайта. Они включатся только с вашего согласия.</p>
+    {% else %}
+      <h2 id="cookieConsentTitle">Cookies</h2>
+      <p>We use optional cookies to analyse site traffic. They will only be enabled with your consent.</p>
+    {% endif %}
+  </div>
+  <div class="cookie-consent__actions">
+    <button class="cookie-consent__button cookie-consent__button--secondary" type="button" data-cookie-reject>
+      {% if LANGUAGE_CODE == 'ru' %}Отклонить{% else %}Reject{% endif %}
+    </button>
+    <button class="cookie-consent__button cookie-consent__button--primary" type="button" data-cookie-accept>
+      {% if LANGUAGE_CODE == 'ru' %}Разрешить{% else %}Allow{% endif %}
+    </button>
+  </div>
+</section>

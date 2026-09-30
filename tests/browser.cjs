@@ -8,10 +8,28 @@ const path=require('node:path');
  const reports=[];
  for(const [name,size] of [['desktop',{width:1440,height:1000}],['mobile',{width:390,height:844}]]){
   const context=await browser.newContext({viewport:size,isMobile:name==='mobile',hasTouch:name==='mobile',deviceScaleFactor:1});
+  const analyticsRequests=[];
+  await context.route(url=>/googletagmanager\.com|mc\.yandex\.ru/.test(url.href),route=>route.abort());
   const page=await context.newPage();const errors=[];
   page.on('pageerror',e=>errors.push(e.message));
+  page.on('request',request=>{if(/googletagmanager\.com|mc\.yandex\.ru/.test(request.url()))analyticsRequests.push(request.url())});
   page.on('response',r=>{if(r.url().startsWith(process.env.DERRY_URL||'http://127.0.0.1:8765')&&r.status()>=400)errors.push(r.status()+' '+r.url())});
   await page.goto(process.env.DERRY_URL||'http://127.0.0.1:8765',{waitUntil:'networkidle'});
+  assert.equal(await page.locator('#cookieConsent').isVisible(),true);
+  assert.equal(analyticsRequests.length,0);
+  await page.screenshot({path:path.join(out,name+'-cookie-consent.png'),fullPage:true});
+  if(name==='desktop'){
+   await page.locator('[data-cookie-reject]').click();
+   await page.reload({waitUntil:'networkidle'});
+   assert.equal(await page.locator('#cookieConsent').isVisible(),false);
+   assert.equal(analyticsRequests.length,0);
+  }else{
+   await page.locator('[data-cookie-accept]').click();
+   await page.waitForFunction(()=>typeof window.gtag==='function'&&typeof window.ym==='function');
+   assert.equal(await page.locator('#cookieConsent').isVisible(),false);
+   assert(analyticsRequests.some(url=>url.includes('googletagmanager.com')));
+   assert(analyticsRequests.some(url=>url.includes('mc.yandex.ru')));
+  }
   await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
   assert.equal(await page.evaluate(()=>DerryAtlas.unlocatedCount),8);
   // The crawlable directory is present independently of the JS-built sidebar.
