@@ -200,7 +200,7 @@ class AtlasEditRuTests(TestCase):
         self.assertIn('точный земельный участок',
                       school.metadata['ru']['confidence_explanation'])
         school_page = self.client.get('/ru/places/4-derry-elementary-school/')
-        self.assertContains(school_page, 'О месте: начальная школа Дерри')
+        self.assertContains(school_page, 'О месте: Начальная школа Дерри')
         self.assertContains(school_page, 'общественный ориентир')
         self.assertContains(school_page, 'Почему месту присвоен уровень A')
         self.assertContains(self.client.get('/ru/method/'), 'водонапорную башню')

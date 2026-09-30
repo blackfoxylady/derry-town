@@ -17,12 +17,21 @@ def _glossary():
     return json.loads(path.read_text(encoding='utf-8'))
 
 
+@lru_cache(maxsize=1)
+def _place_names():
+    path = Path(settings.BASE_DIR) / 'data' / 'place_editorial.json'
+    data = json.loads(path.read_text(encoding='utf-8'))
+    return {key: value['name_ru'] for key, value in data['places'].items()}
+
+
 def _is_ru(russian=None):
     return get_language() == 'ru' if russian is None else russian
 
 
 def feature_name(feature, russian=None):
     if _is_ru(russian):
+        if name := _place_names().get(str(feature.key)):
+            return name
         entry = _glossary()['features'].get(str(feature.key), {})
         if entry.get('name'):
             return entry['name']
@@ -31,7 +40,8 @@ def feature_name(feature, russian=None):
 
 def feature_search_terms(feature):
     entry = _glossary()['features'].get(str(feature.key), {})
-    return [feature.name, feature.short, entry.get('name', ''), *(entry.get('aliases') or [])]
+    return [feature.name, feature.short, _place_names().get(str(feature.key), entry.get('name', '')),
+            *(entry.get('aliases') or [])]
 
 
 def character_name(character, russian=None):
