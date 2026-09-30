@@ -63,6 +63,7 @@ a.quiet{text-decoration:none;color:inherit;display:inline-block}
 .map-context h2{max-width:760px;font:700 27px/1.18 Georgia,"Times New Roman",serif;margin:6px 0 14px}
 .map-context p{max-width:780px;margin:0 0 10px;color:#394d47;font-size:14px;line-height:1.65}
 .map-context p:last-child{margin-bottom:0}
+.map-context .map-context-actions{margin-top:18px}
 .place-directory{scroll-margin-top:18px;border-top:1px solid #c9cebf;background:var(--paper)}
 .place-directory-inner{max-width:1180px;margin:0 auto;padding:64px 28px 90px}
 .place-directory h2{font:700 36px/1.1 Georgia,"Times New Roman",serif;margin:0 0 14px;letter-spacing:.2px}

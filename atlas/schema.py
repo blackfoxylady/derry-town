@@ -71,7 +71,7 @@ def places(request, name, description, cards):
         'numberOfItems': len(cards),
         'itemListElement': [
             {'@type': 'ListItem', 'position': position,
-             'name': card['feature'].name,
+             'name': card['name'],
              'url': request.build_absolute_uri(card['url'])}
             for position, card in enumerate(cards, 1)
         ],
@@ -99,16 +99,17 @@ def editorial(request, name, description, breadcrumb, published):
 def place(request, ctx):
     """Страница места из готового context'а place_page."""
     feature, note = ctx['feature'], ctx['note']
-    page = _page(request, 'Article', feature.name,
-                 note or (feature.name + (' · ' + feature.period if feature.period else '')))
-    page['headline'] = feature.name
+    name = ctx['feature_name']
+    page = _page(request, 'Article', name,
+                 note or (name + (' · ' + feature.period if feature.period else '')))
+    page['headline'] = name
     if feature.period:
         page['temporalCoverage'] = feature.period
     if ctx['og_photo']:
         page['image'] = request.build_absolute_uri(ctx['og_photo'])
     return _graph(request, page,
                   _breadcrumbs(request, ('Derry', reverse('index')),
-                               (_('Places'), reverse('places')), (feature.name, '')))
+                               (_('Places'), reverse('places')), (name, '')))
 
 
 def photo(request, ctx):

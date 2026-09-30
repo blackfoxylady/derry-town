@@ -138,9 +138,27 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
 .editorial-sources h2{font-size:18px;margin-top:22px}
 .editorial-sources ul{margin:0;padding-left:20px}
 .editorial-sources li{padding:4px 0;font-size:12px;line-height:1.5}
+.printable-preview{max-width:900px;margin:27px 0 24px}
+.printable-preview a{display:block;border:1px solid #bdc8b7;border-radius:8px;overflow:hidden;background:#e7e4d6;box-shadow:0 8px 28px rgba(38,61,56,.09)}
+.printable-preview img{display:block;width:100%;height:auto;aspect-ratio:594/420;object-fit:cover}
+.printable-preview figcaption{margin-top:8px;color:var(--muted);font-size:11px}
+.download-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:900px;margin:25px 0 18px}
+.download-card{display:flex;min-width:0;flex-direction:column;border:1px solid var(--line);border-radius:8px;background:#faf8f1;padding:20px 21px}
+.download-card-primary{border-color:#9cae9a;background:#f0f2e8}
+.download-format{color:#64736b;font-size:10px;font-weight:750;letter-spacing:1.1px;text-transform:uppercase}
+.editorial .download-card h2{font-size:21px;margin:7px 0 9px}
+.download-card p{margin:0 0 16px;color:#394d47;font-size:13px;line-height:1.55}
+.download-card small{display:block;margin-top:10px;color:var(--muted);font-size:10px;line-height:1.45}
+.download-button{align-self:flex-start;border-radius:5px;background:#315e5a;color:#fff;padding:10px 16px;font-size:13px;font-weight:700;text-decoration:none}
+.download-button:hover{background:#264d49}
+.svg-downloads{list-style:none;margin:auto 0 0;padding:0;border-top:1px solid #dde0d5}
+.svg-downloads li{border-bottom:1px solid #dde0d5}
+.svg-downloads a{display:block;padding:8px 2px;font-size:12px;font-weight:650;text-decoration:none}
+.svg-downloads a:hover{text-decoration:underline}
+.download-language{max-width:900px!important;margin:0 0 34px!important;color:var(--muted);font-size:12px!important}
 .derry-explore{max-width:900px;margin-top:46px;padding:25px 0 4px;border-top:1px solid var(--line)}
 .derry-explore h2{margin:5px 0 15px;font:700 23px/1.2 Georgia,serif}
-.derry-explore-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0;padding:0;list-style:none}
+.derry-explore-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0;padding:0;list-style:none}
 .derry-explore-grid li{min-width:0}
 .derry-explore-grid a,.derry-explore-current{display:flex;height:100%;min-height:91px;box-sizing:border-box;flex-direction:column;gap:7px;padding:14px 15px;border:1px solid var(--line);border-radius:7px;background:#faf8f1;text-decoration:none}
 .derry-explore-grid a:hover{border-color:#8ca096;background:#f4f3e9}
@@ -156,6 +174,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
  .editorial .editorial-deck{font-size:17px}
  .answer-box,.screen-note{margin:20px 0 25px;padding:15px}
  .book-list{grid-template-columns:1fr}.book-entry:first-child:nth-last-child(3){grid-column:auto}
+ .download-grid{grid-template-columns:1fr}.download-card{padding:17px}
  .derry-explore{margin-top:38px;padding-top:21px}.derry-explore h2{font-size:20px;margin-top:4px}
  .derry-explore-grid{grid-template-columns:1fr}.derry-explore-grid a,.derry-explore-current{min-height:0}
 }

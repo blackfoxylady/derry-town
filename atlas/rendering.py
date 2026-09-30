@@ -216,7 +216,7 @@ def current_payload(force=False):
     return payload, key
 
 
-def render_atlas(payload, outdir, fmt='all'):
+def render_atlas(payload, outdir, fmt='all', language='en'):
     from .print_engine import render
     outdir.mkdir(parents=True, exist_ok=True)
-    render(payload, outdir, fmt)
+    render(payload, outdir, fmt, language)

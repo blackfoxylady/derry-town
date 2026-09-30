@@ -11,7 +11,7 @@
 <p>A complete directory of the streets, homes, schools, civic buildings, businesses, waterways and outlying sites named in Stephen King’s <i>IT</i>. These are locations from the novel, not filming locations from screen adaptations. Each page separates what the text establishes from what the atlas reconstructs: a street or neighboring landmark may be known even when an exact lot, coordinate or building outline is not. Search and filter by category, mapping confidence and available material. Places without enough spatial evidence remain in the directory as unlocated rather than being assigned an arbitrary point.</p>
 {% endif %}
 <p class="places-summary"><b>{{ place_count }}</b> {% trans "places" %} · <b>{{ mapped_count }}</b> {% trans "mapped" %} · <b>{{ unlocated_count }}</b> {% trans "unlocated" %}</p>
-<p class="places-hero-links"><a class="quiet" href="{% url 'index' %}">{% trans "Open the map" %}</a><a class="quiet" href="{% url 'method' %}">{% trans "Sources & method" %}</a></p>
+<p class="places-hero-links"><a class="quiet" href="{% url 'index' %}">{% trans "Open the map" %}</a><a class="quiet" href="{% url 'method' %}">{% trans "Sources & method" %}</a><a class="quiet" href="{% url 'printable_map' %}">{% if LANGUAGE_CODE == 'ru' %}Карта для печати{% else %}Printable map{% endif %}</a></p>
 </div>
 
 <section class="place-tools" aria-label="{% trans 'Place filters' %}">
@@ -54,10 +54,10 @@
 
 <section id="placesCatalog" class="places-catalog" data-total="{{ place_count }}">
 <ul id="placesList" class="places-list">
-{% for c in cards %}<li class="place-card{% if c.image %} has-image{% endif %}" data-order="{{ c.order }}" data-name="{{ c.feature.name }}" data-search="{{ c.search_text }}" data-location="{% if c.mapped %}mapped{% else %}unlocated{% endif %}" data-confidence="{{ c.feature.confidence }}" data-kind="{{ c.feature.kind }}" data-photos="{{ c.photo_count }}" data-covers="{{ c.cover_count }}" data-content-complete="{{ c.content_complete|yesno:'1,0' }}" data-ru-complete="{{ c.ru_complete|yesno:'1,0' }}" data-sources="{{ c.evidence_count }}">
+{% for c in cards %}<li class="place-card{% if c.image %} has-image{% endif %}" data-order="{{ c.order }}" data-name="{{ c.name }}" data-search="{{ c.search_text }}" data-location="{% if c.mapped %}mapped{% else %}unlocated{% endif %}" data-confidence="{{ c.feature.confidence }}" data-kind="{{ c.feature.kind }}" data-photos="{{ c.photo_count }}" data-covers="{{ c.cover_count }}" data-content-complete="{{ c.content_complete|yesno:'1,0' }}" data-ru-complete="{{ c.ru_complete|yesno:'1,0' }}" data-sources="{{ c.evidence_count }}">
 <div class="place-number">{{ c.number }}</div>
 <div class="place-card-body">
-<div class="place-card-title"><h2><a href="{{ c.url }}">{{ c.feature.name }}</a></h2><span class="confidence-badge confidence-{{ c.feature.confidence|lower }}" title="{{ c.confidence_label }}">{{ c.feature.confidence }}</span></div>
+<div class="place-card-title"><h2><a href="{{ c.url }}">{{ c.name }}</a></h2><span class="confidence-badge confidence-{{ c.feature.confidence|lower }}" title="{{ c.confidence_label }}">{{ c.feature.confidence }}</span></div>
 <p class="place-card-meta">{% if c.feature.kind %}{{ c.feature.kind }}{% else %}{% trans "Unlocated" %}{% endif %}{% if c.feature.period %} · {{ c.feature.period }}{% endif %}</p>
 {% if c.note %}<p class="place-card-excerpt">{{ c.note }}</p>{% endif %}
 <p class="place-card-facts"><span title="{% trans 'Sources' %}">{% blocktranslate count n=c.evidence_count %}{{ n }} source{% plural %}{{ n }} sources{% endblocktranslate %}</span><span title="{% trans 'Photographs' %}">{% blocktranslate count n=c.photo_count %}{{ n }} photo{% plural %}{{ n }} photos{% endblocktranslate %}</span><span title="{% trans 'Covers' %}">{% blocktranslate count n=c.cover_count %}{{ n }} cover{% plural %}{{ n }} covers{% endblocktranslate %}</span>{% if not c.content_complete %}<span class="data-warning">{% trans "text incomplete" %}</span>{% endif %}{% if not c.ru_complete %}<span class="data-warning">{% trans "RU incomplete" %}</span>{% endif %}</p>

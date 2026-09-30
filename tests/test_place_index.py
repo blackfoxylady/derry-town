@@ -43,7 +43,9 @@ class PlaceIndexTests(TestCase):
         self.assertContains(response, '/places/u3-tracker-brothers/')
         self.assertNotContains(response, 'Main Street')
         self.assertContains(response, 'A civic landmark.')
-        self.assertContains(response, 'data-search="4 Derry Elementary School School Civic')
+        self.assertContains(
+            response,
+            'data-search="4 Derry Elementary School School начальная школа Дерри Civic')
         self.assertContains(response, 'data-sources="1"')
         self.assertContains(response, 'data-location="unlocated"')
         self.assertContains(response, 'src="/static/atlas/places.js"')
@@ -74,6 +76,11 @@ class PlaceIndexTests(TestCase):
         response = self.client.get('/ru/places/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<html lang="ru"')
+        self.assertContains(response, '>начальная школа Дерри</a>')
+        self.assertContains(response, '>городская ратуша Дерри</a>')
         self.assertContains(response, 'Городской ориентир.')
         self.assertContains(response, 'Школа отмечает район.')
+        self.assertContains(
+            response,
+            'data-search="4 Derry Elementary School School начальная школа Дерри')
         self.assertContains(response, '/ru/places/4-derry-elementary-school/')

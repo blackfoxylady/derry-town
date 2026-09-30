@@ -15,9 +15,10 @@ from django.utils.translation import get_language, gettext_lazy as _, ngettext
 from django.views.decorators.http import require_safe
 from . import schema
 from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
+from .localized_names import character_name, feature_name, feature_search_terms, tag_name
 from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
                      Revision, Setting, Source, Tag)
-from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths, slug_name
+from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
 from .rendering import current_payload, RENDER_VERSION
 
 
@@ -66,6 +67,20 @@ HUB_PAGES = {
         },
         'breadcrumb': {'en': 'Books set in Derry', 'ru': 'Книги о Дерри'},
     },
+    'printable': {
+        'template': 'atlas/printable_map.html',
+        'title': {
+            'en': 'Printable Map of Derry, Maine — Free PDF & SVG Download',
+            'ru': 'Карта Дерри для печати — скачать PDF и SVG',
+        },
+        'description': {
+            'en': ('Download a free printable map of Derry, Maine reconstructed from Stephen '
+                   'King’s IT. Four A2 sheets are available as a PDF atlas and individual SVG files.'),
+            'ru': ('Скачайте карту Дерри, штат Мэн, реконструированную по роману Стивена Кинга '
+                   '«Оно»: четыре листа A2 в PDF и отдельные файлы SVG.'),
+        },
+        'breadcrumb': {'en': 'Printable map', 'ru': 'Карта для печати'},
+    },
 }
 
 
@@ -102,6 +117,11 @@ def derry_bangor(request):
 @require_safe
 def derry_books(request):
     return _hub_page(request, 'books')
+
+
+@require_safe
+def printable_map(request):
+    return _hub_page(request, 'printable')
 
 
 def _ru_plural(number, one, few, many):
@@ -225,7 +245,7 @@ def _photo_alt(photo, feature=None):
     caption = _caption(photo)
     if caption:
         return caption
-    place = feature.name if feature else 'Derry'
+    place = feature_name(feature) if feature else 'Derry'
     return f'Фотография: {place}' if _is_ru() else f'{place} photograph'
 
 
@@ -450,6 +470,7 @@ def _reference_key(reference):
 def _related_place_card(feature, chapter=''):
     return {
         'feature': feature,
+        'name': feature_name(feature),
         'number': _place_number(feature),
         'url': reverse('place', args=[place_slug(feature)]),
         'kind': _kind_label(feature),
@@ -568,6 +589,7 @@ def places(request):
         feature_photos = photos_by_feature.get(feature.key, [])
         feature_covers = covers_by_feature.get(feature.key, [])
         localized = _feature_place_content(feature)
+        display_name = feature_name(feature)
         note = _feature_note(feature)
         ru = _feature_ru(feature)
         content_complete = bool(feature.note and feature.about and feature.confidence_explanation)
@@ -587,11 +609,11 @@ def places(request):
                      'width': photo.width, 'height': photo.height}
 
         search_text = ' '.join(filter(None, (
-            feature.key, feature.name, feature.short, feature.kind, feature.period,
+            feature.key, *feature_search_terms(feature), feature.kind, feature.period,
             note, localized['about'], localized['confidence_explanation'],
         )))
         cards.append({
-            'feature': feature,
+            'feature': feature, 'name': display_name,
             'number': _place_number(feature),
             'url': reverse('place', args=[place_slug(feature)]),
             'map_url': reverse('index') + '?place=' + feature.key if mapped else '',
@@ -665,19 +687,19 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
         if feature is None:
             raise Http404
         place = feature.key
-        landing = {'type': 'place', 'label': feature.name}
+        landing = {'type': 'place', 'label': feature_name(feature)}
     elif filter_type == 'character':
         character_object = characters_by_slug.get(filter_slug)
         if character_object is None:
             raise Http404
         character = character_object.slug
-        landing = {'type': 'character', 'label': character_object.name}
+        landing = {'type': 'character', 'label': character_name(character_object)}
     elif filter_type == 'tag':
         tag = tags_by_slug.get(filter_slug)
         if tag is None:
             raise Http404
         tags = [tag.slug]
-        landing = {'type': 'tag', 'label': slug_name(tag.slug)}
+        landing = {'type': 'tag', 'label': tag_name(tag)}
     elif filter_type == 'year':
         if filter_year not in year_counts:
             raise Http404
@@ -731,10 +753,14 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
         return options
 
     place_values = sorted(
-        ((key, features[key].name if key in features else key, count)
+        ((key, feature_name(features[key]) if key in features else key, count)
          for key, count in place_counts.items()), key=lambda item: item[1])
-    character_values = [(item.slug, item.name, item.n) for item in characters]
-    tag_values = [(item.slug, slug_name(item.slug), item.n) for item in tag_rows]
+    character_values = sorted(
+        ((item.slug, character_name(item), item.n) for item in characters),
+        key=lambda item: item[1].casefold())
+    tag_values = sorted(
+        ((item.slug, tag_name(item), item.n) for item in tag_rows),
+        key=lambda item: item[1].casefold())
     year_values = [(str(value), str(value), count)
                    for value, count in sorted(year_counts.items())]
 
@@ -753,7 +779,7 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
                 year, place_feature=features.get(place)))
             for value, label, count in tag_values
         ] + [
-            option(slug_name(value), 0, True, _gallery_url(
+            option(tag_name(value), 0, True, _gallery_url(
                 place, character, [tag for tag in tags if tag != value], year,
                 place_feature=features.get(place)))
             for value in tags if value not in tags_by_slug
@@ -774,7 +800,7 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
         cards.append({
             'photo': photo, **_card_image(photo), 'caption': _caption(photo),
             'alt': _photo_alt(photo, feature),
-            'place_label': feature.name if feature else photo.feature_key,
+            'place_label': feature_name(feature) if feature else photo.feature_key,
             'place_url': place_page_url or place_gallery_url,
             'place_gallery_url': (place_gallery_url
                                   if place_page_url and place != photo.feature_key else ''),
@@ -845,7 +871,7 @@ def photo_page(request, photo_id):
     caption = _caption(photo)
     alt = _photo_alt(photo, feature)
     heading = caption or alt
-    place_label = feature.name if feature else photo.feature_key or _('Derry')
+    place_label = feature_name(feature) if feature else photo.feature_key or _('Derry')
     page_title = _('%(subject)s — Derry, Maine · Stephen King’s IT') % {'subject': heading}
     description_subject = heading if heading.endswith(('.', '!', '?')) else heading + '.'
     if photo.year:
@@ -867,14 +893,14 @@ def photo_page(request, photo_id):
         'og_image_width': og_width, 'og_image_height': og_height,
         'published_time': photo.created, 'modified_time': photo.modified,
         'place_page_url': reverse('place', args=[place_slug(feature)]) if on_map else '',
-        'place_label': feature.name if feature else photo.feature_key,
+        'place_label': feature_name(feature) if feature else photo.feature_key,
         'place_gallery_url': (_gallery_url(place=photo.feature_key, place_feature=feature)
                               if photo.feature_key else ''),
         'map_url': map_url,
         'year_url': _gallery_url(year=str(photo.year)) if photo.year else '',
-        'characters': [{'name': c.name, 'url': _gallery_url(character=c.slug)}
+        'characters': [{'name': character_name(c), 'url': _gallery_url(character=c.slug)}
                        for c in photo.characters.order_by('name')],
-        'tags': [{'slug': t.slug, 'name': slug_name(t.slug),
+        'tags': [{'slug': t.slug, 'name': tag_name(t),
                   'url': _gallery_url(tags=[t.slug])} for t in photo.tags.order_by('slug')]}
     context['jsonld'] = schema.photo(request, context)
     response = render(request, 'atlas/photo.html', context)
@@ -923,10 +949,11 @@ def place_page(request, slug):
     modified_time = max(modified_candidates) if modified_candidates else None
     place_content = _feature_place_content(feature)
     nearby_places, same_chapter_places = _related_places(feature, evidence)
-    page_title = _('%(name)s — Derry, Maine · Stephen King’s IT') % {'name': feature.name}
+    display_name = feature_name(feature)
+    page_title = _('%(name)s — Derry, Maine · Stephen King’s IT') % {'name': display_name}
     meta_description = _(
         'Explore %(name)s in Derry, Maine: its location, book evidence and mapping confidence '
-        'in this literary atlas of Stephen King’s IT.') % {'name': feature.name}
+        'in this literary atlas of Stephen King’s IT.') % {'name': display_name}
     cards = [{'photo': p, **_card_image(p), 'caption': _caption(p),
               'alt': _photo_alt(p, feature)} for p in photos]
     if covers:
@@ -938,7 +965,7 @@ def place_page(request, slug):
     else:
         og_width = og_height = None
     context = {
-        'feature': feature, 'note': _feature_note(feature),
+        'feature': feature, 'feature_name': display_name, 'note': _feature_note(feature),
         'page_title': page_title, 'meta_description': meta_description,
         'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
         'place_about': place_content['about'],
@@ -1033,6 +1060,7 @@ def sitemap(request):
         (reverse('derry_real'), HUB_LASTMOD, []),
         (reverse('derry_bangor'), HUB_LASTMOD, []),
         (reverse('derry_books'), HUB_LASTMOD, []),
+        (reverse('printable_map'), HUB_LASTMOD, []),
     ]
 
     def add_photo_landing(path, landing_photos):

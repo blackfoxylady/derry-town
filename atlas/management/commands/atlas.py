@@ -61,6 +61,7 @@ class Command(BaseCommand):
         p = sub.add_parser('history'); p.add_argument('--limit', type=int, default=20)
         p = sub.add_parser('render'); p.add_argument('--output', required=True)
         p.add_argument('--format', choices=['all', 'pdf', 'svg'], default='all')
+        p.add_argument('--language', choices=['en', 'ru', 'all'], default='en')
         sub.add_parser('rebuild')
 
     def handle(self, *args, **o):
@@ -94,7 +95,7 @@ class Command(BaseCommand):
             from atlas.rendering import current_payload, render_atlas
             payload, _ = current_payload(force=action == 'rebuild')
             if action == 'render':
-                render_atlas(payload, Path(o['output']), o['format'])
+                render_atlas(payload, Path(o['output']), o['format'], o['language'])
             self.stdout.write(f'{action}: revision {payload["revision"]}, {len(payload["base"])} scene elements')
             return
         transform = lambda doc: doc

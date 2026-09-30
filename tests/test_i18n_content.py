@@ -41,17 +41,36 @@ class RuContentTests(TestCase):
         self.assertContains(response, 'Каменное здание.')
         self.assertContains(response, 'Бен читает здесь.')
         self.assertContains(response, 'Second mention.')  # без перевода — английский
-        self.assertContains(response, 'Derry Public Library')  # названия не переводятся
+        self.assertContains(response, 'Публичная библиотека Дерри')
         self.assertContains(response, 'Ch. 4 - Ben Hanscom / 1')  # главы — в оригинале
         self.assertContains(response, 'Библиотека — городской ориентир.')
         # Для отсутствующего русского поля действует поэлементный fallback на английский.
         self.assertContains(response, 'Its street relationship is inferred.')
-        self.assertContains(response, 'О месте Derry Public Library')
+        self.assertContains(response, 'О месте: Публичная библиотека Дерри')
         self.assertContains(response, 'Почему месту присвоен уровень B')
         response = self.client.get('/places/12-derry-public-library/')
         self.assertContains(response, 'A stone building.')
         self.assertContains(response, 'The library is a civic landmark.')
         self.assertNotContains(response, 'Каменное здание.')
+
+    def test_place_names_are_localized_without_changing_canonical_urls(self):
+        russian = self.client.get('/ru/places/12-derry-public-library/')
+        self.assertContains(russian, '<h1>Публичная библиотека Дерри</h1>')
+        self.assertContains(russian, 'Узнайте о месте «Публичная библиотека Дерри»')
+        self.assertContains(
+            russian,
+            '<link rel="canonical" href="http://testserver/ru/places/12-derry-public-library/">')
+        self.assertNotContains(russian, '/places/12-publichnaia-biblioteka-derri/')
+
+        catalog = self.client.get('/ru/places/')
+        self.assertContains(catalog, '>Публичная библиотека Дерри</a>')
+        self.assertContains(
+            catalog,
+            'data-search="12 Derry Public Library Library Публичная библиотека Дерри')
+
+        english = self.client.get('/places/12-derry-public-library/')
+        self.assertContains(english, '<h1>Derry Public Library</h1>')
+        self.assertNotContains(english, 'Публичная библиотека Дерри')
 
     def test_method_page_russian_geometry_note(self):
         self.assertContains(self.client.get('/ru/method/'), 'Длина канала выведена.')
@@ -107,7 +126,8 @@ class AtlasEditRuTests(TestCase):
         site_ru = next(s for s in ru.json()['data']['sites'] if s['id'] == 12)
         self.assertEqual(site_ru['note'], 'Русское описание библиотеки.')
         self.assertNotEqual(site_en['note'], site_ru['note'])
-        self.assertEqual(site_en['name'], site_ru['name'])  # названия не переводятся
+        # Основная карта переводится отдельным этапом; её payload пока сохраняет каноническое имя.
+        self.assertEqual(site_en['name'], site_ru['name'])
 
     def test_shipped_translation_patch_applies_cleanly(self):
         self.cmd('apply', str(settings.BASE_DIR / 'data/i18n_ru.json'),
@@ -120,15 +140,24 @@ class AtlasEditRuTests(TestCase):
         self.assertContains(self.client.get('/ru/places/12-derry-public-library/'),
                             'стеклянный переход')
         school = Feature.objects.get(pk='4')
-        self.assertTrue(school.metadata['ru']['about'].startswith('Derry Elementary School —'))
+        self.assertTrue(school.metadata['ru']['about'].startswith('Начальная школа Дерри —'))
         self.assertIn('точный земельный участок',
                       school.metadata['ru']['confidence_explanation'])
         school_page = self.client.get('/ru/places/4-derry-elementary-school/')
-        self.assertContains(school_page, 'О месте Derry Elementary School')
+        self.assertContains(school_page, 'О месте: начальная школа Дерри')
         self.assertContains(school_page, 'общественный ориентир')
         self.assertContains(school_page, 'Почему месту присвоен уровень A')
         self.assertContains(self.client.get('/ru/method/'), 'водонапорную башню')
         self.assertContains(self.client.get('/method/'), 'Standpipe')  # английская без изменений
+
+        translated = json.dumps(
+            [item['values'] for item in json.loads(
+                (settings.BASE_DIR / 'data/i18n_ru.json').read_text(encoding='utf-8'))],
+            ensure_ascii=False)
+        for english_name in ('Witcham Street', 'Beverly Marsh', 'Zack Denbrough',
+                             'Mrs Kersh', 'Kenduskeag', 'Matthew Clements',
+                             'Bullseye', 'Penobscot'):
+            self.assertNotIn(english_name, translated)
 
     def test_clearing_description_ru_removes_metadata_key(self):
         self.cmd('edit', '12', '--description-ru', 'Черновик.', '--author', 'dev', '--reason', 'set')

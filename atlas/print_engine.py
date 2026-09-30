@@ -8,6 +8,132 @@ from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+LANGUAGES = ('en', 'ru')
+STRINGS = {
+    'en': {
+        'book': 'S T E P H E N  K I N G  /  I T',
+        'plate': 'PLATE {number:02d} / 04',
+        'periods': '1957-58 / 1984-85 / HISTORICAL SITES',
+        'reading': 'READING THIS SHEET',
+        'confidence': (
+            ('A', 'Text-anchored relationship'),
+            ('B', 'Inferred position'),
+            ('C', 'Proposed location'),
+        ),
+        'confidence_note': ('All coordinates are reconstructed. A names a relationship stated '
+                            'in the text; it does not certify an exact position.'),
+        'map_key': 'MAP KEY',
+        'key_items': (
+            ('forest', 'Woodland and scrub'),
+            ('park', 'Park / open ground'),
+            ('water', 'Surface water'),
+        ),
+        'covered': 'Covered watercourse',
+        'footpath': 'Approximate footpath',
+        'contours': ('Contour strokes show conceptual relief only. Unlabelled buildings, minor '
+                     'streets and parcel shapes are illustrative. No numerical elevations are implied.'),
+        'places': 'PLACES ON THIS SHEET',
+        'relationships': 'LOCAL RELATIONSHIPS',
+        'source_note': ('Source of inspiration: Stephen King, IT (1986). Chapter references and '
+                        'reconstruction decisions are in the map database. The original research '
+                        'notes are retained as a baseline reference.'),
+        'intro': {
+            'city': ('Four sheets form one map. Sheet 2 expands the town centre; sheets 3 and 4 '
+                     "reveal the Barrens and the Losers' ground. Smaller downtown sites are indexed on sheet 2."),
+            'central': ('Both periods and the historical interludes share one plan. Old businesses '
+                        'and destroyed places retain their locations; dates and qualifications are '
+                        'in the companion notes.'),
+            'barrens': ('A tapered river valley, approximately 4.8 km long and 2.4 km wide in the '
+                        'novel. The border, contours, vegetation and footpaths are reconstructed.'),
+            'camp': ('The precise shape of this small area is inferred. The western branch, the path '
+                     'from the Kansas bridge and the separate entry cylinder preserve the book\'s '
+                     'local relationships.'),
+        },
+        'local_relationships': (
+            '44  The small western arm is dammed. The broader eastern arm remains a distinct channel.',
+            '43  The clubhouse and smoke-hole are one place. Its stated width is about 1.5 m; the numbered symbol is enlarged for reading.',
+            '45  Silver is hidden under the bridge over the tributary. The route to the clearing follows the slope down to the river.',
+            "47  The entry cylinder is drawn separately from Pumphouse #3 and from Patrick's trail-end cylinder.",
+            'Paths and vegetation describe a plausible landscape. Their individual bends and boundaries are not supplied by King.',
+        ),
+        'scale': '1:{scale:,} at A2 - reconstructed distances',
+        'kilometres': '{value:g} km',
+        'metres': '{value:g} m',
+        'reconstruction': 'A NOVEL-BASED RECONSTRUCTION',
+        'print': 'A2 / 594 x 420 mm / Print at 100% for stated scale',
+        'footer': ('Composite map: former sites retained. Surface geography only. Map geometry and '
+                   'relief are inferred; no screen adaptation geography used.'),
+        'pdf_title': "Derry - A literary atlas of Stephen King's IT",
+        'pdf_author': 'Novel-based reconstruction prepared for the reader',
+        'svg_description': ('A printable literary map reconstructed from Stephen King\'s IT. '
+                            'Place and street names are in English.'),
+    },
+    'ru': {
+        'book': 'С Т И В Е Н  К И Н Г  /  « О Н О »',
+        'plate': 'ЛИСТ {number:02d} / 04',
+        'periods': '1957–58 / 1984–85 / ИСТОРИЧЕСКИЕ МЕСТА',
+        'reading': 'КАК ЧИТАТЬ ЭТОТ ЛИСТ',
+        'confidence': (
+            ('A', 'Связь закреплена текстом'),
+            ('B', 'Положение выведено'),
+            ('C', 'Место предполагается'),
+        ),
+        'confidence_note': ('Все координаты реконструированы. Уровень A означает, что взаимное '
+                            'положение закреплено текстом, но не подтверждает точную координату.'),
+        'map_key': 'УСЛОВНЫЕ ОБОЗНАЧЕНИЯ',
+        'key_items': (
+            ('forest', 'Лес и кустарник'),
+            ('park', 'Парк / открытая местность'),
+            ('water', 'Открытая вода'),
+        ),
+        'covered': 'Закрытый водоток',
+        'footpath': 'Приблизительная тропа',
+        'contours': ('Контуры передают только условный рельеф. Неподписанные здания, мелкие улицы '
+                     'и границы участков иллюстративны. Численные высоты не подразумеваются.'),
+        'places': 'МЕСТА НА ЭТОМ ЛИСТЕ',
+        'relationships': 'ЛОКАЛЬНЫЕ СВЯЗИ',
+        'source_note': ('Источник: роман Стивена Кинга «Оно» (1986). Ссылки на главы и решения по '
+                        'реконструкции хранятся в базе карты. Исходные исследовательские заметки '
+                        'сохранены как отправная точка.'),
+        'intro': {
+            'city': ('Четыре листа образуют одну карту. Лист 2 подробно показывает центр города, '
+                     'листы 3 и 4 — Пустоши и поляну Неудачников. Небольшие места в центре '
+                     'перечислены на листе 2.'),
+            'central': ('Оба периода и интерлюдии объединены на одном плане. Прежние места '
+                        'сохранены; даты и оговорки — на сайте.'),
+            'barrens': ('Сужающаяся речная долина: в романе её длина около 4,8 км, ширина — около '
+                        '2,4 км. Границы, рельеф, растительность и тропы реконструированы.'),
+            'camp': ('Точная форма этого небольшого участка выведена косвенно. Западный рукав, '
+                     'тропа от моста Kansas Street и отдельный входной цилиндр сохраняют локальные '
+                     'связи, описанные в книге.'),
+        },
+        'local_relationships': (
+            '44  Небольшой западный рукав перегорожен. Более широкий восточный рукав остаётся отдельным руслом.',
+            '43  Клуб и дымовое отверстие — одно место. Указанная ширина — около 1,5 м; номерной знак увеличен для читаемости.',
+            '45  Silver спрятан под мостом через приток. Путь к поляне спускается по склону к реке.',
+            '47  Входной цилиндр показан отдельно от Pumphouse #3 и цилиндра в конце тропы Patrick.',
+            'Тропы и растительность показывают правдоподобный ландшафт. Их точные изгибы и границы в книге не заданы.',
+        ),
+        'scale': '1:{scale:,}, формат A2 · реконструированные расстояния',
+        'kilometres': '{value:g} км',
+        'metres': '{value:g} м',
+        'reconstruction': 'РЕКОНСТРУКЦИЯ ПО РОМАНУ',
+        'print': 'A2 / 594 × 420 мм / Печатать в масштабе 100%',
+        'footer': ('Сводная карта: прежние места сохранены. Показана только наземная география. '
+                   'Геометрия и рельеф выведены косвенно; география экранизаций не использована.'),
+        'pdf_title': 'Дерри — литературный атлас романа Стивена Кинга «Оно»',
+        'pdf_author': 'Реконструкция по роману, подготовленная для читателя',
+        'svg_description': ('Печатная литературная карта, реконструированная по роману Стивена '
+                            'Кинга «Оно». Названия мест и улиц сохранены на английском.'),
+        'views': {
+            'city': ('ДЕРРИ', 'Город, Пустоши и загородные дороги'),
+            'central': ('ЦЕНТР ДЕРРИ', 'Улицы, мосты и памятные места'),
+            'barrens': ('ПУСТОШИ', 'Речная долина, старая железная дорога и Kansas Street'),
+            'camp': ('ПОЛЯНА НЕУДАЧНИКОВ', 'Подробная реконструкция поляны и речных берегов'),
+        },
+    },
+}
+
 def hexrgb(s):return tuple(int(s[i:i+2],16)/255 for i in (1,3,5))
 class Surface:
     def __init__(self,c=None,width=1683.78,height=1190.55):self.c=c;self.w=width;self.h=height;self.svg=[]
@@ -156,28 +282,30 @@ def scale_bar(s,x,y,view):
     lengthpt=val/view['scale']*1000*mm
     for i in range(4):s.box(x+i*lengthpt/4,y,lengthpt/4,5,C['ink'] if i%2==0 else C['paper'],C['ink'],.5)
     s.text(x,y+17,'0',8)
-    s.text(x+lengthpt/2,y+17,f'{val/2000:g} km' if val>=1000 else f'{val/2:g} m',8,anchor='middle')
-    s.text(x+lengthpt,y+17,f'{val/1000:g} km' if val>=1000 else f'{val:g} m',8,anchor='end')
-    s.text(x,y-9,f'1:{view["scale"]:,} at A2 - reconstructed distances',8,'Sans',C['muted'])
+    unit='kilometres' if val>=1000 else 'metres'
+    s.text(x+lengthpt/2,y+17,T[unit].format(value=val/2000 if val>=1000 else val/2),8,anchor='middle')
+    s.text(x+lengthpt,y+17,T[unit].format(value=val/1000 if val>=1000 else val),8,anchor='end')
+    s.text(x,y-9,T['scale'].format(scale=view['scale']),8,'Sans',C['muted'])
 
 def sidebar(s,view,sites):
     x=465*mm;y=43*mm;w=115*mm
-    s.text(x,y,'READING THIS SHEET',11,'SansBold');y+=19
-    intro=PRINT['intro'][view['id']]
+    s.text(x,y,T['reading'],11,'SansBold');y+=19
+    intro=T['intro'][view['id']]
     y=s.wrap(x,y,intro,w,9.2,13);y+=15
-    for conf,label in [('A','Text-anchored relationship'),('B','Inferred position'),('C','Proposed location')]:
+    for conf,label in T['confidence']:
         col=C['ink'];mx=x+5
         if conf=='C':s.path([[mx,y-7],[mx+6,y-1],[mx,y+5],[mx-6,y-1]],C['paper'],col,.9,True)
         else:s.circle(mx,y-1,5,col if conf=='A' else C['paper'],col,.9)
         s.text(x+19,y+2,f'{conf}  {label}',8.7);y+=18
-    y=s.wrap(x,y+4,'All coordinates are reconstructed. A names a relationship stated in the text; it does not certify an exact position.',w,8.4,11.8,'Italic',C['muted'])
-    y+=18;s.text(x,y,'MAP KEY',10,'SansBold');y+=18
-    for color,lab in [(C['forest'],'Woodland and scrub'),(C['park'],'Park / open ground'),(C['water'],'Surface water')]:
+    y=s.wrap(x,y+4,T['confidence_note'],w,8.4,11.8,'Italic',C['muted'])
+    y+=18;s.text(x,y,T['map_key'],10,'SansBold');y+=18
+    for color_key,lab in T['key_items']:
+        color=C[color_key]
         s.box(x,y-8,14,8,color,'#aab39d',.4);s.text(x+21,y,lab,8.6);y+=16
-    s.path([[x,y-3],[x+16,y-3]],None,C['waterline'],1.8,False,[4,3]);s.text(x+21,y,'Covered watercourse',8.6);y+=16
-    s.path([[x,y-3],[x+16,y-3]],None,'#9d8257',1,False,[3,2]);s.text(x+21,y,'Approximate footpath',8.6);y+=18
-    y=s.wrap(x,y,'Contour strokes show conceptual relief only. Unlabelled buildings, minor streets and parcel shapes are illustrative. No numerical elevations are implied.',w,8.2,11.6,'Italic',C['muted']);y+=20
-    s.text(x,y,'PLACES ON THIS SHEET',10,'SansBold');y+=18
+    s.path([[x,y-3],[x+16,y-3]],None,C['waterline'],1.8,False,[4,3]);s.text(x+21,y,T['covered'],8.6);y+=16
+    s.path([[x,y-3],[x+16,y-3]],None,'#9d8257',1,False,[3,2]);s.text(x+21,y,T['footpath'],8.6);y+=18
+    y=s.wrap(x,y,T['contours'],w,8.2,11.6,'Italic',C['muted']);y+=20
+    s.text(x,y,T['places'],10,'SansBold');y+=18
     if view['id']=='city':entries=[p for p in sites if not(p['rank']>1 and PRINT['downtown_bounds'][0]<p['x']<PRINT['downtown_bounds'][2] and PRINT['downtown_bounds'][1]<p['y']<PRINT['downtown_bounds'][3])]
     else:entries=sites
     # A2 side index is deliberately kept at a readable 8.4 pt.
@@ -194,24 +322,25 @@ def sidebar(s,view,sites):
         else:s.text(x+25,y,label,size)
         y+=11 if view['id']=='city' else 12
     if view['id']=='camp':
-        y+=22;s.text(x,y,'LOCAL RELATIONSHIPS',10,'SansBold');y+=18
-        for para in PRINT['local_relationships']:
+        y+=22;s.text(x,y,T['relationships'],10,'SansBold');y+=18
+        for para in T['local_relationships']:
             y=s.wrap(x,y,para,w,9,13);y+=12
     # Footer source panel is fixed; overflowing content is a build error.
     if y>373*mm:raise RuntimeError(f'Sidebar overflow on {view["id"]}: {y/mm:.1f} mm')
     s.path([[x,379*mm],[x+w,379*mm]],None,C['line'],.7)
-    s.wrap(x,385*mm,PRINT['source_note'],w,8,11,'Sans',C['muted'])
+    s.wrap(x,385*mm,T['source_note'],w,8,11,'Sans',C['muted'])
 
 def make_pdf():
     dest=OUT/'Derry_Print_Atlas.pdf';c=canvas.Canvas(str(dest),pagesize=(594*mm,420*mm),pageCompression=1)
-    c.setTitle("Derry - A literary atlas of Stephen King's IT");c.setAuthor('Novel-based reconstruction prepared for the reader')
+    c.setTitle(T['pdf_title']);c.setAuthor(T['pdf_author'])
     for no,view in enumerate(VIEWS,1):
+        title,subtitle=(T.get('views',{}).get(view['id']) or (view['title'],view['subtitle']))
         surf=Surface(c,594*mm,420*mm);surf.box(0,0,surf.w,surf.h,C['paper'])
-        surf.text(12*mm,15*mm,'S T E P H E N  K I N G  /  I T',8.5,'SansBold',C['muted'])
-        surf.text(12*mm,30*mm,view['title'],29,'SerifBold')
-        surf.text(195*mm,24*mm,view['subtitle'],11,'Sans',C['muted'])
-        surf.text(580*mm,15*mm,f'PLATE {no:02d} / 04',9,'SansBold',anchor='end')
-        surf.text(580*mm,28*mm,'1957-58 / 1984-85 / HISTORICAL SITES',8,'Sans',C['muted'],'end')
+        surf.text(12*mm,15*mm,T['book'],8.5,'SansBold',C['muted'])
+        surf.text(12*mm,30*mm,title,29,'SerifBold')
+        surf.text(195*mm,24*mm,subtitle,11,'Sans',C['muted'])
+        surf.text(580*mm,15*mm,T['plate'].format(number=no),9,'SansBold',anchor='end')
+        surf.text(580*mm,28*mm,T['periods'],8,'Sans',C['muted'],'end')
         draw_base(surf,view);sites=draw_labels(surf,view);sidebar(surf,view,sites)
         # North, placed consistently within a blank corner of the map.
         nx0=442*mm;ny0=54*mm
@@ -219,18 +348,25 @@ def make_pdf():
         surf.text(nx0,ny0-6,'N',10,'SansBold',anchor='middle')
         surf.path([[nx0,ny0],[nx0-5,ny0+18],[nx0,ny0+13],[nx0+5,ny0+18]],C['ink'],None,0,True)
         scale_bar(surf,13*mm,401*mm,view)
-        surf.text(450*mm,405*mm,'A NOVEL-BASED RECONSTRUCTION',8,'SansBold',C['muted'],'end')
-        surf.text(580*mm,413*mm,'A2 / 594 x 420 mm / Print at 100% for stated scale',8,'Sans',C['muted'],'end')
-        surf.text(13*mm,417*mm,'Composite map: former sites retained. Surface geography only. Map geometry and relief are inferred; no screen adaptation geography used.',7.8,'Sans',C['muted'])
-        svg='<svg xmlns="http://www.w3.org/2000/svg" width="594mm" height="420mm" viewBox="0 0 '+str(594*mm)+' '+str(420*mm)+'">'+''.join(surf.svg)+'</svg>'
+        surf.text(450*mm,405*mm,T['reconstruction'],8,'SansBold',C['muted'],'end')
+        surf.text(580*mm,405*mm,'derryfiles.space',8,'SansBold',C['ink'],'end')
+        surf.text(580*mm,413*mm,T['print'],8,'Sans',C['muted'],'end')
+        surf.text(13*mm,417*mm,T['footer'],7.8,'Sans',C['muted'])
+        svg=('<svg xmlns="http://www.w3.org/2000/svg" lang="'+LANG+'" width="594mm" '
+             'height="420mm" viewBox="0 0 '+str(594*mm)+' '+str(420*mm)+'"><title>'
+             +html.escape(title)+'</title><desc>'+html.escape(T['svg_description'])+'</desc>'
+             +''.join(surf.svg)+'</svg>')
         (OUT/f'derry_{view["id"]}.svg').write_text(svg)
         c.showPage()
     c.save()
     (OUT/'label_audit.json').write_text(json.dumps(LABEL_LOG,indent=2))
     print('PDF',dest,'objects',len(BASE))
 
-def render(payload, output, fmt):
-    global C,KIND,D,BASE,LABELS,VIEWS,PRINT,OUT,LABEL_LOG
+def _render_language(payload, output, fmt, language):
+    global C,KIND,D,BASE,LABELS,VIEWS,PRINT,OUT,LABEL_LOG,T,LANG
+    if language not in LANGUAGES:raise ValueError(f'Unsupported print language: {language}')
+    output.mkdir(parents=True,exist_ok=True)
+    LANG=language;T=STRINGS[language]
     C=payload['palette'];KIND=payload['colors'];D=payload['data']
     LABELS=payload['labels'];VIEWS=payload['views'];PRINT=payload['print'];OUT=output;LABEL_LOG=[]
     for n,f in [('Sans','DejaVuSans.ttf'),('SansBold','DejaVuSans-Bold.ttf'),('Serif','DejaVuSerif.ttf'),('SerifBold','DejaVuSerif-Bold.ttf'),('Italic','DejaVuSans-Oblique.ttf')]:
@@ -241,7 +377,15 @@ def render(payload, output, fmt):
     BASE=[dict(type='image',x=a,y=b,w=c-a,h=d-b,path=str(relief))]+payload['base']
     make_pdf()
     import json
-    (OUT/'manifest.json').write_text(json.dumps({'revision':payload['revision'],'digest':payload['digest'],'format':fmt},indent=2))
+    (OUT/'manifest.json').write_text(json.dumps({'revision':payload['revision'],'digest':payload['digest'],'format':fmt,'language':language},indent=2))
     if fmt=='svg':(OUT/'Derry_Print_Atlas.pdf').unlink()
     if fmt=='pdf':
         for view in VIEWS:(OUT/f'derry_{view["id"]}.svg').unlink()
+
+def render(payload, output, fmt, language='en'):
+    if language=='all':
+        for lang in LANGUAGES:_render_language(payload,output/lang,fmt,lang)
+        (output/'manifest.json').write_text(json.dumps({
+            'revision':payload['revision'],'digest':payload['digest'],'format':fmt,
+            'languages':list(LANGUAGES)},indent=2))
+    else:_render_language(payload,output,fmt,language)

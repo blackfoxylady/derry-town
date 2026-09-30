@@ -27,6 +27,7 @@ urlpatterns += i18n_patterns(
     path('is-derry-maine-real/', views.derry_real, name='derry_real'),
     path('how-bangor-inspired-derry-maine/', views.derry_bangor, name='derry_bangor'),
     path('books-set-in-derry-maine/', views.derry_books, name='derry_books'),
+    path('printable-derry-map/', views.printable_map, name='printable_map'),
     path('method/', views.method, name='method'),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     prefix_default_language=False)
