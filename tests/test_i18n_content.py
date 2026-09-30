@@ -81,15 +81,23 @@ class RuContentTests(TestCase):
             root = Path(tmp)
             with override_settings(MEDIA_ROOT=root / 'media'):
                 make_image(root / 'a.png', color=(10, 20, 30))
-                photo = photos.add(root / 'a.png', caption='Ben at the library.',
-                                   caption_ru='Бен в библиотеке.', feature='12', year=1958)
+                photo = photos.add(
+                    root / 'a.png', caption='Ben at the library.',
+                    caption_ru='Бен в библиотеке.', feature='12', year=1958,
+                    characters=['pennywise'], tags=['school'],
+                )
                 self.assertContains(self.client.get(f'/ru/photos/{photo.id}/'), 'Бен в библиотеке.')
+                self.assertContains(self.client.get(f'/ru/photos/{photo.id}/'), 'Пеннивайз')
+                self.assertContains(self.client.get(f'/ru/photos/{photo.id}/'), '>школа</a>')
+                self.assertNotContains(self.client.get(f'/ru/photos/{photo.id}/'), '>Pennywise</a>')
                 self.assertContains(self.client.get(f'/photos/{photo.id}/'), 'Ben at the library.')
                 self.assertContains(self.client.get('/ru/photos/'), 'Бен в библиотеке.')
                 data = self.client.get('/api/v1/photos/', {'lang': 'ru'}).json()
                 self.assertEqual(data['features']['12']['photos'][0]['caption'], 'Бен в библиотеке.')
+                self.assertEqual(data['features']['12']['name'], 'Публичная библиотека Дерри')
                 data = self.client.get('/api/v1/photos/').json()
                 self.assertEqual(data['features']['12']['photos'][0]['caption'], 'Ben at the library.')
+                self.assertEqual(data['features']['12']['name'], 'Derry Public Library')
                 # Правка перевода без пересоздания записи.
                 photos.edit(photo.id, caption_ru='Бен читает.')
                 self.assertContains(self.client.get(f'/ru/photos/{photo.id}/'), 'Бен читает.')
@@ -149,6 +157,32 @@ class RuContentTests(TestCase):
         self.assertEqual(glossary['terms']['Adrian Mellon'], 'Адриан Меллон')
         self.assertEqual(glossary['terms']['Main Street Bridge'], 'мост на Главной улице')
         self.assertEqual(glossary['terms']["Losers' Club"], 'Клуб Неудачников')
+        self.assertEqual(glossary['characters']['pennywise'], 'Пеннивайз')
+        expected_photo_tags = {
+            'balloons': 'воздушные шары',
+            'canal': 'Канал',
+            'canal-days': 'Дни Канала',
+            'cleaning-up': 'уборка',
+            'georgies-room': 'комната Джорджи',
+            'giant-bird': 'гигантская птица',
+            'interludes': 'интерлюдии',
+            'laundromat': 'прачечная',
+            'losers-club': 'Клуб Неудачников',
+            'main-street-bridge': 'мост на Главной улице',
+            'night': 'ночь',
+            'paul-bunyan': 'Пол Баньян',
+            'photo-album': 'фотоальбом',
+            'police': 'полиция',
+            'pov': 'точка зрения',
+            'school': 'школа',
+            'summer': 'лето',
+            'summer-vacation': 'летние каникулы',
+            'supernatural': 'сверхъестественное',
+            'vacation': 'каникулы',
+            'winter': 'зима',
+        }
+        for slug, name in expected_photo_tags.items():
+            self.assertEqual(glossary['tags'][slug], name)
 
 
 @override_settings(ALLOWED_HOSTS=['testserver'], STORAGES={

@@ -143,7 +143,8 @@
     "richie-tozier": "Ричи Тозьер",
     "eddie-kaspbrak": "Эдди Каспбрак",
     "stan-uris": "Стэн Урис",
-    "mike-hanlon": "Майк Хэнлон"
+    "mike-hanlon": "Майк Хэнлон",
+    "pennywise": "Пеннивайз"
   },
   "terms": {
     "Derry": "Дерри",
@@ -165,17 +166,38 @@
   },
   "tags": {
     "architecture": "архитектура",
+    "balloons": "воздушные шары",
     "barrens": "Пустошь",
     "birds": "птицы",
+    "canal": "Канал",
+    "canal-days": "Дни Канала",
+    "cleaning-up": "уборка",
     "dam": "плотина",
     "downtown": "центр города",
+    "georgies-room": "комната Джорджи",
+    "giant-bird": "гигантская птица",
     "interior": "интерьер",
+    "interludes": "интерлюдии",
     "kenduskeag": "Кендускиг",
+    "laundromat": "прачечная",
     "library": "библиотека",
+    "losers-club": "Клуб Неудачников",
+    "main-street-bridge": "мост на Главной улице",
     "neibolt": "Нейболт-стрит",
+    "night": "ночь",
     "park": "парк",
+    "paul-bunyan": "Пол Баньян",
+    "photo-album": "фотоальбом",
+    "police": "полиция",
+    "pov": "точка зрения",
+    "school": "школа",
     "silver": "Сильвер",
     "street": "улица",
-    "sunset": "закат"
+    "summer": "лето",
+    "summer-vacation": "летние каникулы",
+    "sunset": "закат",
+    "supernatural": "сверхъестественное",
+    "vacation": "каникулы",
+    "winter": "зима"
   }
 }

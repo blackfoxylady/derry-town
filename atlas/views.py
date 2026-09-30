@@ -386,7 +386,7 @@ def photo_data(request):
         feature = features.get(key)
         if feature is None:  # привязка не пережила правку атласа; чинится через `photos check`
             continue
-        entry = {'name': feature.name, 'object_type': feature.object_type,
+        entry = {'name': feature_name(feature, russian=ru), 'object_type': feature.object_type,
                  'photos': [{'id': p.id, 'thumb': _media_urls(p)['thumb'],
                              'caption': _caption(p, ru), 'year': p.year} for p in group]}
         if feature.geometry_id:
