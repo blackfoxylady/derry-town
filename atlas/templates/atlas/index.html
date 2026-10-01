@@ -41,7 +41,7 @@
 {% for group in place_groups %}<details class="place-group{% if group.slug == 'unlocated' %} unlocated{% endif %}" id="group-{{ group.slug }}" open>
 <summary><span>{{ group.title }}</span><small>{{ group.items|length }}</small></summary>
 <ul class="place-directory-list">
-{% for item in group.items %}<li><a href="{{ item.url }}"><span class="directory-num">{{ item.number }}</span><span class="directory-copy"><b>{{ item.feature.name }}</b>{% if item.feature.period %}<small>{{ item.feature.period }}</small>{% endif %}</span></a></li>{% endfor %}
+{% for item in group.items %}<li><a href="{{ item.url }}"><span class="directory-num">{{ item.number }}</span><span class="directory-copy"><b>{{ item.name }}</b>{% if item.feature.period %}<small>{{ item.feature.period }}</small>{% endif %}</span></a></li>{% endfor %}
 </ul>
 </details>{% endfor %}
 </div>

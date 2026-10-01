@@ -15,7 +15,8 @@ from django.utils.translation import get_language, gettext_lazy as _, ngettext
 from django.views.decorators.http import require_safe
 from . import schema
 from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
-from .localized_names import character_name, feature_name, feature_search_terms, tag_name
+from .localized_names import (character_name, feature_name, feature_search_terms,
+                              localize_map_payload, tag_name)
 from .localized_photos import photo_caption
 from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
                      Revision, Setting, Source, Tag)
@@ -24,6 +25,7 @@ from .rendering import current_payload, RENDER_VERSION
 
 
 HUB_LASTMOD = date(2026, 9, 29)
+RU_MAP_PAYLOAD_VERSION = '2'
 HUB_PAGES = {
     'real': {
         'template': 'atlas/derry_real.html',
@@ -170,6 +172,7 @@ def index(request):
         for feature in sorted(buckets[kind], key=feature_sort):
             items.append({
                 'feature': feature,
+                'name': feature_name(feature),
                 'number': f'{int(feature.key):02d}' if feature.key.isdigit() else feature.key.upper(),
                 'url': reverse('place', args=[place_slug(feature)]),
             })
@@ -279,7 +282,7 @@ def map_data(request):
     # API живёт вне языкового префикса; язык приходит явным параметром ?lang=ru
     # и попадает в ETag, чтобы версии не перепутались в кеше браузера.
     ru = request.GET.get('lang') == 'ru'
-    suffix = '-ru' if ru else ''
+    suffix = f'-ru-v{RU_MAP_PAYLOAD_VERSION}' if ru else ''
     etag = f'"{state.revision.digest}-r{state.revision_id}-v{RENDER_VERSION}{suffix}"'
     if request.headers.get('If-None-Match') == etag:
         response = HttpResponseNotModified()
@@ -296,8 +299,8 @@ def map_data(request):
 
 def _localized_payload(payload):
     """Русская версия payload карты: поверх канонического английского
-    накладываются описания и заметки evidence из Feature.metadata['ru'].
-    Названия мест сознательно остаются английскими."""
+    накладываются имена, подписи, описания и заметки evidence."""
+    payload = localize_map_payload(payload)
     meta = {f.key: ru for f in Feature.objects.exclude(metadata={})
             if (ru := _feature_ru(f))}
     if not meta:

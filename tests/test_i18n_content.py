@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from atlas import dataset as ds, photos
+from atlas.localized_names import localize_map_payload
 from atlas.models import Evidence, Feature, Geometry, MapState, Photo, Setting, Source
 
 from .test_photos import make_image
@@ -71,6 +72,13 @@ class RuContentTests(TestCase):
         english = self.client.get('/places/12-derry-public-library/')
         self.assertContains(english, '<h1>Derry Public Library</h1>')
         self.assertNotContains(english, 'Публичная библиотека Дерри')
+
+        russian_home = self.client.get('/ru/')
+        self.assertContains(russian_home, '<b>Публичная библиотека Дерри</b>')
+        self.assertContains(russian_home, 'href="/ru/places/12-derry-public-library/"')
+        english_home = self.client.get('/')
+        self.assertContains(english_home, '<b>Derry Public Library</b>')
+        self.assertNotContains(english_home, '<b>Публичная библиотека Дерри</b>')
 
     def test_method_page_russian_geometry_note(self):
         self.assertContains(self.client.get('/ru/method/'), 'Длина канала выведена.')
@@ -184,6 +192,35 @@ class RuContentTests(TestCase):
         for slug, name in expected_photo_tags.items():
             self.assertEqual(glossary['tags'][slug], name)
 
+    def test_map_glossary_covers_places_and_cartographic_labels(self):
+        glossary = json.loads(
+            (settings.BASE_DIR / 'data/proper_names_ru.json').read_text(encoding='utf-8'))
+        source = json.loads(
+            (settings.BASE_DIR / 'data/initial.json').read_text(encoding='utf-8'))
+        display_keys = {item['key'] for item in source['tables']['feature']
+                        if item['object_type'] in ('site', 'unplaced')}
+        self.assertFalse(display_keys - glossary['features'].keys())
+        label_texts = {item['text'] for item in source['tables']['label']}
+        self.assertEqual(set(glossary['labels']), label_texts)
+        self.assertLessEqual(set(glossary['short_names']), display_keys)
+
+    def test_map_name_localizer_preserves_english_source_and_url_slug(self):
+        payload = {
+            'data': {'sites': [{
+                'id': 12, 'name': 'Derry Public Library', 'short': 'Library',
+            }], 'unplaced': []},
+            'labels': [{'text': 'Kansas Street'}],
+        }
+        localized = localize_map_payload(payload)
+        self.assertEqual(payload['data']['sites'][0]['name'], 'Derry Public Library')
+        self.assertEqual(payload['labels'][0]['text'], 'Kansas Street')
+        site = localized['data']['sites'][0]
+        self.assertEqual(site['name'], 'Публичная библиотека Дерри')
+        self.assertEqual(site['short'], 'Публичная библиотека Дерри')
+        self.assertEqual(site['slug'], 'derry-public-library')
+        self.assertIn('Derry Public Library', site['search_aliases'])
+        self.assertEqual(localized['labels'][0]['text'], 'Канзас-стрит')
+
 
 @override_settings(ALLOWED_HOSTS=['testserver'], STORAGES={
     'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
@@ -216,8 +253,11 @@ class AtlasEditRuTests(TestCase):
         site_ru = next(s for s in ru.json()['data']['sites'] if s['id'] == 12)
         self.assertEqual(site_ru['note'], 'Русское описание библиотеки.')
         self.assertNotEqual(site_en['note'], site_ru['note'])
-        # Основная карта переводится отдельным этапом; её payload пока сохраняет каноническое имя.
-        self.assertEqual(site_en['name'], site_ru['name'])
+        self.assertEqual(site_en['name'], 'Derry Public Library')
+        self.assertEqual(site_ru['name'], 'Публичная библиотека Дерри')
+        self.assertEqual(site_ru['short'], 'Публичная библиотека Дерри')
+        self.assertEqual(site_ru['slug'], 'derry-public-library')
+        self.assertIn('Derry Public Library', site_ru['search_aliases'])
 
     def test_shipped_translation_patch_applies_cleanly(self):
         self.cmd('apply', str(settings.BASE_DIR / 'data/i18n_ru.json'),

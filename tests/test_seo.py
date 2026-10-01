@@ -218,7 +218,7 @@ class SeoTests(TestCase):
         self.assertEqual(russian.status_code, 200)
         self.assertContains(russian, '<h1>Скачать карту Дерри для печати</h1>', html=True)
         self.assertContains(russian, 'atlas/downloads/ru/Derry_Print_Atlas.pdf')
-        self.assertContains(russian, 'Названия улиц и мест сохранены на английском')
+        self.assertContains(russian, 'названия улиц и мест переведены на русский')
         self.assertContains(russian, 'Фотографии и их отметки в печатную версию не включены')
         self.assertContains(russian, 'hreflang="en" href="http://testserver/printable-derry-map/"')
 

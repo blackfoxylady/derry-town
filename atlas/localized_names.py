@@ -4,10 +4,12 @@ Canonical English names and slugs remain the source of URLs and dataset identity
 This module only supplies presentation labels and search aliases.
 """
 from functools import lru_cache
+import copy
 import json
 from pathlib import Path
 
 from django.conf import settings
+from django.utils.text import slugify
 from django.utils.translation import get_language
 
 
@@ -42,6 +44,35 @@ def feature_search_terms(feature):
     entry = _glossary()['features'].get(str(feature.key), {})
     return [feature.name, feature.short, _place_names().get(str(feature.key), entry.get('name', '')),
             *(entry.get('aliases') or [])]
+
+
+def localize_map_payload(payload):
+    """Return an RU presentation copy without changing canonical EN map data.
+
+    Map identifiers, coordinates and English URL slugs remain stable.  Only
+    reader-facing names, compact labels and search aliases are added/replaced.
+    """
+    localized = copy.deepcopy(payload)
+    glossary = _glossary()
+    features = glossary['features']
+    short_names = glossary.get('short_names', {})
+    for group in ('sites', 'unplaced'):
+        for item in localized['data'][group]:
+            entry = features.get(str(item['id']))
+            if not entry or not entry.get('name'):
+                continue
+            english_name = item['name']
+            english_short = item.get('short', english_name)
+            item['slug'] = slugify(english_name)
+            item['search_aliases'] = list(dict.fromkeys(filter(None, (
+                english_name, english_short, *(entry.get('aliases') or [])))))
+            item['name'] = entry['name']
+            if 'short' in item:
+                item['short'] = short_names.get(str(item['id']), entry['name'])
+    labels = glossary.get('labels', {})
+    for label in localized['labels']:
+        label['text'] = labels.get(label['text'], label['text'])
+    return localized
 
 
 def character_name(character, russian=None):

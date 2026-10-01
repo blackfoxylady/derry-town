@@ -6,7 +6,7 @@ const URLS=window.ATLAS_URLS||{mapData:'/api/v1/map/',photoData:'/api/v1/photos/
 const photoUrl=id=>URLS.photo.replace('/0/','/'+id+'/');
 // The slug mirrors Django's slugify for these ASCII names; a stale slug 301-redirects anyway.
 const slugify=s=>String(s).toLowerCase().replace(/['’]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
-const placeUrl=s=>{const n=slugify(s.name);return URLS.place.replace('/x/','/'+String(s.id).toLowerCase()+(n?'-'+n:'')+'/')};
+const placeUrl=s=>{const n=s.slug||slugify(s.name);return URLS.place.replace('/x/','/'+String(s.id).toLowerCase()+(n?'-'+n:'')+'/')};
 // i18n: the jsi18n catalog defines gettext/ngettext; the offline artifact falls back to English.
 const _=typeof gettext==='function'?gettext:s=>s;
 const n_=typeof ngettext==='function'?ngettext:(s,p,n)=>n===1?s:p;
@@ -72,7 +72,7 @@ function scene(){
 function screen(x,y){return [(x-state.cx)*state.k+state.w/2,(state.cy-y)*state.k+state.h/2]}
 function geo(x,y){return [state.cx+(x-state.w/2)/state.k,state.cy-(y-state.h/2)/state.k]}
 function fit(id){const v=PAYLOAD.views.find(v=>v.id===id);state.view=id;const [a,b,c,d]=v.bounds;state.cx=(a+c)/2;state.cy=(b+d)/2;state.k=Math.min((state.w-60)/(c-a),(state.h-100)/(d-b));render();}
-function hits(s){return (s.kind==='Unlocated'||state.active.has(s.kind))&&(!state.search||[s.id,s.name,s.short,s.note,s.period].join(' ').toLowerCase().includes(state.search));}
+function hits(s){return (s.kind==='Unlocated'||state.active.has(s.kind))&&(!state.search||[s.id,s.name,s.short,s.note,s.period,...(s.search_aliases||[])].join(' ').toLowerCase().includes(state.search));}
 function format(m){return m>=1000?(m/1000).toLocaleString(LANG,{maximumFractionDigits:2})+' '+_('km'):Math.round(m).toLocaleString(LANG)+' '+_('m')}
 function intersects(a,b,pad=2){return !(a[2]+pad<b[0]||a[0]-pad>b[2]||a[3]+pad<b[1]||a[1]-pad>b[3])}
 function render(){
