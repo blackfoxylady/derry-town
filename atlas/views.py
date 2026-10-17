@@ -394,6 +394,9 @@ def photo_data(request):
                              'caption': _caption(p, ru), 'year': p.year} for p in group]}
         if feature.geometry_id:
             entry['anchor'] = _photo_anchor(feature.geometry.shape)
+        # Прямой адрес лендинга места: ссылка с карты без промежуточного 301.
+        gallery = _gallery_url(place=key, place_feature=feature)
+        entry['gallery'] = translate_url(gallery, 'ru') if ru else gallery
         result[key] = entry
     response = JsonResponse({'features': result},
                             json_dumps_params={'ensure_ascii': False, 'separators': (',', ':')})
@@ -406,12 +409,23 @@ def gallery_place_slug(feature):
     return slugify(f'{feature.key}-{feature.name}')
 
 
+# Сочетания фильтров галереи — бесконечное пространство адресов для краулеров
+# (инцидент 17.10.2026): не больше двух значений сразу.
+MAX_GALLERY_FILTERS = 2
+
+
+def _filter_count(place, character, tags, year):
+    return bool(place) + bool(character) + len(tags) + bool(year)
+
+
 def _gallery_url(place='', character='', tags=(), year='', place_feature=None):
     """Canonical landing URL for one filter; query URL for combinations.
 
     Query strings remain useful for combined filters, while every valid single
-    dimension has a crawlable, self-canonical path.
+    dimension has a crawlable, self-canonical path. Tags are sorted, so one
+    combination has exactly one address.
     """
+    tags = sorted(tags)
     active = sum((bool(place), bool(character), bool(tags), bool(year)))
     if active == 1:
         if place:
@@ -718,22 +732,23 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
             if (value := value.strip()) and value not in tags:
                 tags.append(value)
 
-        # Old, valid single-filter query URLs permanently converge on the
-        # crawlable landing. Invalid values keep the existing empty-result UX.
+        # Unknown values and more than MAX_GALLERY_FILTERS values are 404, so
+        # crawlers cannot multiply addresses. Foreign parameters (utm_* and
+        # the like) do not affect the result.
+        valid = ((not place or place in place_counts)
+                 and (not character or character in characters_by_slug)
+                 and all(tag in tags_by_slug for tag in tags)
+                 and (not year or (year.isdigit() and int(year) in year_counts)))
+        if not valid or _filter_count(place, character, tags, year) > MAX_GALLERY_FILTERS:
+            raise Http404
+        # Old single-filter query URLs permanently converge on the crawlable landing.
         known_parameters = {'place', 'character', 'tag', 'year'}
-        dimensions = sum((bool(place), bool(character), bool(tags), bool(year)))
-        valid_single = (
-            (place in place_counts if place else False)
-            or (character in characters_by_slug if character else False)
-            or (len(tags) == 1 and tags[0] in tags_by_slug)
-            or (year.isdigit() and int(year) in year_counts)
-        )
-        if (dimensions == 1 and valid_single and set(request.GET) <= known_parameters
-                and (not tags or len(tags) == 1)):
+        if _filter_count(place, character, tags, year) == 1 and set(request.GET) <= known_parameters:
             return redirect(_gallery_url(
                 place, character, tags, year, place_feature=features.get(place)), permanent=True)
 
-    photos = Photo.objects.prefetch_related('characters', 'tags')
+    all_photos = Photo.objects.prefetch_related('characters', 'tags')
+    photos = all_photos
     if place:
         photos = photos.filter(feature_key=place)
     if character:
@@ -741,19 +756,35 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
     if tags:
         photos = photos.filter(tags__slug__in=tags).distinct()
     if year:
-        photos = photos.filter(year=int(year)) if year.isdigit() else photos.none()
+        photos = photos.filter(year=int(year))
+    # With the filter limit reached, further filters work in the browser
+    # (gallery.js) and never reach the URL: the page carries every photo,
+    # the ones outside the current filter are hidden.
+    client_filter = _filter_count(place, character, tags, year) == MAX_GALLERY_FILTERS
+    shown_ids = set(photos.values_list('id', flat=True)) if client_filter else None
+    if client_filter:
+        photos = all_photos
 
-    def option(label, count, active, url):
-        return {'label': label, 'count': count, 'active': active, 'url': url}
+    def link(new_place, new_character, new_tags, new_year):
+        """Chip target: (url, nofollow). No url when it would exceed the filter limit
+        (the chip becomes a client-side button); links to combinations are nofollow,
+        landings stay crawlable."""
+        n = _filter_count(new_place, new_character, new_tags, new_year)
+        if n > MAX_GALLERY_FILTERS:
+            return None, False
+        return _gallery_url(new_place, new_character, new_tags, new_year,
+                            place_feature=features.get(new_place)), n > 1
 
-    def single(values, current, build):
-        """Clicking the active option clears it; an invalid query value stays removable."""
-        options = [option(label, n, value == current,
-                          build('' if value == current else value))
-                   for value, label, n in values]
-        if current and all(value != current for value, _, _ in values):
-            options.append(option(current, 0, True, build('')))
-        return options
+    def option(dim, value, label, count, active, target):
+        url, nofollow = target
+        return {'dim': dim, 'value': value, 'label': label, 'count': count, 'active': active,
+                'url': url, 'nofollow': nofollow}
+
+    def single(dim, values, current, build):
+        """Clicking the active option clears it."""
+        return [option(dim, value, label, n, value == current,
+                       build('' if value == current else value))
+                for value, label, n in values]
 
     place_values = sorted(
         ((key, feature_name(features[key]) if key in features else key, count)
@@ -769,29 +800,21 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
 
     groups = [
         {'title': _('Place'), 'options': single(
-            place_values, place, lambda value: _gallery_url(
-                value, character, tags, year, place_feature=features.get(value)))},
+            'place', place_values, place, lambda value: link(value, character, tags, year))},
         {'title': _('Character'), 'options': single(
-            character_values, character,
-            lambda value: _gallery_url(place, value, tags, year,
-                                       place_feature=features.get(place)))},
+            'character', character_values, character,
+            lambda value: link(place, value, tags, year))},
         {'title': _('Tags'), 'options': [
-            option(label, count, value in tags, _gallery_url(
+            option('tag', value, label, count, value in tags, link(
                 place, character,
                 [tag for tag in tags if tag != value] if value in tags else tags + [value],
-                year, place_feature=features.get(place)))
+                year))
             for value, label, count in tag_values
-        ] + [
-            option(tag_name(value), 0, True, _gallery_url(
-                place, character, [tag for tag in tags if tag != value], year,
-                place_feature=features.get(place)))
-            for value in tags if value not in tags_by_slug
         ]},
     ]
-    if len(year_values) > 1 or (year and all(value != year for value, _, _ in year_values)):
+    if len(year_values) > 1:
         groups.append({'title': _('Year'), 'options': single(
-            year_values, year, lambda value: _gallery_url(
-                place, character, tags, value, place_feature=features.get(place)))})
+            'year', year_values, year, lambda value: link(place, character, tags, value))})
 
     cards = []
     for photo in photos:
@@ -808,7 +831,20 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
             'place_gallery_url': (place_gallery_url
                                   if place_page_url and place != photo.feature_key else ''),
             'year_url': _gallery_url(year=str(photo.year)) if photo.year else '',
+            'hidden': client_filter and photo.id not in shown_ids,
+            'characters': ' '.join(item.slug for item in photo.characters.all()),
+            'tags': ' '.join(item.slug for item in photo.tags.all()),
         })
+    shown = sum(not card['hidden'] for card in cards)
+    client_state = None
+    if client_filter:
+        # Ready plural forms for the counter: the JS needs no translation catalog.
+        client_state = {
+            'place': place, 'character': character, 'tags': tags, 'year': year,
+            'base': reverse('gallery'),
+            'counts': {n: ngettext('%(n)s photograph', '%(n)s photographs', n) % {'n': n}
+                       for n in range(len(cards) + 1)},
+        }
 
     gallery_heading = _('Photographs')
     gallery_intro = ''
@@ -848,7 +884,11 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
                 'Stephen King’s IT.') % {'year': label}
         gallery_intro = meta_description
 
+    # Combinations are duplicates of the landings: not indexed and not followed.
+    robots_meta = ('noindex, nofollow'
+                   if _filter_count(place, character, tags, year) > 1 else '')
     response = render(request, 'atlas/gallery.html', {
+        'robots_meta': robots_meta, 'client_state': client_state, 'shown': shown,
         'groups': groups, 'cards': cards, 'clear_url': reverse('gallery'),
         'filtered': bool(place or character or tags or year),
         'landing': landing, 'gallery_heading': gallery_heading,
@@ -859,6 +899,8 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
             request, page_title, meta_description, gallery_heading if landing else ''),
     })
     response['Cache-Control'] = 'no-cache'
+    if robots_meta:
+        response['X-Robots-Tag'] = robots_meta
     return response
 
 
@@ -1138,8 +1180,12 @@ def sitemap(request):
 
 @require_safe
 def robots(request):
-    return HttpResponse('User-agent: *\nDisallow: /api/\nSitemap: '
-                        + request.build_absolute_uri(reverse('sitemap')) + '\n',
+    """Сочетания фильтров галереи закрыты: в индексе только лендинги из sitemap.
+    Адреса без слеша тоже — краулеры отрезают его сами."""
+    return HttpResponse('User-agent: *\nDisallow: /api/\n'
+                        'Disallow: /photos?\nDisallow: /photos/?\n'
+                        'Disallow: /ru/photos?\nDisallow: /ru/photos/?\n'
+                        'Sitemap: ' + request.build_absolute_uri(reverse('sitemap')) + '\n',
                         content_type='text/plain')
 
 

@@ -94,6 +94,10 @@ class SeoTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Sitemap: http://testserver/sitemap.xml')
         self.assertContains(response, 'Disallow: /api/')
+        for path in ('/photos?', '/photos/?', '/ru/photos?', '/ru/photos/?'):
+            self.assertContains(response, f'Disallow: {path}\n')
+        # Лендинги фильтров (/photos/tag/…/) остаются открытыми.
+        self.assertNotContains(response, 'Disallow: /photos/\n')
 
     def test_pages_carry_canonical_and_hreflang(self):
         response = self.client.get('/')
@@ -102,8 +106,8 @@ class SeoTests(TestCase):
         self.assertContains(response, '<meta name="description"')
         response = self.client.get('/ru/')
         self.assertContains(response, 'hreflang="en" href="http://testserver/"')
-        # Canonical галереи не тащит query-параметры фильтров.
-        response = self.client.get('/photos/', {'place': '12'})
+        # Canonical галереи не тащит query-параметры (сочетания фильтров — в test_gallery).
+        response = self.client.get('/photos/', {'utm_source': 'x'})
         self.assertContains(response, '<link rel="canonical" href="http://testserver/photos/">')
         for path in ('/is-derry-maine-real/', '/how-bangor-inspired-derry-maine/',
                      '/books-set-in-derry-maine/', '/printable-derry-map/'):

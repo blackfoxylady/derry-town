@@ -3,6 +3,14 @@ services:
   db:
     image: postgres:17.11-bookworm
     restart: unless-stopped
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # derry делит 1 vCPU / 2 ГБ с продом mika: под нагрузкой страдает только derry.
+    cpus: 0.3
+    mem_limit: 384m
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-derry}
       POSTGRES_USER: ${POSTGRES_USER:-derry}
@@ -17,6 +25,12 @@ services:
   web:
     build: .
     restart: unless-stopped
+    logging: *logging
+    cpus: 0.6
+    mem_limit: 768m
+    # Access-log пишет nginx (с User-Agent); gunicorn оставляет только ошибки.
+    command: ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2",
+              "--timeout", "120", "--error-logfile", "-"]
     env_file: .env
     environment:
       POSTGRES_HOST: db

@@ -24,9 +24,11 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
 .chip.on{background:#315e5a;border-color:#315e5a;color:#fff}
 .chip .n{font-size:10px;color:var(--muted)}
 .chip.on .n{color:#cfe0d2}
+button.chip{font-family:inherit;cursor:pointer}
 .status{justify-content:space-between;color:var(--muted);font-size:12px}
 .grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr));gap:18px}
 .card{border:1px solid var(--line);border-radius:7px;background:#faf8f1;overflow:hidden;display:flex;flex-direction:column}
+.card[hidden],.empty[hidden]{display:none}
 .card .pic{display:block;background:#e8e4d4}
 .card img{display:block;width:100%;height:auto}
 .card .caption{margin:0;padding:10px 12px 4px;font-size:12px}

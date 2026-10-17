@@ -1,3 +1,5 @@
+import json
+import re
 import tempfile
 from pathlib import Path
 from django.test import TestCase, override_settings
@@ -44,9 +46,13 @@ class GalleryTests(TestCase):
         self.loose = photos.add(source / 'd.png', caption='Derry in 1985.', year=1985)
 
     def captions(self, response):
+        """Подписи видимых карточек: на странице с двумя фильтрами в HTML
+        есть все фото, неподходящие скрыты (дальше фильтрует gallery.js)."""
+        shown = [card for card in response.content.decode().split('<li class="card"')[1:]
+                 if not card.startswith(' hidden')]
         return [c for c in ('Ben at the library.', 'The library building.',
                             'Bill races Silver.', 'Derry in 1985.')
-                if c.encode() in response.content]
+                if any(c in card for card in shown)]
 
     def test_gallery_lists_all_photos_with_thumbs_and_filter_panel(self):
         response = self.client.get('/photos/')
@@ -107,32 +113,90 @@ class GalleryTests(TestCase):
         # Фото с обоими тегами не задваивается.
         response = self.client.get('/photos/', {'tag': 'library,interior'})
         self.assertContains(response, '2 photographs')
-        # Ссылка-переключатель второго тега дописывает его через запятую.
+        # Ссылка-переключатель второго тега дописывает его через запятую,
+        # теги в адресе отсортированы: у сочетания ровно один адрес.
         self.assertRedirects(
             self.client.get('/photos/', {'tag': 'library'}),
             '/photos/tag/library/', status_code=301)
         response = self.client.get('/photos/tag/library/')
-        self.assertContains(response, '?tag=library,interior')
+        self.assertContains(response, 'href="/photos/?tag=interior,library" rel="nofollow"')
+        self.assertEqual(self.captions(self.client.get('/photos/', {'tag': 'silver,library'})),
+                         ['Ben at the library.', 'The library building.', 'Bill races Silver.'])
 
     def test_dimensions_combine_as_and(self):
-        response = self.client.get('/photos/', {'place': '12', 'tag': 'interior', 'year': '1958'})
+        response = self.client.get('/photos/', {'place': '12', 'tag': 'interior'})
         self.assertEqual(self.captions(response), ['Ben at the library.'])
         self.assertContains(response, '<link rel="canonical" href="http://testserver/photos/">')
         self.assertContains(response, '<h1 class="gallery-title">Photographs</h1>')
         self.assertNotContains(response, 'class="gallery-intro"')
         response = self.client.get('/photos/', {'place': '12', 'character': 'bill-denbrough'})
         self.assertEqual(self.captions(response), [])
+        self.assertContains(response, 'No photographs match')
 
-    def test_unknown_or_invalid_values_give_empty_result_not_error(self):
-        for params in ({'tag': 'no-such-tag'}, {'place': '999'}, {'character': 'pennywise'},
-                       {'year': '1929'}, {'year': 'abc'}):
-            response = self.client.get('/photos/', params)
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'No photographs match')
-            self.assertContains(response, 'Clear filters')
+    def test_combinations_are_noindex_and_limited_to_two_values(self):
+        combo = self.client.get('/photos/', {'place': '12', 'year': '1958'})
+        self.assertContains(combo, '<meta name="robots" content="noindex, nofollow">')
+        self.assertEqual(combo['X-Robots-Tag'], 'noindex, nofollow')
+        # Третье значение — кнопка для фильтра в браузере, не ссылка; снять фильтр — ссылкой.
+        self.assertContains(
+            combo, '<button type="button" class="chip" data-dim="tag" data-value="library">Library')
+        self.assertContains(combo, 'href="/photos/year/1958/"')
+        self.assertNotContains(combo, '?place=12&amp;tag=')
+        # Замена значения в том же измерении сохраняет два фильтра.
+        self.assertContains(combo, 'href="/photos/?place=12&amp;year=1985" rel="nofollow"')
+        for params in ({'place': '12', 'tag': 'interior', 'year': '1958'},
+                       {'tag': 'library,interior,silver'},
+                       {'place': '12', 'character': 'ben-hanscom', 'tag': 'library'}):
+            self.assertEqual(self.client.get('/photos/', params).status_code, 404, params)
+        for path in ('/photos/', '/photos/tag/library/', '/photos/place/12-derry-public-library/'):
+            response = self.client.get(path)
+            self.assertNotContains(response, 'name="robots"')
+            self.assertFalse(response.has_header('X-Robots-Tag'), path)
+        # С главной галереи чипы ведут на лендинги — без nofollow.
+        self.assertNotContains(self.client.get('/photos/'), 'rel="nofollow"')
+
+    def test_filters_beyond_limit_run_in_the_browser(self):
+        combo = self.client.get('/photos/', {'place': '12', 'year': '1958'})
+        self.assertEqual(self.captions(combo), ['Ben at the library.', 'The library building.'])
+        self.assertContains(combo, '2 photographs')
+        # Все фото в HTML с атрибутами для gallery.js, лишние скрыты.
+        self.assertContains(combo, '<li class="card"', count=4)
+        self.assertContains(combo, '<li class="card" hidden', count=2)
+        self.assertContains(combo, 'data-place="12" data-characters="ben-hanscom" data-tags="')
+        self.assertContains(combo, 'data-place="" data-characters="" data-tags="" data-year="1985"')
+        self.assertContains(combo, '<p class="empty" hidden>')
+        self.assertContains(combo, 'src="/static/atlas/gallery.js"')
+        state = self.client_state(combo)
+        self.assertEqual({k: state[k] for k in ('place', 'character', 'tags', 'year', 'base')},
+                         {'place': '12', 'character': '', 'tags': [], 'year': '1958',
+                          'base': '/photos/'})
+        self.assertEqual(state['counts']['3'], '3 photographs')
+        # Страницы до лимита — как прежде: только подходящие фото, без скрипта.
+        for path in ('/photos/', '/photos/tag/library/'):
+            response = self.client.get(path)
+            self.assertNotContains(response, '<li class="card" hidden')
+            self.assertNotContains(response, 'gallery.js')
+            self.assertNotContains(response, 'data-dim=')
+        russian = self.client_state(self.client.get('/ru/photos/', {'place': '12', 'year': '1958'}))
+        self.assertEqual(russian['base'], '/ru/photos/')
+        self.assertEqual(russian['counts']['3'], '3 фотографии')
+
+    def client_state(self, response):
+        match = re.search(r'<script id="gallery-filter" type="application/json">(.*?)</script>',
+                          response.content.decode())
+        return json.loads(match.group(1))
+
+    def test_unknown_or_invalid_values_are_not_found(self):
+        for params in ({'tag': 'no-such-tag'}, {'tag': 'library,no-such-tag'}, {'place': '999'},
+                       {'character': 'pennywise'}, {'year': '1929'}, {'year': 'abc'}):
+            self.assertEqual(self.client.get('/photos/', params).status_code, 404, params)
         for path in ('/photos/place/not-a-place/', '/photos/character/nobody/',
                      '/photos/tag/not-a-tag/', '/photos/year/1999/'):
             self.assertEqual(self.client.get(path).status_code, 404, path)
+        # Посторонние параметры (метки рекламы и т. п.) выдачу не ломают.
+        response = self.client.get('/photos/', {'utm_source': 'x'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(self.captions(response)), 4)
 
     def test_landing_pages_have_unique_copy_canonical_and_breadcrumbs(self):
         cases = (

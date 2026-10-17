@@ -24,10 +24,10 @@ class I18nRoutingTests(TestCase):
         self.assertContains(self.client.get('/'), 'href="/ru/"')
         self.assertContains(self.client.get('/ru/'), 'href="/"')
         # Query-параметры фильтров сохраняются при переключении языка.
-        self.assertContains(self.client.get('/photos/', {'place': '12'}),
-                            'href="/ru/photos/?place=12"')
-        self.assertContains(self.client.get('/ru/photos/', {'place': '12'}),
-                            'href="/photos/?place=12"')
+        self.assertContains(self.client.get('/photos/', {'utm_source': 'x'}),
+                            'href="/ru/photos/?utm_source=x"')
+        self.assertContains(self.client.get('/ru/photos/', {'utm_source': 'x'}),
+                            'href="/photos/?utm_source=x"')
 
     def test_service_routes_have_no_language_prefix(self):
         for path in ('/ru/api/v1/map/', '/ru/healthz/'):

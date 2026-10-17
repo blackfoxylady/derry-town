@@ -69,6 +69,12 @@ class MapPhotosTests(TestCase):
         self.assertEqual(first['thumb'],
                          '/media/' + photos.relative_paths(self.ben.sha256, self.ben.ext)['thumb'])
 
+    def test_gallery_link_is_the_place_landing(self):
+        # Карта ведёт прямо на лендинг места, без 301 с /photos/?place=.
+        self.assertEqual(self.fetch()['road:02']['gallery'], '/photos/place/road02-main-street/')
+        ru = self.client.get('/api/v1/photos/', {'lang': 'ru'}).json()['features']
+        self.assertTrue(ru['road:02']['gallery'].startswith('/ru/photos/place/road02-'))
+
     def test_anchor_point_middle_vertex_and_absent_for_unplaced(self):
         features = self.fetch()
         self.assertEqual(features['12']['anchor'], [120, -80])
