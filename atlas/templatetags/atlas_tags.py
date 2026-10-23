@@ -2,7 +2,9 @@ import json
 from django import template
 from django.urls import translate_url
 from django.utils.safestring import mark_safe
+from django.utils.translation import get_language
 
+from .. import locators
 from ..terms import period_label
 
 register = template.Library()
@@ -49,6 +51,25 @@ def alternate_url(context, lang):
     """Абсолютный адрес страницы в заданном языке — для hreflang."""
     request = context['request']
     return request.build_absolute_uri(translate_url(request.path, lang))
+
+
+@register.simple_tag
+def locator(preset, key=None):
+    """Кадр локатора на языке страницы: {url, width, height} или None, если кадра нет
+    (тогда шаблон показывает штрихованный блок). {% locator 'panel' place.key as frame %}"""
+    return locators.frame(preset, key, 'ru' if get_language() == 'ru' else 'en')
+
+
+@register.simple_tag
+def town_marker(key):
+    """Рамка кадра панели на вставке «весь город», в процентах вставки."""
+    return locators.town_marker(key)
+
+
+@register.simple_tag
+def off_map(key):
+    """Текст и направление для мест за пределами листа (U4, U8), иначе None."""
+    return locators.off_map(key, 'ru' if get_language() == 'ru' else 'en')
 
 
 @register.filter

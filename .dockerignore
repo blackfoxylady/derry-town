@@ -9,3 +9,4 @@ staticfiles
 backups
 node_modules
 docs/verification/screenshots
+build

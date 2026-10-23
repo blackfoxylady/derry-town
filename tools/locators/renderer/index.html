@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Derry locators: reference renderer</title>
+<!-- Served by tools/locators/shoot.cjs only. derry-map.js/.css and components.css are the
+     Design reference renderer (handoff/blocks/12-cartography/renderer, foundation) as is;
+     fonts and tokens come from the site's own static files, never from a CDN. -->
+<link rel="stylesheet" href="/static/atlas/fonts.css">
+<link rel="stylesheet" href="/static/atlas/tokens.css">
+<link rel="stylesheet" href="components.css">
+<link rel="stylesheet" href="derry-map.css">
+<style>
+  html, body { height: 100%; margin: 0; overflow: hidden; }
+  #stage { position: fixed; inset: 0; }
+  /* Locators never show the grid references, photos or map controls (block 04). */
+  .dm .ov-grid { display: none; }
+</style>
+</head>
+<body>
+<div id="stage"><svg id="map"></svg></div>
+<script src="derry-map.js"></script>
+<script>
+(async function () {
+  const P = new URLSearchParams(location.search);
+  if (P.get('lang')) document.documentElement.lang = P.get('lang');
+  // Load every face up front: with font-display: swap a label could otherwise be
+  // measured and shot in the fallback font.
+  await Promise.all([...document.fonts].map((face) => face.load()));
+  const geo = await (await fetch(P.get('data'))).json();
+  const sel = P.get('sel');
+  const svg = document.getElementById('map');
+  const map = DerryMap.create(svg, geo, { style: 'survey', selected: sel ? (isNaN(+sel) ? sel : +sel) : null, photos: {} });
+  let cx = +P.get('cx');
+  const cy = +P.get('cy'), k = +P.get('k');
+  map.setView(cx, cy, k);
+  // The renderer never fits the selected place's name into the view. On small frames
+  // (a card fits ~17 characters) shift the view sideways until the name fits, keeping
+  // the marker at least 30 px from the edge; a name longer than the frame stays cut.
+  const label = svg.querySelector('.lbl--place.is-selected');
+  if (label) {
+    const w = svg.getBoundingClientRect().width, gap = 6, b = label.getBoundingClientRect();
+    const half = w / 2 - 30;
+    let dx = 0;
+    if (b.right > w - gap) dx = Math.min(b.right - (w - gap), half);
+    else if (b.left < gap) dx = -Math.min(gap - b.left, half);
+    if (dx) { cx += dx / k; map.setView(cx, cy, k); }
+  }
+  window.__view = { cx: Math.round(cx * 10) / 10, cy, k };
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>

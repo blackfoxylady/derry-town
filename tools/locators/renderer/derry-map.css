@@ -1,0 +1,134 @@
+/* ==========================================================================
+   Derry map: cartographic styles. Needs tokens.css + components.css
+   (markers .mk*, labels use the type tokens). Three styles share one set of
+   layer classes; only the variables change.
+   HANDOFF: "survey" is the only style that ships. The "plate" and "atlas"
+   blocks are rejected explorations, kept so the demo still runs; do not port
+   them. Survey colours now come from tokens.css (--map-*).
+   ========================================================================== */
+.dm { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; font-family: var(--font-display); }
+.dm.is-dragging { cursor: grabbing; }
+
+/* ---- Style A · Survey (light, USGS-like, the design system's map tokens) ---- */
+.dm--survey {
+  --m-paper: var(--map-margin); --m-land: var(--map-land); --m-park: var(--map-park); --m-yard: var(--map-yard); --m-field: var(--map-field); --m-sand: var(--map-sand);
+  --m-valley: var(--map-valley); --m-wood: var(--map-woods); --m-wood-dot: var(--map-woods-dot); --m-wood-edge: var(--map-woods-edge); --m-tree: var(--map-tree);
+  --m-contour: var(--map-contour); --m-contour-op: 0.55; --m-contour-fill: transparent;
+  --m-builtup: var(--map-builtup); --m-bld: var(--map-building); --m-bld-edge: var(--map-building-edge); --m-bld-key: var(--map-building-landmark);
+  --m-water: var(--map-water); --m-water-edge: var(--map-water-edge);
+  --m-road: var(--map-road); --m-road-major: var(--map-road-major); --m-road-cas: var(--map-road-casing);
+  --m-path: var(--map-path); --m-rail: var(--map-rail); --m-bridge: var(--map-bridge); --m-dot: var(--map-dot); --m-dot-edge: var(--map-dot-edge);
+  --m-frame: var(--map-frame); --m-grid: var(--map-grid); --m-veg: var(--map-veg);
+  --m-label-region: var(--map-label-area); --m-label-water: var(--map-label-water); --m-label-road: var(--map-label-street); --m-halo: var(--map-label-halo);
+}
+/* ---- Style B · Plate (engraved: ink on paper, colour only in markers) ---- */
+.dm--plate {
+  --m-paper: #E4DFD0; --m-land: #F6F2E7; --m-park: #EEEDDF; --m-yard: #EFEADC; --m-field: #F3EFE3; --m-sand: #F1EBD8;
+  --m-valley: #EEF0E4; --m-wood: #F1F1E4; --m-wood-dot: #7E8C74; --m-wood-edge: #5E6B57; --m-tree: #6F7D66;
+  --m-contour: #6E6A5E; --m-contour-op: 0.42; --m-contour-fill: transparent;
+  --m-builtup: transparent; --m-bld: #8A918B; --m-bld-edge: #6E7672; --m-bld-key: #18262E;
+  --m-water: #D3E0E5; --m-water-edge: #34535D;
+  --m-road: #F6F2E7; --m-road-major: #F6F2E7; --m-road-cas: #3D4A4F;
+  --m-path: #4E5A5C; --m-rail: #18262E; --m-bridge: #18262E; --m-dot: #F6F2E7; --m-dot-edge: #18262E;
+  --m-frame: #18262E; --m-grid: rgb(24 38 46 / 0.12); --m-veg: #5E6B57;
+  --m-label-region: #18262E; --m-label-water: #34535D; --m-label-road: #3D4A4F; --m-halo: #F6F2E7;
+}
+/* ---- Style C · Atlas (soft, frameless, buildings only up close) ---- */
+.dm--atlas {
+  --m-paper: #F3EFE4; --m-land: #F6F3EA; --m-park: #DCE8CA; --m-yard: #EAE0D0; --m-field: #EEEEDC; --m-sand: #F1EAD3;
+  --m-valley: #E1EBD2; --m-wood: #CADDB5; --m-wood-dot: #CADDB5; --m-wood-edge: transparent; --m-tree: #9DB98A;
+  --m-contour: transparent; --m-contour-op: 1; --m-contour-fill: rgb(170 140 95 / 0.07);
+  --m-builtup: #EAD9C4; --m-bld: #CDB49B; --m-bld-edge: #CDB49B; --m-bld-key: #A98466;
+  --m-water: #9EC5D8; --m-water-edge: #86B4C9;
+  --m-road: #FFFFFF; --m-road-major: #F5E1B6; --m-road-cas: #D6C9B4;
+  --m-path: #A99C88; --m-rail: #7B756A; --m-bridge: #6E6A60; --m-dot: #FFFFFF; --m-dot-edge: #A99C88;
+  --m-frame: transparent; --m-grid: transparent; --m-veg: #9DB98A;
+  --m-label-region: #6B5E50; --m-label-water: #2F6E8C; --m-label-road: #7D705F; --m-halo: #F6F3EA;
+}
+
+/* ---- Layers ---- */
+.dm .m-paper { fill: var(--m-paper); }
+.dm .m-land { fill: var(--m-land); }
+.dm .m-park { fill: var(--m-park); }
+.dm .m-yard { fill: var(--m-yard); }
+.dm .m-field { fill: var(--m-field); }
+.dm .m-sand { fill: var(--m-sand); }
+.dm .m-valley { fill: none; stroke: var(--m-valley); stroke-linecap: round; stroke-linejoin: round; }
+.dm .m-wood { fill: var(--m-wood); }
+.dm .m-wood-dot { fill: var(--m-wood-dot); }
+.dm .m-wood-edge { fill: none; stroke: var(--m-wood-edge); }
+.dm .m-tree { fill: var(--m-tree); }
+.dm .m-crown { fill: rgb(255 255 255 / 0.18); stroke: var(--m-tree); stroke-width: 0.9; }
+.dm .m-contour { fill: none; stroke: var(--m-contour); opacity: var(--m-contour-op); }
+.dm .m-contour.is-closed { fill: var(--m-contour-fill); }
+.dm .m-veg { fill: none; stroke: var(--m-veg); stroke-linecap: round; }
+.dm .m-builtup { fill: none; stroke: var(--m-builtup); stroke-linecap: round; stroke-linejoin: round; }
+.dm .m-bld-mass { fill: var(--m-bld-mass, var(--m-bld)); stroke: var(--m-bld-mass, var(--m-bld)); stroke-linejoin: round; }
+.dm .m-bld-link { fill: none; stroke: var(--m-bld-mass, var(--m-bld)); stroke-linecap: round; }
+.dm .m-bld { fill: var(--m-bld); stroke: var(--m-bld-edge); stroke-linejoin: round; }
+.dm .m-ripple { fill: none; stroke: #FFFFFF; opacity: 0.55; }
+.dm .m-bld-key { fill: var(--m-bld-key); stroke: var(--m-bld-key); }
+.dm .m-water-edge { fill: none; stroke: var(--m-water-edge); stroke-linecap: round; stroke-linejoin: round; }
+.dm .m-water { fill: none; stroke: var(--m-water); stroke-linecap: round; stroke-linejoin: round; }
+.dm .is-canal { stroke-linecap: butt; }
+.dm .m-road-cas { fill: none; stroke: var(--m-road-cas); stroke-linecap: round; stroke-linejoin: round; }
+.dm .m-road { fill: none; stroke: var(--m-road); stroke-linecap: round; stroke-linejoin: round; }
+.dm .m-road--main, .dm .m-road--highway, .dm .m-road--primary { stroke: var(--m-road-major); }
+.dm .m-road--track, .dm .m-road--trackdash, .dm .m-road--lane { stroke: var(--m-path); }
+.dm .m-path { fill: none; stroke: var(--m-path); }
+.dm .m-covered { fill: none; stroke: var(--m-water-edge); opacity: 0.8; }
+.dm .m-bridge { fill: none; stroke: var(--m-bridge); stroke-linecap: butt; }
+.dm .m-rail { fill: none; stroke: var(--m-rail); }
+.dm .m-tie { fill: none; stroke: var(--m-rail); }
+.dm .m-rail-stop { fill: none; stroke: var(--m-rail); stroke-linecap: butt; }
+.dm .m-road-fade { fill: none; stroke: var(--m-road-cas); opacity: 0.75; stroke-linecap: butt; }
+.dm .m-dot { fill: var(--m-dot); stroke: var(--m-dot-edge); }
+.dm .m-grid { fill: none; stroke: var(--m-grid); }
+.dm .m-frame { fill: none; stroke: var(--m-frame); }
+.dm .m-frame-bars { fill: none; stroke: var(--m-frame); stroke-dasharray: none; opacity: 0.85; }
+
+/* Plate: engraved water hatch is drawn by a thinner second pass */
+.dm--plate .m-water { stroke: var(--m-water); }
+.dm--plate .m-wood-area { stroke: none; }
+
+/* ---- LOD ---- */
+.dm[data-z="far"] .lod-mid, .dm[data-z="far"] .lod-near, .dm[data-z="mid"] .lod-near { display: none; }
+.dm[data-bld="tint"] .lod-plan, .dm[data-bld="plan"] .lod-massing { display: none; }
+.dm--atlas[data-z="far"] .L-buildings, .dm--atlas[data-z="mid"] .L-buildings { display: none; }
+.dm--plate[data-z="far"] .L-buildings { opacity: 0.75; }
+
+/* ---- Overlay: labels ---- */
+.dm .lbl { paint-order: stroke; stroke: var(--m-halo); stroke-linejoin: round; pointer-events: none; }
+.dm .lbl--region { font: 600 15px/1 var(--font-display); letter-spacing: 0.32em; fill: var(--m-label-region); stroke-width: 3.5px; text-transform: uppercase; }
+.dm .lbl--water { font: italic 400 14px/1 var(--font-read); letter-spacing: 0.06em; fill: var(--m-label-water); stroke-width: 3px; }
+.dm .lbl--land { font: italic 400 13px/1 var(--font-read); fill: var(--m-label-region); stroke-width: 3px; }
+.dm .lbl--road { font: 500 12px/1 var(--font-display); letter-spacing: 0.14em; fill: var(--m-label-road); stroke-width: 3px; }
+.dm .lbl--place { font: 600 13px/1 var(--font-display); fill: var(--color-ink); stroke-width: 4px; }
+.dm .lbl--place.is-selected { font-size: 14px; }
+.dm--plate .lbl--place { font-family: var(--font-read); font-weight: 600; }
+.dm--atlas .lbl--region { letter-spacing: 0.24em; font-size: 14px; }
+.dm .gref { font: 600 12px/1 var(--font-display); fill: var(--color-ink-2); text-anchor: middle; paint-order: stroke; stroke: var(--m-paper); stroke-width: 3px; }
+
+/* ---- Overlay: far-zoom dots (same size for A/B/C) ---- */
+.dm .mk__dot { stroke-width: 1.6; }
+.dm .mk--a .mk__dot { fill: var(--cat); stroke: #FFFFFF; stroke-width: 1.2; }
+.dm .mk--b .mk__dot { fill: #FFFFFF; stroke: var(--cat); }
+.dm .mk--c .mk__dot { fill: #FFFFFF; stroke: var(--cat); stroke-dasharray: 2.4 1.6; }
+
+/* ---- Overlay: search state ---- */
+.dm .mk.is-dim { opacity: 0.45; }
+.dm .mk.is-dim .mk__disc { fill: #FFFFFF; stroke: var(--cat); stroke-width: 1.4; stroke-dasharray: none; }
+.dm .mk.is-dim .mk__num { fill: var(--cat); }
+.dm .mk.is-dim .mk__halo { display: none; }
+.dm .mk.is-match .mk__ring { stroke: var(--color-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+
+/* ---- Overlay: photo layer ---- */
+.dm .ph-dot { fill: #8A6A3E; stroke: #FFFFFF; stroke-width: 1; }
+.dm .ph-medal__ring { fill: #FFFFFF; stroke: var(--color-ink); stroke-width: 1.2; }
+.dm .ph-count { font: 700 10px var(--font-display); fill: var(--color-ink); paint-order: stroke; stroke: #FFFFFF; stroke-width: 3px; }
+.dm .ph-print { cursor: pointer; }
+.dm .ph-print__card { fill: #FFFEF7; stroke: #C9C0A4; stroke-width: 0.7; }
+.dm .ph-print__shadow { fill: rgb(31 48 41 / 0.22); }
+.dm .ph-leader { fill: none; stroke: #8A7A5C; stroke-width: 0.8; }
+.dm .ph-print__cap { font: italic 8px var(--font-read); fill: #6B5D49; }
+.dm .ph-print.is-hover .ph-print__shadow { fill: rgb(31 48 41 / 0.32); transform: translate(1px, 3px); }

@@ -8,3 +8,4 @@ media/
 staticfiles/
 backups/
 node_modules/
+build/

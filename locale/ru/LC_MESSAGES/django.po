@@ -866,3 +866,14 @@ msgstr ""
 
 msgid "Read the article"
 msgstr "Читать статью"
+
+#: locator.html
+#, python-format
+msgid "Map around %(name)s"
+msgstr "Карта вокруг: %(name)s"
+
+msgid "Off the map"
+msgstr "За пределами карты"
+
+msgid "No point on the map"
+msgstr "Точки на карте нет"

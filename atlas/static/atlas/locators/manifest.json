@@ -1,0 +1,892 @@
+{
+ "digest": "f63391d6a6209a42d1bc634704ecb00fe052c2438096c82ec2093ae22b6686a5",
+ "files": [
+  "1-card-ru.webp",
+  "1-card.webp",
+  "1-panel-ru.webp",
+  "1-panel.webp",
+  "1-tile-ru.webp",
+  "1-tile.webp",
+  "10-card-ru.webp",
+  "10-card.webp",
+  "10-panel-ru.webp",
+  "10-panel.webp",
+  "10-tile-ru.webp",
+  "10-tile.webp",
+  "11-card-ru.webp",
+  "11-card.webp",
+  "11-panel-ru.webp",
+  "11-panel.webp",
+  "11-tile-ru.webp",
+  "11-tile.webp",
+  "12-card-ru.webp",
+  "12-card.webp",
+  "12-example-ru.webp",
+  "12-example.webp",
+  "12-panel-ru.webp",
+  "12-panel.webp",
+  "12-tile-ru.webp",
+  "12-tile.webp",
+  "13-card-ru.webp",
+  "13-card.webp",
+  "13-panel-ru.webp",
+  "13-panel.webp",
+  "13-tile-ru.webp",
+  "13-tile.webp",
+  "14-card-ru.webp",
+  "14-card.webp",
+  "14-panel-ru.webp",
+  "14-panel.webp",
+  "14-tile-ru.webp",
+  "14-tile.webp",
+  "15-card-ru.webp",
+  "15-card.webp",
+  "15-panel-ru.webp",
+  "15-panel.webp",
+  "15-tile-ru.webp",
+  "15-tile.webp",
+  "16-card-ru.webp",
+  "16-card.webp",
+  "16-panel-ru.webp",
+  "16-panel.webp",
+  "16-tile-ru.webp",
+  "16-tile.webp",
+  "17-card-ru.webp",
+  "17-card.webp",
+  "17-panel-ru.webp",
+  "17-panel.webp",
+  "17-tile-ru.webp",
+  "17-tile.webp",
+  "18-card-ru.webp",
+  "18-card.webp",
+  "18-panel-ru.webp",
+  "18-panel.webp",
+  "18-tile-ru.webp",
+  "18-tile.webp",
+  "19-card-ru.webp",
+  "19-card.webp",
+  "19-panel-ru.webp",
+  "19-panel.webp",
+  "19-tile-ru.webp",
+  "19-tile.webp",
+  "2-card-ru.webp",
+  "2-card.webp",
+  "2-panel-ru.webp",
+  "2-panel.webp",
+  "2-tile-ru.webp",
+  "2-tile.webp",
+  "20-card-ru.webp",
+  "20-card.webp",
+  "20-panel-ru.webp",
+  "20-panel.webp",
+  "20-tile-ru.webp",
+  "20-tile.webp",
+  "21-card-ru.webp",
+  "21-card.webp",
+  "21-panel-ru.webp",
+  "21-panel.webp",
+  "21-tile-ru.webp",
+  "21-tile.webp",
+  "22-card-ru.webp",
+  "22-card.webp",
+  "22-panel-ru.webp",
+  "22-panel.webp",
+  "22-tile-ru.webp",
+  "22-tile.webp",
+  "23-card-ru.webp",
+  "23-card.webp",
+  "23-panel-ru.webp",
+  "23-panel.webp",
+  "23-tile-ru.webp",
+  "23-tile.webp",
+  "24-card-ru.webp",
+  "24-card.webp",
+  "24-panel-ru.webp",
+  "24-panel.webp",
+  "24-tile-ru.webp",
+  "24-tile.webp",
+  "25-card-ru.webp",
+  "25-card.webp",
+  "25-panel-ru.webp",
+  "25-panel.webp",
+  "25-tile-ru.webp",
+  "25-tile.webp",
+  "26-card-ru.webp",
+  "26-card.webp",
+  "26-panel-ru.webp",
+  "26-panel.webp",
+  "26-tile-ru.webp",
+  "26-tile.webp",
+  "27-card-ru.webp",
+  "27-card.webp",
+  "27-panel-ru.webp",
+  "27-panel.webp",
+  "27-tile-ru.webp",
+  "27-tile.webp",
+  "28-card-ru.webp",
+  "28-card.webp",
+  "28-panel-ru.webp",
+  "28-panel.webp",
+  "28-tile-ru.webp",
+  "28-tile.webp",
+  "29-card-ru.webp",
+  "29-card.webp",
+  "29-panel-ru.webp",
+  "29-panel.webp",
+  "29-tile-ru.webp",
+  "29-tile.webp",
+  "3-card-ru.webp",
+  "3-card.webp",
+  "3-panel-ru.webp",
+  "3-panel.webp",
+  "3-tile-ru.webp",
+  "3-tile.webp",
+  "30-card-ru.webp",
+  "30-card.webp",
+  "30-panel-ru.webp",
+  "30-panel.webp",
+  "30-tile-ru.webp",
+  "30-tile.webp",
+  "31-card-ru.webp",
+  "31-card.webp",
+  "31-panel-ru.webp",
+  "31-panel.webp",
+  "31-tile-ru.webp",
+  "31-tile.webp",
+  "32-card-ru.webp",
+  "32-card.webp",
+  "32-panel-ru.webp",
+  "32-panel.webp",
+  "32-tile-ru.webp",
+  "32-tile.webp",
+  "33-card-ru.webp",
+  "33-card.webp",
+  "33-panel-ru.webp",
+  "33-panel.webp",
+  "33-tile-ru.webp",
+  "33-tile.webp",
+  "34-card-ru.webp",
+  "34-card.webp",
+  "34-panel-ru.webp",
+  "34-panel.webp",
+  "34-tile-ru.webp",
+  "34-tile.webp",
+  "35-card-ru.webp",
+  "35-card.webp",
+  "35-panel-ru.webp",
+  "35-panel.webp",
+  "35-tile-ru.webp",
+  "35-tile.webp",
+  "36-card-ru.webp",
+  "36-card.webp",
+  "36-panel-ru.webp",
+  "36-panel.webp",
+  "36-tile-ru.webp",
+  "36-tile.webp",
+  "37-card-ru.webp",
+  "37-card.webp",
+  "37-panel-ru.webp",
+  "37-panel.webp",
+  "37-tile-ru.webp",
+  "37-tile.webp",
+  "38-card-ru.webp",
+  "38-card.webp",
+  "38-panel-ru.webp",
+  "38-panel.webp",
+  "38-tile-ru.webp",
+  "38-tile.webp",
+  "39-card-ru.webp",
+  "39-card.webp",
+  "39-panel-ru.webp",
+  "39-panel.webp",
+  "39-tile-ru.webp",
+  "39-tile.webp",
+  "4-card-ru.webp",
+  "4-card.webp",
+  "4-panel-ru.webp",
+  "4-panel.webp",
+  "4-tile-ru.webp",
+  "4-tile.webp",
+  "40-card-ru.webp",
+  "40-card.webp",
+  "40-panel-ru.webp",
+  "40-panel.webp",
+  "40-tile-ru.webp",
+  "40-tile.webp",
+  "41-card-ru.webp",
+  "41-card.webp",
+  "41-panel-ru.webp",
+  "41-panel.webp",
+  "41-tile-ru.webp",
+  "41-tile.webp",
+  "42-card-ru.webp",
+  "42-card.webp",
+  "42-panel-ru.webp",
+  "42-panel.webp",
+  "42-tile-ru.webp",
+  "42-tile.webp",
+  "43-card-ru.webp",
+  "43-card.webp",
+  "43-panel-ru.webp",
+  "43-panel.webp",
+  "43-tile-ru.webp",
+  "43-tile.webp",
+  "44-card-ru.webp",
+  "44-card.webp",
+  "44-panel-ru.webp",
+  "44-panel.webp",
+  "44-tile-ru.webp",
+  "44-tile.webp",
+  "45-card-ru.webp",
+  "45-card.webp",
+  "45-panel-ru.webp",
+  "45-panel.webp",
+  "45-tile-ru.webp",
+  "45-tile.webp",
+  "46-card-ru.webp",
+  "46-card.webp",
+  "46-panel-ru.webp",
+  "46-panel.webp",
+  "46-tile-ru.webp",
+  "46-tile.webp",
+  "47-card-ru.webp",
+  "47-card.webp",
+  "47-panel-ru.webp",
+  "47-panel.webp",
+  "47-tile-ru.webp",
+  "47-tile.webp",
+  "48-card-ru.webp",
+  "48-card.webp",
+  "48-panel-ru.webp",
+  "48-panel.webp",
+  "48-tile-ru.webp",
+  "48-tile.webp",
+  "49-card-ru.webp",
+  "49-card.webp",
+  "49-panel-ru.webp",
+  "49-panel.webp",
+  "49-tile-ru.webp",
+  "49-tile.webp",
+  "5-card-ru.webp",
+  "5-card.webp",
+  "5-panel-ru.webp",
+  "5-panel.webp",
+  "5-tile-ru.webp",
+  "5-tile.webp",
+  "50-card-ru.webp",
+  "50-card.webp",
+  "50-panel-ru.webp",
+  "50-panel.webp",
+  "50-tile-ru.webp",
+  "50-tile.webp",
+  "51-card-ru.webp",
+  "51-card.webp",
+  "51-panel-ru.webp",
+  "51-panel.webp",
+  "51-tile-ru.webp",
+  "51-tile.webp",
+  "52-card-ru.webp",
+  "52-card.webp",
+  "52-panel-ru.webp",
+  "52-panel.webp",
+  "52-tile-ru.webp",
+  "52-tile.webp",
+  "53-card-ru.webp",
+  "53-card.webp",
+  "53-panel-ru.webp",
+  "53-panel.webp",
+  "53-tile-ru.webp",
+  "53-tile.webp",
+  "54-card-ru.webp",
+  "54-card.webp",
+  "54-panel-ru.webp",
+  "54-panel.webp",
+  "54-tile-ru.webp",
+  "54-tile.webp",
+  "55-card-ru.webp",
+  "55-card.webp",
+  "55-panel-ru.webp",
+  "55-panel.webp",
+  "55-tile-ru.webp",
+  "55-tile.webp",
+  "56-card-ru.webp",
+  "56-card.webp",
+  "56-panel-ru.webp",
+  "56-panel.webp",
+  "56-tile-ru.webp",
+  "56-tile.webp",
+  "57-card-ru.webp",
+  "57-card.webp",
+  "57-panel-ru.webp",
+  "57-panel.webp",
+  "57-tile-ru.webp",
+  "57-tile.webp",
+  "58-card-ru.webp",
+  "58-card.webp",
+  "58-panel-ru.webp",
+  "58-panel.webp",
+  "58-tile-ru.webp",
+  "58-tile.webp",
+  "59-card-ru.webp",
+  "59-card.webp",
+  "59-panel-ru.webp",
+  "59-panel.webp",
+  "59-tile-ru.webp",
+  "59-tile.webp",
+  "6-card-ru.webp",
+  "6-card.webp",
+  "6-example-ru.webp",
+  "6-example.webp",
+  "6-panel-ru.webp",
+  "6-panel.webp",
+  "6-tile-ru.webp",
+  "6-tile.webp",
+  "60-card-ru.webp",
+  "60-card.webp",
+  "60-panel-ru.webp",
+  "60-panel.webp",
+  "60-tile-ru.webp",
+  "60-tile.webp",
+  "61-card-ru.webp",
+  "61-card.webp",
+  "61-panel-ru.webp",
+  "61-panel.webp",
+  "61-tile-ru.webp",
+  "61-tile.webp",
+  "62-card-ru.webp",
+  "62-card.webp",
+  "62-panel-ru.webp",
+  "62-panel.webp",
+  "62-tile-ru.webp",
+  "62-tile.webp",
+  "63-card-ru.webp",
+  "63-card.webp",
+  "63-panel-ru.webp",
+  "63-panel.webp",
+  "63-tile-ru.webp",
+  "63-tile.webp",
+  "64-card-ru.webp",
+  "64-card.webp",
+  "64-panel-ru.webp",
+  "64-panel.webp",
+  "64-tile-ru.webp",
+  "64-tile.webp",
+  "65-card-ru.webp",
+  "65-card.webp",
+  "65-panel-ru.webp",
+  "65-panel.webp",
+  "65-tile-ru.webp",
+  "65-tile.webp",
+  "66-card-ru.webp",
+  "66-card.webp",
+  "66-panel-ru.webp",
+  "66-panel.webp",
+  "66-tile-ru.webp",
+  "66-tile.webp",
+  "67-card-ru.webp",
+  "67-card.webp",
+  "67-panel-ru.webp",
+  "67-panel.webp",
+  "67-tile-ru.webp",
+  "67-tile.webp",
+  "68-card-ru.webp",
+  "68-card.webp",
+  "68-panel-ru.webp",
+  "68-panel.webp",
+  "68-tile-ru.webp",
+  "68-tile.webp",
+  "69-card-ru.webp",
+  "69-card.webp",
+  "69-panel-ru.webp",
+  "69-panel.webp",
+  "69-tile-ru.webp",
+  "69-tile.webp",
+  "7-card-ru.webp",
+  "7-card.webp",
+  "7-panel-ru.webp",
+  "7-panel.webp",
+  "7-tile-ru.webp",
+  "7-tile.webp",
+  "70-card-ru.webp",
+  "70-card.webp",
+  "70-panel-ru.webp",
+  "70-panel.webp",
+  "70-tile-ru.webp",
+  "70-tile.webp",
+  "71-card-ru.webp",
+  "71-card.webp",
+  "71-panel-ru.webp",
+  "71-panel.webp",
+  "71-tile-ru.webp",
+  "71-tile.webp",
+  "72-card-ru.webp",
+  "72-card.webp",
+  "72-panel-ru.webp",
+  "72-panel.webp",
+  "72-tile-ru.webp",
+  "72-tile.webp",
+  "73-card-ru.webp",
+  "73-card.webp",
+  "73-panel-ru.webp",
+  "73-panel.webp",
+  "73-tile-ru.webp",
+  "73-tile.webp",
+  "74-card-ru.webp",
+  "74-card.webp",
+  "74-panel-ru.webp",
+  "74-panel.webp",
+  "74-tile-ru.webp",
+  "74-tile.webp",
+  "75-card-ru.webp",
+  "75-card.webp",
+  "75-panel-ru.webp",
+  "75-panel.webp",
+  "75-tile-ru.webp",
+  "75-tile.webp",
+  "76-card-ru.webp",
+  "76-card.webp",
+  "76-panel-ru.webp",
+  "76-panel.webp",
+  "76-tile-ru.webp",
+  "76-tile.webp",
+  "77-card-ru.webp",
+  "77-card.webp",
+  "77-panel-ru.webp",
+  "77-panel.webp",
+  "77-tile-ru.webp",
+  "77-tile.webp",
+  "78-card-ru.webp",
+  "78-card.webp",
+  "78-panel-ru.webp",
+  "78-panel.webp",
+  "78-tile-ru.webp",
+  "78-tile.webp",
+  "79-card-ru.webp",
+  "79-card.webp",
+  "79-panel-ru.webp",
+  "79-panel.webp",
+  "79-tile-ru.webp",
+  "79-tile.webp",
+  "8-card-ru.webp",
+  "8-card.webp",
+  "8-example-ru.webp",
+  "8-example.webp",
+  "8-panel-ru.webp",
+  "8-panel.webp",
+  "8-tile-ru.webp",
+  "8-tile.webp",
+  "80-card-ru.webp",
+  "80-card.webp",
+  "80-panel-ru.webp",
+  "80-panel.webp",
+  "80-tile-ru.webp",
+  "80-tile.webp",
+  "81-card-ru.webp",
+  "81-card.webp",
+  "81-panel-ru.webp",
+  "81-panel.webp",
+  "81-tile-ru.webp",
+  "81-tile.webp",
+  "82-card-ru.webp",
+  "82-card.webp",
+  "82-panel-ru.webp",
+  "82-panel.webp",
+  "82-tile-ru.webp",
+  "82-tile.webp",
+  "83-card-ru.webp",
+  "83-card.webp",
+  "83-panel-ru.webp",
+  "83-panel.webp",
+  "83-tile-ru.webp",
+  "83-tile.webp",
+  "84-card-ru.webp",
+  "84-card.webp",
+  "84-panel-ru.webp",
+  "84-panel.webp",
+  "84-tile-ru.webp",
+  "84-tile.webp",
+  "9-card-ru.webp",
+  "9-card.webp",
+  "9-panel-ru.webp",
+  "9-panel.webp",
+  "9-tile-ru.webp",
+  "9-tile.webp",
+  "mapcard-ru.webp",
+  "mapcard.webp",
+  "town-ru.webp",
+  "town.webp"
+ ],
+ "places": {
+  "1": [
+   -1180,
+   1210
+  ],
+  "10": [
+   -670,
+   1330
+  ],
+  "11": [
+   -35,
+   160
+  ],
+  "12": [
+   -1510,
+   540
+  ],
+  "13": [
+   -1380,
+   470
+  ],
+  "14": [
+   -1720,
+   850
+  ],
+  "15": [
+   145,
+   -135
+  ],
+  "16": [
+   235,
+   -195
+  ],
+  "17": [
+   130,
+   80
+  ],
+  "18": [
+   380,
+   -370
+  ],
+  "19": [
+   292,
+   -294
+  ],
+  "2": [
+   -840,
+   760
+  ],
+  "20": [
+   810,
+   -425
+  ],
+  "21": [
+   -1250,
+   -680
+  ],
+  "22": [
+   -970,
+   -380
+  ],
+  "23": [
+   1470,
+   -785
+  ],
+  "24": [
+   1115,
+   -1200
+  ],
+  "25": [
+   1245,
+   -1120
+  ],
+  "26": [
+   1370,
+   -990
+  ],
+  "27": [
+   1850,
+   -1640
+  ],
+  "28": [
+   2020,
+   -1495
+  ],
+  "29": [
+   1935,
+   -1560
+  ],
+  "3": [
+   -735,
+   680
+  ],
+  "30": [
+   2480,
+   -1890
+  ],
+  "31": [
+   -380,
+   210
+  ],
+  "32": [
+   -670,
+   580
+  ],
+  "33": [
+   -2220,
+   1030
+  ],
+  "34": [
+   -2180,
+   1190
+  ],
+  "35": [
+   -2060,
+   1310
+  ],
+  "36": [
+   -1960,
+   1760
+  ],
+  "37": [
+   3030,
+   -2210
+  ],
+  "38": [
+   -5130,
+   2230
+  ],
+  "39": [
+   -4840,
+   2700
+  ],
+  "4": [
+   -550,
+   550
+  ],
+  "40": [
+   -5350,
+   1930
+  ],
+  "41": [
+   -3240,
+   1940
+  ],
+  "42": [
+   -3300,
+   1840
+  ],
+  "43": [
+   -3240,
+   1510
+  ],
+  "44": [
+   -3435,
+   1490
+  ],
+  "45": [
+   -3130,
+   1830
+  ],
+  "46": [
+   -3345,
+   1765
+  ],
+  "47": [
+   -3170,
+   1260
+  ],
+  "48": [
+   -4110,
+   1610
+  ],
+  "49": [
+   -4030,
+   1910
+  ],
+  "5": [
+   -365,
+   615
+  ],
+  "50": [
+   -4860,
+   2320
+  ],
+  "51": [
+   -2660,
+   760
+  ],
+  "52": [
+   -3190,
+   1160
+  ],
+  "53": [
+   -180,
+   -40
+  ],
+  "54": [
+   1090,
+   -975
+  ],
+  "55": [
+   32,
+   -25
+  ],
+  "56": [
+   -60,
+   -205
+  ],
+  "57": [
+   -210,
+   -140
+  ],
+  "58": [
+   -90,
+   -68
+  ],
+  "59": [
+   500,
+   -980
+  ],
+  "6": [
+   -70,
+   410
+  ],
+  "60": [
+   940,
+   -730
+  ],
+  "61": [
+   -850,
+   630
+  ],
+  "62": [
+   -3710,
+   2390
+  ],
+  "63": [
+   -3240,
+   3190
+  ],
+  "64": [
+   1830,
+   485
+  ],
+  "65": [
+   -1180,
+   875
+  ],
+  "66": [
+   -4480,
+   3540
+  ],
+  "67": [
+   -4080,
+   3580
+  ],
+  "68": [
+   350,
+   330
+  ],
+  "69": [
+   -145,
+   545
+  ],
+  "7": [
+   720,
+   680
+  ],
+  "70": [
+   -3530,
+   3320
+  ],
+  "71": [
+   -3950,
+   3120
+  ],
+  "72": [
+   80,
+   -285
+  ],
+  "73": [
+   370,
+   -1360
+  ],
+  "74": [
+   1880,
+   820
+  ],
+  "75": [
+   -2870,
+   -1510
+  ],
+  "76": [
+   -2910,
+   -960
+  ],
+  "77": [
+   -3450,
+   -1510
+  ],
+  "78": [
+   -1550,
+   1060
+  ],
+  "79": [
+   -4180,
+   1790
+  ],
+  "8": [
+   -1190,
+   1540
+  ],
+  "80": [
+   -4190,
+   1440
+  ],
+  "81": [
+   -5520,
+   3710
+  ],
+  "82": [
+   -4930,
+   610
+  ],
+  "83": [
+   -5380,
+   2135
+  ],
+  "84": [
+   650,
+   -600
+  ],
+  "9": [
+   -885,
+   1460
+  ]
+ },
+ "presets": {
+  "card": [
+   270,
+   120
+  ],
+  "example": [
+   220,
+   110
+  ],
+  "mapcard": [
+   400,
+   140
+  ],
+  "panel": [
+   380,
+   270
+  ],
+  "tile": [
+   480,
+   360
+  ],
+  "town": [
+   224,
+   160
+  ]
+ },
+ "revision": 11,
+ "town": {
+  "cx": -1245.0,
+  "cy": 750.0,
+  "h": 320,
+  "k": 0.0483,
+  "w": 448
+ },
+ "version": "1"
+}
