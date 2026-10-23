@@ -171,3 +171,43 @@ def novel_references(references, russian=None):
             if label not in labels:
                 labels.append(label)
     return labels
+
+
+def chapter_short(key, russian=None):
+    """«Ch. 4» / «Гл. 4» для мета-строк; у интерлюдии — «Interlude» / «Интерлюдия»."""
+    if isinstance(key, int):
+        return ('Гл. ' if _is_ru(russian) else 'Ch. ') + str(key)
+    return 'Интерлюдия' if _is_ru(russian) else 'Interlude'
+
+
+def novel_reference_rows(references, russian=None):
+    """Строки «In the novel» на странице места: {ch, title, part} без повторов,
+    в порядке записей. Число глав — len({row['key']})."""
+    rows, seen = [], set()
+    for reference in references:
+        for key, section in parse_reference(reference):
+            if (key, section) in seen:
+                continue
+            seen.add((key, section))
+            rows.append({'key': key, 'ch': chapter_short(key, russian),
+                         'title': chapter_title(key, russian), 'part': section})
+    return rows
+
+
+def _join(items, conjunction):
+    return items[0] if len(items) == 1 else ', '.join(items[:-1]) + conjunction + items[-1]
+
+
+def same_chapters_heading(keys, russian=None):
+    """Заголовок ряда «из тех же глав»: «Also in Ch. 4 and Ch. 11» / «Ещё в гл. 4 и 11».
+    Главы по возрастанию, интерлюдии — названием после глав."""
+    chapters = sorted(k for k in set(keys) if isinstance(k, int))
+    interludes = [k for k in INTERLUDE_TITLES if k in set(keys)]
+    if _is_ru(russian):
+        numbers = [str(n) for n in chapters]
+        # «гл. 4 и 11», но «гл. 4, 11 и <интерлюдия>»: «и» одно на всю строку.
+        items = ['гл. ' + (', '.join(numbers) if interludes else _join(numbers, ' и '))] if chapters else []
+        items += [chapter_title(k, True) for k in interludes]
+        return 'Ещё в ' + _join(items, ' и ') if items else ''
+    items = [f'Ch. {n}' for n in chapters] + [chapter_title(k, False) for k in interludes]
+    return 'Also in ' + _join(items, ' and ') if items else ''

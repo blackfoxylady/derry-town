@@ -159,7 +159,7 @@ class CoverPageTests(CoverData, TestCase):
         self.assertContains(response, 'alt="School front, 1958."')
         self.assertContains(response, '/media/covers/medium/')
         self.assertContains(response, '/media/covers/large/')
-        self.assertNotContains(response, 'cover-years')
+        self.assertNotContains(response, 'role="tablist"')
         # Превью для соцсетей — заглавное фото.
         self.assertContains(response, 'og:image')
         self.assertContains(response, '/media/covers/large/', status_code=200)
@@ -169,12 +169,22 @@ class CoverPageTests(CoverData, TestCase):
         covers.add(self.image('a.png', color=(200, 160, 90)), feature='4', year=1958, alt='School, 1958.')
         response = self.client.get('/places/4-derry-elementary-school/')
         content = response.content.decode()
-        self.assertIn('cover-years', content)
-        self.assertIn('aria-pressed="true">1958<', content)
-        self.assertIn('aria-pressed="false">1985<', content)
-        # 1958 показан по умолчанию (первый в стопке), 1985 грузится лениво.
-        self.assertLess(content.index('data-year="1958"'), content.index('data-year="1985"'))
-        self.assertIn('loading="lazy"', content)
+        # Переключатель — tablist, 1958 выбран по умолчанию, ←/→ — в place.js.
+        self.assertIn('role="tablist" aria-label="Cover year"', content)
+        self.assertIn('id="cover-tab-1958" aria-controls="cover-1958" aria-selected="true">1958<', content)
+        self.assertIn('id="cover-tab-1985" aria-controls="cover-1985" aria-selected="false" tabindex="-1">1985<',
+                      content)
+        self.assertLess(content.index('id="cover-1958"'), content.index('id="cover-1985"'))
+        self.assertIn('class="place-cover__panel is-on" id="cover-1958" role="tabpanel"', content)
+        self.assertIn('id="cover-1985" role="tabpanel" aria-labelledby="cover-tab-1985" aria-hidden="true"',
+                      content)
+        self.assertIn('loading="lazy"', content)  # 1985 грузится лениво
+
+    def test_default_cover_is_the_earliest_year_without_1958(self):
+        covers.add(self.image('b.png', color=(60, 60, 90)), feature='4', year=1985, alt='School, 1985.')
+        covers.add(self.image('a.png', color=(200, 160, 90)), feature='4', year=1984, alt='School, 1984.')
+        content = self.client.get('/places/4-derry-elementary-school/').content.decode()
+        self.assertIn('class="place-cover__panel is-on" id="cover-1984"', content)
 
     def test_alt_is_localized_with_fallback(self):
         covers.add(self.image('a.png'), feature='4', year=1958,
@@ -183,7 +193,7 @@ class CoverPageTests(CoverData, TestCase):
         response = self.client.get('/ru/places/4-derry-elementary-school/')
         self.assertContains(response, 'alt="Фасад школы."')
         self.assertContains(response, 'alt="School later."')  # пустой перевод откатывается
-        self.assertContains(response, 'aria-label="Год"')
+        self.assertContains(response, 'aria-label="Год обложки"')
 
     def test_cover_not_duplicated_in_photo_sections(self):
         covers.add(self.image(), feature='4', year=1958, alt='School front.')

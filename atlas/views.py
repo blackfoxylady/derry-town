@@ -22,8 +22,10 @@ from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
 from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
 from .locators import EXAMPLES as LOCATOR_EXAMPLES
 from .rendering import current_payload, RENDER_VERSION
-from .terms import (chapter_label, confidence_label, confidence_levels, kind_label,
-                    novel_references, parse_reference, period_label)
+from .terms import (CONFIDENCE_EXPLANATIONS, CONFIDENCE_LABELS,
+                    chapter_short, confidence_label, confidence_levels, kind_label,
+                    novel_reference_rows, novel_references, parse_reference, period_label,
+                    same_chapters_heading)
 
 
 HUB_LASTMOD = date(2026, 9, 29)
@@ -565,13 +567,6 @@ def _place_number(feature):
     return f'{int(feature.key):02d}' if feature.key.isdigit() else feature.key.upper()
 
 
-def _kind_label(feature):
-    """Короткая форма категории — для мета-строк."""
-    if feature.object_type == 'unplaced':
-        return _('Unlocated')
-    return kind_label(feature.kind, short=True)
-
-
 def _chapter_keys(reference):
     """Главы одной ссылки Evidence без раздела (§), чтобы места связывались
     по главе. Позиции в тексте вида ``[1771]`` главами не считаются."""
@@ -582,14 +577,19 @@ def _reference_key(reference):
     return ' '.join(reference.split()).casefold()
 
 
-def _related_place_card(feature, chapter=''):
+def _related_place_card(feature, chapter=None):
+    """Карточка связанного места: кадр локатора, номер, имя, «Категория · Гл. N»."""
     return {
         'feature': feature,
         'name': feature_name(feature),
         'number': _place_number(feature),
         'url': reverse('place', args=[place_slug(feature)]),
-        'kind': _kind_label(feature),
-        'chapter': chapter,
+        # У мест без точки категории нет: вместо неё — уровень «No location».
+        'kind': kind_label(feature.kind, short=True) if feature.kind else CONFIDENCE_LABELS['U'],
+        'kind_class': feature.kind.lower() if feature.kind else '',
+        'letter': feature.confidence or 'U',
+        'chapter_key': chapter,
+        'chapter': chapter_short(chapter) if chapter is not None else '',
     }
 
 
@@ -628,7 +628,7 @@ def _related_places(feature, current_evidence, limit=4):
     for evidence in current_evidence:
         keys = _chapter_keys(evidence.reference)
         for key in keys:
-            current_chapters.setdefault(key, chapter_label(key))
+            current_chapters.setdefault(key, key)
         if keys:
             reference_chapters[_reference_key(evidence.reference)] = keys[0]
 
@@ -661,7 +661,8 @@ def _related_places(feature, current_evidence, limit=4):
     for card in nearby:
         entry = semantic.get(card['feature'].key)
         if entry:
-            card['chapter'] = primary_chapter(entry)
+            card['chapter_key'] = primary_chapter(entry)
+            card['chapter'] = chapter_short(card['chapter_key'])
 
     candidates = [entry for key, entry in semantic.items() if key not in nearby_keys]
     candidates.sort(key=lambda entry: (
@@ -1067,6 +1068,10 @@ def place_slug(feature):
 LEGACY_PLACE_KEYS = {'u5': '84'}
 
 
+PLACE_PHOTOS_DESKTOP = 6
+PLACE_PHOTOS_PHONE = 4
+
+
 @require_safe
 def place_page(request, slug):
     key = slug.split('-', 1)[0]
@@ -1077,9 +1082,15 @@ def place_page(request, slug):
         return redirect(reverse('place', args=[canonical]), permanent=True)
     # «In the novel»: главы и интерлюдии подписями из таблицы глав, как в карточке на карте.
     evidence = list(Evidence.objects.filter(feature=feature).order_by('order', 'key'))
-    refs = novel_references([e.reference for e in evidence])
-    photos = Photo.objects.filter(feature_key=feature.key)
-    covers = [_cover_context(c) for c in PlaceCover.objects.filter(feature_key=feature.key)]
+    refs = novel_reference_rows([e.reference for e in evidence])
+    photos = Photo.objects.filter(feature_key=feature.key).order_by('order', 'id')
+    # Обложки по годам; по умолчанию 1958, иначе самый ранний год (D12).
+    covers = sorted((_cover_context(c) for c in PlaceCover.objects.filter(feature_key=feature.key)),
+                    key=lambda c: c['year'])
+    default_year = 1958 if any(c['year'] == 1958 for c in covers) else (
+        covers[0]['year'] if covers else None)
+    for cover in covers:
+        cover['selected'] = cover['year'] == default_year
     latest_photo = photos.order_by('-modified').values_list('modified', flat=True).first()
     latest_cover = (PlaceCover.objects.filter(feature_key=feature.key)
                     .order_by('-modified').values_list('modified', flat=True).first())
@@ -1095,27 +1106,51 @@ def place_page(request, slug):
         'in this literary atlas of Stephen King’s IT.') % {'name': display_name}
     cards = [{'photo': p, **_card_image(p), 'caption': _caption(p),
               'alt': _photo_alt(p, feature)} for p in photos]
-    if covers:
-        og_width, og_height = _fitted_dimensions(covers[0]['width'], covers[0]['height'],
+    photo_total = len(cards)
+    # До 6 фото на десктопе (при 7+ — пять и плитка «+N»), до 4 на телефоне (при 5+ — три и плитка).
+    shown = cards[:PLACE_PHOTOS_DESKTOP if photo_total <= PLACE_PHOTOS_DESKTOP
+                  else PLACE_PHOTOS_DESKTOP - 1]
+    phone_limit = (PLACE_PHOTOS_PHONE if photo_total <= PLACE_PHOTOS_PHONE
+                   else PLACE_PHOTOS_PHONE - 1)
+    for index, card in enumerate(shown):
+        card['phone_hidden'] = index >= phone_limit
+    cover_og = next((c for c in covers if c['selected']), None)
+    if cover_og:
+        og_width, og_height = _fitted_dimensions(cover_og['width'], cover_og['height'],
                                                  COVER_LARGE_SIZE)
     elif cards:
         og_width, og_height = _fitted_dimensions(cards[0]['photo'].width, cards[0]['photo'].height,
                                                  MEDIUM_SIZE)
     else:
         og_width = og_height = None
+    letter = feature.confidence or 'U'
     context = {
+        'letter': letter,
         'feature': feature, 'feature_name': display_name, 'note': _feature_note(feature),
         'page_title': page_title, 'meta_description': meta_description,
         'confidence': confidence_label(feature.confidence) if feature.confidence else '',
-        'refs': refs, 'period': period_label(feature.period),
+        'confidence_label': CONFIDENCE_LABELS[letter],
+        'confidence_line': CONFIDENCE_EXPLANATIONS[letter],
+        'kind_class': feature.kind.lower() if feature.kind else '',
+        'kind_short': kind_label(feature.kind, short=True) if feature.kind else '',
+        'kind_full': kind_label(feature.kind) if feature.kind else '',
+        'refs': refs, 'chapter_count': len({row['key'] for row in refs}),
+        'period': period_label(feature.period),
         'place_about': place_content['about'],
         'confidence_explanation': place_content['confidence_explanation'],
         'nearby_places': nearby_places,
         'same_chapter_places': same_chapter_places,
-        'covers': covers, 'cards': cards,
+        'same_chapter_heading': same_chapters_heading(
+            [card['chapter_key'] for card in same_chapter_places]),
+        'covers': covers, 'cards': shown, 'photo_total': photo_total,
+        'more_desktop': photo_total - len(shown) if photo_total > PLACE_PHOTOS_DESKTOP else 0,
+        'more_phone': photo_total - phone_limit if photo_total > PLACE_PHOTOS_PHONE else 0,
+        # Кнопка U ведёт на список мест без точки. До фильтра карты (П20) — указатель.
+        'unlocated_count': Feature.objects.filter(object_type='unplaced').count(),
+        'unlocated_url': reverse('places') + '?sure=u',
         # Превью для соцсетей: заглавное фото, иначе первое фото места;
         # совсем без фото шаблон подставит общую карту.
-        'og_photo': covers[0]['large'] if covers else _media_urls(photos[0])['medium'] if photos else '',
+        'og_photo': cover_og['large'] if cover_og else _media_urls(photos[0])['medium'] if photos else '',
         'og_image_width': og_width, 'og_image_height': og_height,
         'published_time': _feature_published(feature.key, scene_modified),
         'modified_time': modified_time,

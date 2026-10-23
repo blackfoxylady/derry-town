@@ -42,13 +42,14 @@ class RuContentTests(TestCase):
         self.assertContains(response, 'Каменное здание.')
         self.assertNotContains(response, 'Бен читает здесь.')  # заметки evidence не выводятся
         self.assertContains(response, 'Публичная библиотека Дерри')
-        self.assertContains(response, '<li>Гл. 4 · Бен Хэнском падает · §1</li>')  # главы — на RU
-        self.assertContains(response, '<p class="period">1958</p>')
+        self.assertContains(response, '<span class="refs__ch">Гл. 4<span class="visually-hidden"> · </span></span>'
+                                      '<span>Бен Хэнском падает</span>')  # главы — на RU
+        self.assertContains(response, '<span class="place-when">1958</span>')
         self.assertContains(response, 'Библиотека — городской ориентир.')
         # Для отсутствующего русского поля действует поэлементный fallback на английский.
         self.assertContains(response, 'Its street relationship is inferred.')
-        self.assertContains(response, 'О месте: Публичная библиотека Дерри')
-        self.assertContains(response, 'Почему месту присвоен уровень B')
+        self.assertContains(response, '>Об этом месте</h2>')
+        self.assertContains(response, 'Почему точка отмечена B')
         response = self.client.get('/places/12-derry-public-library/')
         self.assertContains(response, 'A stone building.')
         self.assertContains(response, 'The library is a civic landmark.')
@@ -56,7 +57,7 @@ class RuContentTests(TestCase):
 
     def test_place_names_are_localized_without_changing_canonical_urls(self):
         russian = self.client.get('/ru/places/12-derry-public-library/')
-        self.assertContains(russian, '<h1>Публичная библиотека Дерри</h1>')
+        self.assertContains(russian, '<span class="visually-hidden">Место 12: </span>Публичная библиотека Дерри</h1>')
         self.assertContains(russian, 'Узнайте о месте «Публичная библиотека Дерри»')
         self.assertContains(
             russian,
@@ -70,7 +71,7 @@ class RuContentTests(TestCase):
             'data-search="12 Derry Public Library Library Публичная библиотека Дерри')
 
         english = self.client.get('/places/12-derry-public-library/')
-        self.assertContains(english, '<h1>Derry Public Library</h1>')
+        self.assertContains(english, '<span class="visually-hidden">Place 12: </span>Derry Public Library</h1>')
         self.assertNotContains(english, 'Публичная библиотека Дерри')
 
         russian_home = self.client.get('/ru/')
@@ -274,9 +275,9 @@ class AtlasEditRuTests(TestCase):
         self.assertIn('точный земельный участок',
                       school.metadata['ru']['confidence_explanation'])
         school_page = self.client.get('/ru/places/4-derry-elementary-school/')
-        self.assertContains(school_page, 'О месте: Начальная школа Дерри')
+        self.assertContains(school_page, '<h2 id="about" class="t-h2">Об этом месте</h2>')
         self.assertContains(school_page, 'общественный ориентир')
-        self.assertContains(school_page, 'Почему месту присвоен уровень A')
+        self.assertContains(school_page, 'Почему точка отмечена A')
         self.assertContains(self.client.get('/ru/method/'), 'водонапорную башню')
         self.assertContains(self.client.get('/method/'), 'Standpipe')  # английская без изменений
 

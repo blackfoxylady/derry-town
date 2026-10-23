@@ -1,83 +1,97 @@
 {% extends 'atlas/gallery_base.html' %}
-{% load i18n atlas_tags %}
+{% load i18n static atlas_tags %}
 {% block og_type %}article{% endblock %}
 {% block og_image %}{% if og_photo %}<meta property="og:image" content="{% absolute_url og_photo %}"><meta property="og:image:width" content="{{ og_image_width }}"><meta property="og:image:height" content="{{ og_image_height }}"><meta property="og:image:alt" content="{{ feature_name }}">{% else %}{{ block.super }}{% endif %}{% endblock %}
 {% block article_meta %}{% if published_time %}<meta property="article:published_time" content="{{ published_time|date:'c' }}">{% endif %}{% if modified_time %}<meta property="article:modified_time" content="{{ modified_time|date:'c' }}">{% endif %}{% endblock %}
+{% block main_class %}page page--place{% endblock %}
 {% block content %}
-<article class="place">
+<article class="place-page">
+<div class="place-page__layout">
+<div class="place-page__intro">
+<div class="place-page__head">
 {% include 'atlas/breadcrumbs.html' with section='places' current=feature_name only %}
-<div class="eyebrow">{% if feature.object_type == 'site' %}{% blocktranslate with number=feature.key %}Place {{ number }}{% endblocktranslate %}{% else %}{% trans "Unlocated place" %}{% endif %}</div>
-<h1>{{ feature_name }}</h1>
-{% if period %}<p class="period">{{ period }}</p>{% endif %}
-{% if covers %}
-<div class="place-cover">
-{% for c in covers %}<img{% if forloop.first %} class="on"{% endif %} data-year="{{ c.year }}" src="{{ c.src }}" srcset="{{ c.srcset }}" sizes="(max-width:600px) 100vw, 640px" alt="{{ c.alt }}" width="{{ c.width }}" height="{{ c.height }}"{% if not forloop.first %} loading="lazy"{% endif %} decoding="async">{% endfor %}
-{% if covers|length > 1 %}<div class="cover-years" role="group" aria-label="{% trans 'Year' %}">
-{% for c in covers %}<button type="button" data-year="{{ c.year }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">{{ c.year }}</button>{% endfor %}
+<div class="place-meta">
+<span class="num num--{{ letter|lower }}{% if kind_class %} num--{{ kind_class }}{% endif %}" aria-hidden="true">{{ feature.key }}</span>
+{% if kind_short %}<span class="eyebrow eyebrow--cat{% if kind_class %} cat--{{ kind_class }}{% endif %}">{{ kind_short }}</span>
+<span class="place-meta__sep" aria-hidden="true">·</span>{% endif %}
+<span class="place-meta__tipwrap"><button type="button" class="place-meta__conf" aria-expanded="false" aria-controls="conf-tip" data-toggletip>{% include 'atlas/place_glyph.html' %}<span class="eyebrow">{{ confidence_label }}</span><span class="place-meta__info">{% include 'atlas/icons/info.svg' %}</span></button>
+<span class="key__tip place-meta__tip" id="conf-tip" role="status" hidden><b>{{ confidence_label }} · {{ letter }}</b> — {{ confidence_line }} <a href="{% url 'method' %}#how-sure">{% trans "How pins work →" %}</a></span></span>
+</div>
+<h1 class="t-h1 place-page__title"><span class="visually-hidden">{% blocktranslate with number=feature.key %}Place {{ number }}:{% endblocktranslate %} </span>{{ feature_name }}</h1>
+{% if period %}<span class="place-when">{{ period }}</span>{% endif %}
+{% if note %}<p class="t-lead place-page__lead">{{ note }}</p>{% endif %}
+</div>
+
+{% if covers %}<figure class="place-cover">
+{% for c in covers %}<div class="place-cover__panel{% if c.selected %} is-on{% endif %}" id="cover-{{ c.year }}"{% if covers|length > 1 %} role="tabpanel" aria-labelledby="cover-tab-{{ c.year }}"{% if not c.selected %} aria-hidden="true"{% endif %}{% endif %}><img src="{{ c.src }}" srcset="{{ c.srcset }}" sizes="(max-width: 63.99em) calc(100vw - 32px), 800px" alt="{{ c.alt }}" width="{{ c.width }}" height="{{ c.height }}"{% if not c.selected %} loading="lazy"{% endif %} decoding="async"></div>{% endfor %}
+{% if covers|length > 1 %}<div class="segmented place-cover__years" role="tablist" aria-label="{% trans 'Cover year' %}">
+{% for c in covers %}<button type="button" role="tab" id="cover-tab-{{ c.year }}" aria-controls="cover-{{ c.year }}" aria-selected="{% if c.selected %}true{% else %}false{% endif %}"{% if not c.selected %} tabindex="-1"{% endif %}>{{ c.year }}</button>{% endfor %}
 </div>{% endif %}
+</figure>{% endif %}
 </div>
-{% if covers|length > 1 %}<script>
-(function(){
-var box=document.querySelector('.place-cover'),imgs=box.querySelectorAll('img'),buttons=box.querySelectorAll('.cover-years button');
-buttons.forEach(function(b){b.addEventListener('click',function(){
-buttons.forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});
-imgs.forEach(function(im){im.classList.toggle('on',im.dataset.year===b.dataset.year);});
-});});
-})();
-</script>{% endif %}
-{% endif %}
-{% if confidence %}<p><span class="badge">{{ confidence }}</span></p>{% endif %}
-{% if note %}<p class="note">{{ note }}</p>{% endif %}
-<p class="place-links"><a href="{{ map_url }}">{% trans "Show on the map" %}</a>{% if cards %} · <a href="{{ gallery_url }}">{% trans "All photographs of this place" %}</a>{% endif %}</p>
-{% if cards %}
-<h2>{% trans "Photographs" %}</h2>
-<ul class="grid">
-{% for c in cards %}<li class="card">
-<a class="pic" href="{% url 'photo' c.photo.id %}"><img src="{{ c.thumb }}" srcset="{{ c.srcset }}" sizes="(max-width:525px) calc(100vw - 30px), (max-width:799px) calc(50vw - 23px), (max-width:1057px) calc(33.333vw - 26.667px), 239px" alt="{{ c.alt }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy" decoding="async"></a>
-<p class="caption"><a href="{% url 'photo' c.photo.id %}">{{ c.caption|default:c.photo.original_name }}</a></p>
-{% if c.photo.year %}<p class="meta">{{ c.photo.year }}</p>{% endif %}
-</li>{% endfor %}
-</ul>
-{% endif %}
-{% if refs %}
-<h2>{% trans "Sources & evidence" %}</h2>
-<ul class="refs">
-{% for r in refs %}<li>{{ r }}</li>{% endfor %}
-</ul>
-{% endif %}
-{% if place_about or confidence_explanation %}
-{% get_current_language as LANGUAGE_CODE %}
-<section class="place-content">
-{% if place_about %}
-<h2>{% if LANGUAGE_CODE == 'ru' %}О месте: {{ feature_name }}{% else %}About {{ feature_name }}{% endif %}</h2>
-<p>{{ place_about }}</p>
-{% endif %}
-{% if confidence_explanation %}
-<h2>{% if LANGUAGE_CODE == 'ru' %}Почему месту присвоен уровень {{ feature.confidence }}{% else %}Why this location is marked {{ feature.confidence }}{% endif %}</h2>
-<p>{{ confidence_explanation }}</p>
-{% endif %}
-</section>
-{% endif %}
-{% if nearby_places or same_chapter_places %}
-<aside class="related-places" aria-labelledby="related-places-title">
-<h2 id="related-places-title">{% trans "Explore related places" %}</h2>
-<div class="related-panels">
-{% if nearby_places %}<section class="related-panel">
-<h3>{% trans "Nearby on the map" %}</h3>
-<ul>{% for related in nearby_places %}<li>
-<span class="related-number">{{ related.number }}</span><span class="related-copy"><a href="{{ related.url }}">{{ related.name }}</a><small>{{ related.kind }}{% if related.chapter %} · {{ related.chapter }}{% endif %}</small></span>
-</li>{% endfor %}</ul>
-<a class="related-map-link" href="{{ map_url }}">{% trans "View this area on the map" %} →</a>
-</section>{% endif %}
-{% if same_chapter_places %}<section class="related-panel">
-<h3>{% trans "Also referenced in the same chapters" %}</h3>
-<ul>{% for related in same_chapter_places %}<li>
-<span class="related-number">{{ related.number }}</span><span class="related-copy"><a href="{{ related.url }}">{{ related.name }}</a><small>{{ related.chapter }}</small></span>
-</li>{% endfor %}</ul>
-</section>{% endif %}
+
+<aside class="fact-panel" aria-label="{% trans 'Place facts' %}">
+{% if feature.object_type == 'site' %}<div class="fact-panel__map">
+{% include 'atlas/locator.html' with preset='panel' key=feature.key name=feature_name eager=True %}
+<a class="btn btn--quiet btn--compact fact-panel__open" href="{{ map_url }}">{% trans "Open in the map ↗" %}</a>
+{% include 'atlas/locator_town.html' with key=feature.key %}
+</div>{% else %}<div class="fact-panel__map fact-panel__map--none">{% include 'atlas/locator_none.html' with key=feature.key preset='panel' %}</div>{% endif %}
+<dl class="fact-panel__facts">
+<dt>{% trans "Number" %}</dt><dd class="fact-panel__num">{{ feature.key }}</dd>
+{% if kind_full %}<dt>{% trans "Kind" %}</dt><dd><span class="eyebrow eyebrow--cat{% if kind_class %} cat--{{ kind_class }}{% endif %}">{{ kind_full }}</span></dd>{% endif %}
+</dl>
+<div class="fact-panel__conf">
+{% include 'atlas/place_glyph.html' %}
+<div class="fact-panel__conf-text"><b>{{ confidence_label }}</b><span>{{ confidence_line }}</span>
+<a href="#why" class="fact-panel__why">{% if letter == 'U' %}{% trans "Why there is no pin ↓" %}{% else %}{% blocktranslate %}Why this pin is {{ letter }} ↓{% endblocktranslate %}{% endif %}</a></div>
 </div>
+{% if refs %}<details class="card-sec fact-panel__refs" open data-fold-on-phone>
+<summary>{% trans "In the novel" %}<small>{% blocktranslate count counter=chapter_count %}{{ counter }} chapter{% plural %}{{ counter }} chapters{% endblocktranslate %}</small></summary>
+<ol class="refs">{% for r in refs %}<li><span class="refs__ch">{{ r.ch }}<span class="visually-hidden"> · </span></span><span>{{ r.title }}</span>{% if r.part %}<span class="refs__part"><span class="visually-hidden"> · </span>§{{ r.part }}</span>{% endif %}</li>{% endfor %}</ol>
+</details>{% endif %}
+<div class="fact-panel__action">{% if feature.object_type == 'site' %}<a class="btn btn--primary btn--block" href="{{ map_url }}">{% trans "Show on the map" %}</a>{% else %}<a class="btn btn--secondary btn--block" href="{{ unlocated_url }}">{% blocktranslate count counter=unlocated_count %}See the {{ counter }} place without a point{% plural %}See the {{ counter }} places without a point{% endblocktranslate %}</a>{% endif %}</div>
 </aside>
-{% endif %}
-{% if feature.object_type == 'site' %}{% include 'atlas/derry_explore.html' with back_url=map_url back_name=feature_name %}{% else %}{% include 'atlas/derry_explore.html' %}{% endif %}
+
+<div class="place-page__body">
+{% if cards %}<section class="place-photos" aria-labelledby="photos-title">
+<h2 id="photos-title" class="t-h2">{% trans "Photographs" %}</h2>
+<ul class="place-photos__grid">
+{% for c in cards %}<li class="place-photos__item{% if c.phone_hidden %} is-desktop-only{% endif %}">
+<a class="card-photo" href="{% url 'photo' c.photo.id %}"><img src="{{ c.thumb }}" srcset="{{ c.srcset }}" sizes="(max-width: 37.49em) 45vw, 250px" alt="{{ c.alt }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy" decoding="async">{% if c.photo.year %}<span class="card-photo__cap">{{ c.photo.year }}</span>{% endif %}</a>
+{% if c.caption %}<span class="place-photos__caption">{{ c.caption }}</span>{% endif %}
+</li>{% endfor %}
+{% if more_desktop %}<li class="place-photos__item place-photos__item--more is-desktop-only"><a class="place-photos__more" href="{{ gallery_url }}"><b>+{{ more_desktop }}</b><span>{% blocktranslate count counter=photo_total %}All {{ counter }} photo →{% plural %}All {{ counter }} photos →{% endblocktranslate %}</span></a></li>{% endif %}
+{% if more_phone %}<li class="place-photos__item place-photos__item--more is-phone-only"><a class="place-photos__more" href="{{ gallery_url }}"><b>+{{ more_phone }}</b><span>{% blocktranslate count counter=photo_total %}All {{ counter }} photo →{% plural %}All {{ counter }} photos →{% endblocktranslate %}</span></a></li>{% endif %}
+</ul>
+<a class="link link--arrow place-photos__all" href="{{ gallery_url }}">{% trans "All photos of this place" %}</a>
+</section>{% endif %}
+
+{% if place_about %}<section class="place-section" aria-labelledby="about">
+<h2 id="about" class="t-h2">{% blocktranslate with name=feature_name %}About {{ name }}{% endblocktranslate %}</h2>
+<div class="prose"><p>{{ place_about }}</p></div>
+</section>{% endif %}
+
+<section class="place-section" aria-labelledby="why">
+<h2 id="why" class="t-h2">{% if letter == 'U' %}{% trans "Why this place has no pin" %}{% else %}{% blocktranslate %}Why this pin is marked {{ letter }}{% endblocktranslate %}{% endif %}</h2>
+<p class="place-section__line">{% include 'atlas/place_glyph.html' %}<span><b>{{ confidence_label }}.</b> {{ confidence_line }}</span></p>
+{% if confidence_explanation %}<div class="prose"><p>{{ confidence_explanation }}</p></div>{% endif %}
+<a class="link link--arrow" href="{% url 'method' %}#how-sure">{% trans "Method: how every pin is graded A, B, C or U" %}</a>
+</section>
+</div>
+</div>
+
+{% if nearby_places or same_chapter_places %}<section class="related" aria-labelledby="related-title">
+<h2 id="related-title" class="t-h2">{% trans "Explore related places" %}</h2>
+{% if nearby_places %}<div class="related__row">
+<div class="related__head"><h3 class="eyebrow">{% trans "Nearby on the map" %}</h3><a class="link link--arrow" href="{{ map_url }}">{% trans "View this area on the map" %}</a></div>
+<ul class="related__list">{% for r in nearby_places %}{% include 'atlas/related_card.html' %}{% endfor %}</ul>
+</div>{% endif %}
+{% if same_chapter_places %}<div class="related__row">
+<div class="related__head"><h3 class="eyebrow">{{ same_chapter_heading }}</h3></div>
+<ul class="related__list">{% for r in same_chapter_places %}{% include 'atlas/related_card.html' with show_chapter=True %}{% endfor %}</ul>
+</div>{% endif %}
+</section>{% endif %}
 </article>
+{% if feature.object_type == 'site' %}{% include 'atlas/derry_explore.html' with back_url=map_url back_name=feature_name %}{% else %}{% include 'atlas/derry_explore.html' %}{% endif %}
 {% endblock %}
+{% block scripts %}<script src="{% static 'atlas/place.js' %}" defer></script>{% endblock %}

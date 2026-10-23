@@ -27,9 +27,6 @@ msgstr "Фотографии"
 msgid "Derry"
 msgstr "Дерри"
 
-msgid "Photographs from a literary atlas of Stephen King’s <i>IT</i>"
-msgstr "Фотографии из литературного атласа романа Стивена Кинга <i>«Оно»</i>"
-
 msgid "NOVEL-BASED RECONSTRUCTION"
 msgstr "РЕКОНСТРУКЦИЯ ПО РОМАНУ"
 
@@ -104,10 +101,6 @@ msgstr ""
 "Посмотрите фотографии Дерри в %(year)s году в литературном атласе романа "
 "Стивена Кинга «Оно»."
 
-#: photo.html
-msgid "All photographs"
-msgstr "Все фотографии"
-
 msgid "Open the original file"
 msgstr "Открыть оригинальный файл"
 
@@ -120,22 +113,6 @@ msgstr "Оригинал"
 msgid "Show on the map"
 msgstr "Показать на карте"
 
-msgid "About this place"
-msgstr "Страница места"
-
-#: place.html
-msgid "Place %(number)s"
-msgstr "Место %(number)s"
-
-msgid "Unlocated place"
-msgstr "Нелокализованное место"
-
-msgid "All photographs of this place"
-msgstr "Все фотографии этого места"
-
-msgid "Sources & evidence"
-msgstr "Источники и свидетельства"
-
 msgid "Explore related places"
 msgstr "Исследуйте связанные места"
 
@@ -144,9 +121,6 @@ msgstr "Места рядом на карте"
 
 msgid "View this area on the map"
 msgstr "Показать этот район на карте"
-
-msgid "Also referenced in the same chapters"
-msgstr "Другие места из тех же глав"
 
 msgid "Photographs from here"
 msgstr "Фотографии этого места"
@@ -363,25 +337,6 @@ msgstr "Категории мест"
 #: SEO titles and descriptions
 msgid "Map of Derry, Maine — Stephen King’s IT Literary Atlas"
 msgstr "Карта Дерри, штат Мэн — литературный атлас «Оно» Стивена Кинга"
-
-msgid ""
-"Explore an interactive map of Derry, Maine, reconstructed from Stephen "
-"King’s IT, with %(count)s mapped place, book evidence and photographs."
-msgid_plural ""
-"Explore an interactive map of Derry, Maine, reconstructed from Stephen "
-"King’s IT, with %(count)s mapped places, book evidence and photographs."
-msgstr[0] ""
-"Исследуйте интерактивную карту Дерри, штат Мэн, реконструированную по "
-"роману Стивена Кинга «Оно»: %(count)s место на карте, книжные свидетельства "
-"и фотографии."
-msgstr[1] ""
-"Исследуйте интерактивную карту Дерри, штат Мэн, реконструированную по "
-"роману Стивена Кинга «Оно»: %(count)s места на карте, книжные свидетельства "
-"и фотографии."
-msgstr[2] ""
-"Исследуйте интерактивную карту Дерри, штат Мэн, реконструированную по "
-"роману Стивена Кинга «Оно»: %(count)s мест на карте, книжные свидетельства "
-"и фотографии."
 
 msgid "Photographs of Derry, Maine — Stephen King’s IT"
 msgstr "Фотографии Дерри, штат Мэн — «Оно» Стивена Кинга"
@@ -962,3 +917,74 @@ msgstr "Контекст"
 
 msgid "Excluded as geography"
 msgstr "Не используется как география"
+
+# П7: страница места
+
+msgid "How pins work →"
+msgstr "Как устроены точки →"
+
+msgid "Place %(number)s:"
+msgstr "Место %(number)s:"
+
+msgid "Cover year"
+msgstr "Год обложки"
+
+msgid "Place facts"
+msgstr "Сведения о месте"
+
+msgid "Open in the map ↗"
+msgstr "Открыть на карте ↗"
+
+msgid "Number"
+msgstr "Номер"
+
+msgid "Kind"
+msgstr "Категория"
+
+msgid "Why there is no pin ↓"
+msgstr "Почему точки нет ↓"
+
+msgid "Why this pin is %(letter)s ↓"
+msgstr "Почему эта точка — %(letter)s ↓"
+
+msgid "In the novel"
+msgstr "В романе"
+
+msgid "%(counter)s chapter"
+msgid_plural "%(counter)s chapters"
+msgstr[0] "%(counter)s глава"
+msgstr[1] "%(counter)s главы"
+msgstr[2] "%(counter)s глав"
+
+msgid "See the %(counter)s place without a point"
+msgid_plural "See the %(counter)s places without a point"
+msgstr[0] "Все %(counter)s место без точки на карте"
+msgstr[1] "Все %(counter)s места без точки на карте"
+msgstr[2] "Все %(counter)s мест без точки на карте"
+
+msgid "All %(counter)s photo →"
+msgid_plural "All %(counter)s photos →"
+msgstr[0] "Все %(counter)s фото →"
+msgstr[1] "Все %(counter)s фото →"
+msgstr[2] "Все %(counter)s фото →"
+
+msgid "All photos of this place"
+msgstr "Все фотографии этого места"
+
+msgid "About %(name)s"
+msgstr "Об этом месте"
+
+msgid "Why this place has no pin"
+msgstr "Почему у этого места нет точки"
+
+msgid "Why this pin is marked %(letter)s"
+msgstr "Почему точка отмечена %(letter)s"
+
+msgid "Method: how every pin is graded A, B, C or U"
+msgstr "Метод: как оценивается каждая точка — A, B, C или U"
+
+msgid "Explore an interactive map of Derry, Maine, the fictional town in Stephen King’s IT, with %(count)s mapped place, book evidence and photographs."
+msgid_plural "Explore an interactive map of Derry, Maine, the fictional town in Stephen King’s IT, with %(count)s mapped places, book evidence and photographs."
+msgstr[0] "Исследуйте интерактивную карту Дерри, штат Мэн, — вымышленного города из романа Стивена Кинга «Оно»: %(count)s место на карте, книжные свидетельства и фотографии."
+msgstr[1] "Исследуйте интерактивную карту Дерри, штат Мэн, — вымышленного города из романа Стивена Кинга «Оно»: %(count)s места на карте, книжные свидетельства и фотографии."
+msgstr[2] "Исследуйте интерактивную карту Дерри, штат Мэн, — вымышленного города из романа Стивена Кинга «Оно»: %(count)s мест на карте, книжные свидетельства и фотографии."
