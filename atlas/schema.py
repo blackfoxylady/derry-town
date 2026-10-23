@@ -9,6 +9,8 @@
 from django.urls import reverse
 from django.utils.translation import get_language, gettext as _
 
+from .terms import period_label
+
 
 def _root(request):
     return request.build_absolute_uri('/')
@@ -107,11 +109,11 @@ def place(request, ctx):
     """Страница места из готового context'а place_page."""
     feature, note = ctx['feature'], ctx['note']
     name = ctx['feature_name']
-    page = _page(request, 'Article', name,
-                 note or (name + (' · ' + feature.period if feature.period else '')))
+    period = period_label(feature.period)
+    page = _page(request, 'Article', name, note or (name + (' · ' + period if period else '')))
     page['headline'] = name
-    if feature.period:
-        page['temporalCoverage'] = feature.period
+    if period:
+        page['temporalCoverage'] = period
     if ctx['og_photo']:
         page['image'] = request.build_absolute_uri(ctx['og_photo'])
     return _graph(request, page,

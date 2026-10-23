@@ -40,10 +40,10 @@ class RuContentTests(TestCase):
     def test_place_page_russian_note_with_fallback(self):
         response = self.client.get('/ru/places/12-derry-public-library/')
         self.assertContains(response, 'Каменное здание.')
-        self.assertContains(response, 'Бен читает здесь.')
-        self.assertContains(response, 'Second mention.')  # без перевода — английский
+        self.assertNotContains(response, 'Бен читает здесь.')  # заметки evidence не выводятся
         self.assertContains(response, 'Публичная библиотека Дерри')
-        self.assertContains(response, 'Ch. 4 - Ben Hanscom / 1')  # главы — в оригинале
+        self.assertContains(response, '<li>Гл. 4 · Бен Хэнском падает · §1</li>')  # главы — на RU
+        self.assertContains(response, '<p class="period">1958</p>')
         self.assertContains(response, 'Библиотека — городской ориентир.')
         # Для отсутствующего русского поля действует поэлементный fallback на английский.
         self.assertContains(response, 'Its street relationship is inferred.')
@@ -96,7 +96,7 @@ class RuContentTests(TestCase):
                 )
                 self.assertContains(self.client.get(f'/ru/photos/{photo.id}/'), 'Бен в библиотеке.')
                 self.assertContains(self.client.get(f'/ru/photos/{photo.id}/'), 'Пеннивайз')
-                self.assertContains(self.client.get(f'/ru/photos/{photo.id}/'), '>школа</a>')
+                self.assertContains(self.client.get(f'/ru/photos/{photo.id}/'), '>Школа</a>')
                 self.assertNotContains(self.client.get(f'/ru/photos/{photo.id}/'), '>Pennywise</a>')
                 self.assertContains(self.client.get(f'/photos/{photo.id}/'), 'Ben at the library.')
                 self.assertContains(self.client.get('/ru/photos/'), 'Бен в библиотеке.')
@@ -167,27 +167,27 @@ class RuContentTests(TestCase):
         self.assertEqual(glossary['terms']["Losers' Club"], 'Клуб Неудачников')
         self.assertEqual(glossary['characters']['pennywise'], 'Пеннивайз')
         expected_photo_tags = {
-            'balloons': 'воздушные шары',
+            'balloons': 'Воздушные шары',
             'canal': 'Канал',
             'canal-days': 'Дни Канала',
-            'cleaning-up': 'уборка',
-            'georgies-room': 'комната Джорджи',
-            'giant-bird': 'гигантская птица',
-            'interludes': 'интерлюдии',
-            'laundromat': 'прачечная',
+            'cleaning-up': 'Уборка',
+            'georgies-room': 'Комната Джорджи',
+            'giant-bird': 'Гигантская птица',
+            'interludes': 'Интерлюдии',
+            'laundromat': 'Прачечная',
             'losers-club': 'Клуб Неудачников',
-            'main-street-bridge': 'мост на Главной улице',
-            'night': 'ночь',
+            'main-street-bridge': 'Мост на Главной улице',
+            'night': 'Ночь',
             'paul-bunyan': 'Пол Баньян',
-            'photo-album': 'фотоальбом',
-            'police': 'полиция',
-            'pov': 'точка зрения',
-            'school': 'школа',
-            'summer': 'лето',
-            'summer-vacation': 'летние каникулы',
-            'supernatural': 'сверхъестественное',
-            'vacation': 'каникулы',
-            'winter': 'зима',
+            'photo-album': 'Фотоальбом',
+            'police': 'Полиция',
+            'pov': 'Точка зрения',
+            'school': 'Школа',
+            'summer': 'Лето',
+            'summer-vacation': 'Летние каникулы',
+            'supernatural': 'Сверхъестественное',
+            'vacation': 'Каникулы',
+            'winter': 'Зима',
         }
         for slug, name in expected_photo_tags.items():
             self.assertEqual(glossary['tags'][slug], name)

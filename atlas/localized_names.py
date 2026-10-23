@@ -46,6 +46,13 @@ def feature_search_terms(feature):
             *(entry.get('aliases') or [])]
 
 
+def russian_search_terms(key):
+    """Русское имя и русские алиасы места: по ним ищет и английская карта."""
+    entry = _glossary()['features'].get(str(key), {})
+    name = _place_names().get(str(key)) or entry.get('name')
+    return list(dict.fromkeys(filter(None, (name, *(entry.get('aliases') or [])))))
+
+
 def localize_map_payload(payload):
     """Return an RU presentation copy without changing canonical EN map data.
 

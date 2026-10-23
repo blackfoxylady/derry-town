@@ -53,7 +53,7 @@ const path=require('node:path');
   await page.locator('#clearSearch').click();
   await page.locator('#search').fill('Juniper Hill');
   await page.locator('#list button').click();
-  assert.match(await page.locator('#detail').innerText(),/Unlocated/);
+  assert.match(await page.locator('#detail').innerText(),/U · No location/);
   await page.locator('#clearSearch').click();
   if(name==='mobile')await page.locator('#placesToggle').click();
   for(const view of ['central','barrens','camp']){

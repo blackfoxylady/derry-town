@@ -3,6 +3,8 @@ from django import template
 from django.urls import translate_url
 from django.utils.safestring import mark_safe
 
+from ..terms import period_label
+
 register = template.Library()
 
 # Внутри <script> JSON нельзя оставлять сырым: '</script>' в подписи фото
@@ -47,3 +49,9 @@ def alternate_url(context, lang):
     """Абсолютный адрес страницы в заданном языке — для hreflang."""
     request = context['request']
     return request.build_absolute_uri(translate_url(request.path, lang))
+
+
+@register.filter
+def period(value):
+    """Период места для показа: короткое тире в диапазонах, на RU — перевод."""
+    return period_label(value)

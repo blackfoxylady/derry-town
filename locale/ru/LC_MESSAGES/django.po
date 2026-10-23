@@ -8,19 +8,6 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: atlas/views.py
-msgid "A · Text-anchored relationship"
-msgstr "A · Связь, закреплённая текстом"
-
-msgid "B · Inferred position"
-msgstr "B · Выведенное положение"
-
-msgid "C · Proposed location"
-msgstr "C · Предположительное расположение"
-
-msgid "U · Unlocated / off map"
-msgstr "U · Не локализовано / вне карты"
-
 msgid "Place"
 msgstr "Место"
 
@@ -194,22 +181,6 @@ msgstr ""
 msgid "What the symbols mean"
 msgstr "Что означают символы"
 
-msgid ""
-"<b>A · Text-anchored relationship.</b> The street, adjoining feature or "
-"named site is explicit. The plotted coordinate remains reconstructed.<br><b>"
-"B · Inferred position.</b> Routes, proximity and relative directions "
-"constrain the placement.<br><b>C · Proposed location.</b> A substantial gap "
-"remains; the position is a plausible option.<br><b>U · Unlocated / off map."
-"</b> The place is indexed without an invented coordinate."
-msgstr ""
-"<b>A · Связь, закреплённая текстом.</b> Улица, соседний объект или "
-"названное место указаны явно. Нанесённая координата всё равно "
-"реконструирована.<br><b>B · Выведенное положение.</b> Маршруты, близость и "
-"взаимные направления ограничивают размещение.<br><b>C · Предположительное "
-"расположение.</b> Существенный пробел остаётся; позиция — правдоподобный "
-"вариант.<br><b>U · Не локализовано / вне карты.</b> Место включено в "
-"указатель без выдуманной координаты."
-
 msgid "The novel"
 msgstr "Роман"
 
@@ -297,12 +268,8 @@ msgstr ""
 "положения. Приближайте карту, чтобы находить небольшие места. Поиск "
 "включает и места, которые нельзя локализовать."
 
-msgid ""
-"Filled circle: text-anchored relationship.<br>Open circle: inferred "
-"position.<br>Diamond: proposed location."
-msgstr ""
-"Закрашенный круг: связь, закреплённая текстом.<br>Пустой круг: выведенное "
-"положение.<br>Ромб: предположительное расположение."
+msgid "Filled circle: named in the novel.<br>Open circle: inferred.<br>Diamond: proposed."
+msgstr "Закрашенный круг: названо в романе.<br>Пустой круг: выведено.<br>Ромб: предположено."
 
 msgid "Interactive map"
 msgstr "Интерактивная карта"
@@ -749,3 +716,72 @@ msgstr "Читать →"
 
 msgid "Download"
 msgstr "Скачать"
+
+#: atlas/terms.py (redesign pass 3)
+msgctxt "confidence"
+msgid "Named in the novel"
+msgstr "Названо в романе"
+
+msgctxt "confidence"
+msgid "Inferred"
+msgstr "Выведено"
+
+msgctxt "confidence"
+msgid "Proposed"
+msgstr "Предположено"
+
+msgctxt "confidence"
+msgid "No location"
+msgstr "Без координат"
+
+msgctxt "confidence meta"
+msgid "named in the novel"
+msgstr "названо в романе"
+
+msgctxt "confidence meta"
+msgid "inferred"
+msgstr "выведено"
+
+msgctxt "confidence meta"
+msgid "proposed"
+msgstr "предположено"
+
+msgctxt "confidence meta"
+msgid "no location"
+msgstr "без координат"
+
+msgid "The street or the site is named in the text; the exact lot is the atlas’s."
+msgstr "Улица или место названы в тексте; точный участок — работа атласа."
+
+msgid "Worked out from routes, distances and what stands next to it."
+msgstr "Положение выведено из маршрутов, расстояний и соседства."
+
+msgid "The book leaves a gap; the point is the atlas’s proposal."
+msgstr "В книге пробел; точка — предположение атласа."
+
+msgid "The book doesn’t say where it is; no point on the map."
+msgstr "Книга не говорит, где это; точки на карте нет."
+
+msgctxt "kind short"
+msgid "Homes"
+msgstr "Дома"
+
+msgctxt "kind short"
+msgid "Civic"
+msgstr "Город"
+
+msgctxt "kind short"
+msgid "Barrens"
+msgstr "Пустошь"
+
+msgctxt "kind short"
+msgid "Encounters"
+msgstr "Встречи"
+
+msgctxt "kind short"
+msgid "Historical"
+msgstr "Историческое"
+
+msgctxt "kind short"
+msgid "Outlying"
+msgstr "Окраины"

@@ -38,11 +38,12 @@ class PlacePageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Derry Public Library')
         self.assertContains(response, 'A stone building.')
-        self.assertContains(response, 'B · Inferred position')
-        # Цитаты с одинаковым референсом группируются, как в карточке на карте.
-        self.assertContains(response, 'Ch. 4 - Ben Hanscom / 1', count=1)
-        self.assertContains(response, 'Ben reads here.')
-        self.assertContains(response, 'Second mention.')
+        self.assertContains(response, 'B · Inferred')
+        # Ссылки на роман: подпись из таблицы глав, одинаковые ссылки — одной строкой.
+        # Заметки evidence в «In the novel» не показываются.
+        self.assertContains(response, '<li>Ch. 4 · Ben Hanscom Takes a Fall · §1</li>', count=1)
+        self.assertNotContains(response, 'Ben reads here.')
+        self.assertNotContains(response, 'Ch. 4 - Ben Hanscom')
         self.assertContains(response, '/?place=12')
         self.assertNotContains(response, 'class="place-content"')
 
@@ -97,7 +98,7 @@ class PlacePageTests(TestCase):
         nearby = response.context['nearby_places']
         chapters = response.context['same_chapter_places']
         self.assertEqual([item['feature'].key for item in nearby], ['13', '14', '15', '16'])
-        self.assertEqual(nearby[0]['chapter'], 'Ch. 4 - Ben Hanscom')
+        self.assertEqual(nearby[0]['chapter'], 'Ch. 4 · Ben Hanscom Takes a Fall')
         self.assertEqual([item['feature'].key for item in chapters], ['17', '18'])
         self.assertNotIn('distance', nearby[0])
         self.assertContains(response, 'Explore related places')

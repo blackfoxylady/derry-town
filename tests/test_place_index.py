@@ -77,6 +77,9 @@ class PlaceIndexTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<html lang="ru"')
         self.assertContains(response, '>Начальная школа Дерри</a>')
+        # Категории: полная форма на фильтре, короткая — в мета-строке карточки.
+        self.assertContains(response, '>Городские места <span class="n">')
+        self.assertContains(response, '<p class="place-card-meta">Город · ')
         self.assertContains(response, '>Городская ратуша Дерри</a>')
         self.assertContains(response, 'Городской ориентир.')
         self.assertContains(response, 'Школа отмечает район.')

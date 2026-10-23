@@ -225,7 +225,7 @@ class GalleryTests(TestCase):
         response = self.client.get('/ru/photos/')
         self.assertContains(response, 'Публичная библиотека Дерри')
         self.assertContains(response, 'Бен Хэнском')
-        self.assertContains(response, '>архитектура<span')
+        self.assertContains(response, '>Архитектура<span')
         self.assertContains(response, 'href="/ru/photos/character/ben-hanscom/"')
         self.assertContains(response, 'href="/ru/photos/tag/library/"')
         self.assertContains(response, 'href="/ru/places/12-derry-public-library/"')
@@ -244,7 +244,7 @@ class GalleryTests(TestCase):
         photo = self.client.get(f'/ru/photos/{self.ben.id}/')
         self.assertContains(photo, 'Публичная библиотека Дерри')
         self.assertContains(photo, 'Бен Хэнском')
-        self.assertContains(photo, '>библиотека</a>')
+        self.assertContains(photo, '>Библиотека</a>')
 
     def test_photo_page_shows_attributes_as_filter_links(self):
         response = self.client.get(f'/photos/{self.ben.id}/')

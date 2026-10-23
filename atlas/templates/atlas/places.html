@@ -1,5 +1,5 @@
 {% extends 'atlas/gallery_base.html' %}
-{% load i18n static %}
+{% load i18n static atlas_tags %}
 {% block content %}
 {% include 'atlas/breadcrumbs.html' with section='places' only %}
 <div class="places-hero">
@@ -30,7 +30,7 @@
 </span></div>
 {% if kinds %}<div class="place-filter-row" data-filter-group="kind"><span class="fname">{% trans "Category" %}</span><span class="chips">
 <button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %}</button>
-{% for kind, count in kinds %}<button type="button" class="chip" data-value="{{ kind }}" aria-pressed="false">{{ kind }} <span class="n">{{ count }}</span></button>{% endfor %}
+{% for kind, label, count in kinds %}<button type="button" class="chip" data-value="{{ kind }}" aria-pressed="false">{{ label }} <span class="n">{{ count }}</span></button>{% endfor %}
 </span></div>{% endif %}
 <div class="place-filter-row" data-filter-group="media"><span class="fname">{% trans "Media" %}</span><span class="chips">
 <button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %}</button>
@@ -58,7 +58,7 @@
 <div class="place-number">{{ c.number }}</div>
 <div class="place-card-body">
 <div class="place-card-title"><h2><a href="{{ c.url }}">{{ c.name }}</a></h2><span class="confidence-badge confidence-{{ c.feature.confidence|lower }}" title="{{ c.confidence_label }}">{{ c.feature.confidence }}</span></div>
-<p class="place-card-meta">{% if c.feature.kind %}{{ c.feature.kind }}{% else %}{% trans "Unlocated" %}{% endif %}{% if c.feature.period %} · {{ c.feature.period }}{% endif %}</p>
+<p class="place-card-meta">{% if c.kind_label %}{{ c.kind_label }}{% else %}{% trans "Unlocated" %}{% endif %}{% if c.feature.period %} · {{ c.feature.period|period }}{% endif %}</p>
 {% if c.note %}<p class="place-card-excerpt">{{ c.note }}</p>{% endif %}
 <p class="place-card-facts"><span title="{% trans 'Sources' %}">{% blocktranslate count n=c.evidence_count %}{{ n }} source{% plural %}{{ n }} sources{% endblocktranslate %}</span><span title="{% trans 'Photographs' %}">{% blocktranslate count n=c.photo_count %}{{ n }} photo{% plural %}{{ n }} photos{% endblocktranslate %}</span><span title="{% trans 'Covers' %}">{% blocktranslate count n=c.cover_count %}{{ n }} cover{% plural %}{{ n }} covers{% endblocktranslate %}</span>{% if not c.content_complete %}<span class="data-warning">{% trans "text incomplete" %}</span>{% endif %}{% if not c.ru_complete %}<span class="data-warning">{% trans "RU incomplete" %}</span>{% endif %}</p>
 <p class="place-card-links"><a href="{{ c.url }}">{% trans "About the place" %}</a>{% if c.map_url %}<a href="{{ c.map_url }}">{% trans "Show on the map" %}</a>{% endif %}{% if c.gallery_url %}<a href="{{ c.gallery_url }}">{% trans "Photographs" %}</a>{% endif %}</p>

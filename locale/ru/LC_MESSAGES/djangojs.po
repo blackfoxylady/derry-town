@@ -30,28 +30,10 @@ msgstr[2] "мест"
 msgid "mapped"
 msgstr "на карте"
 
-msgid "Unlocated / off map"
-msgstr "Не локализовано / вне карты"
-
-msgid "%s location"
-msgstr "положение %s"
-
 msgid "No matching places. Try a shorter name or enable more categories."
 msgstr ""
 "Подходящих мест нет. Попробуйте более короткое название или включите "
 "больше категорий."
-
-msgid "A · Text-anchored relationship"
-msgstr "A · Связь, закреплённая текстом"
-
-msgid "B · Inferred position"
-msgstr "B · Выведенное положение"
-
-msgid "C · Proposed location"
-msgstr "C · Предположительное расположение"
-
-msgid "U · Unlocated / off map"
-msgstr "U · Не локализовано / вне карты"
 
 msgid "Place %s"
 msgstr "Место %s"
@@ -83,13 +65,13 @@ msgid "Homes"
 msgstr "Дома"
 
 msgid "Civic"
-msgstr "Городское"
+msgstr "Городские места"
 
 msgid "Encounters"
 msgstr "Встречи"
 
 msgid "Historical"
-msgstr "Историческое"
+msgstr "Исторические места"
 
 msgid "Outlying"
 msgstr "Окраины"
@@ -156,3 +138,28 @@ msgstr "Историческое событие"
 
 msgid "Encounter"
 msgstr "Встреча"
+
+#: atlas/static/atlas/map.js (redesign pass 3)
+msgid "Named in the novel"
+msgstr "Названо в романе"
+
+msgid "Inferred"
+msgstr "Выведено"
+
+msgid "Proposed"
+msgstr "Предположено"
+
+msgid "No location"
+msgstr "Без координат"
+
+msgid "named in the novel"
+msgstr "названо в романе"
+
+msgid "inferred"
+msgstr "выведено"
+
+msgid "proposed"
+msgstr "предположено"
+
+msgid "no location"
+msgstr "без координат"

@@ -1,7 +1,6 @@
 from collections import Counter
 from datetime import date
 from pathlib import Path
-import re
 from urllib.parse import urlencode
 from xml.sax.saxutils import escape
 from django.conf import settings
@@ -16,16 +15,18 @@ from django.views.decorators.http import require_safe
 from . import schema
 from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
 from .localized_names import (character_name, feature_name, feature_search_terms,
-                              localize_map_payload, tag_name)
+                              localize_map_payload, russian_search_terms, tag_name)
 from .localized_photos import photo_caption
 from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
                      Revision, Setting, Source, Tag)
 from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
 from .rendering import current_payload, RENDER_VERSION
+from .terms import (chapter_label, confidence_label, confidence_levels, kind_label,
+                    novel_references, parse_reference, period_label)
 
 
 HUB_LASTMOD = date(2026, 9, 29)
-RU_MAP_PAYLOAD_VERSION = '2'
+RU_MAP_PAYLOAD_VERSION = '3'
 HUB_PAGES = {
     'real': {
         'template': 'atlas/derry_real.html',
@@ -288,8 +289,7 @@ def map_data(request):
         response = HttpResponseNotModified()
     else:
         payload, key = current_payload()
-        if ru:
-            payload = _localized_payload(payload)
+        payload = _presented_payload(payload, ru)
         etag = '"'+key+suffix+'"'
         response = JsonResponse(payload, json_dumps_params={'ensure_ascii':False,'separators':(',',':')})
     response['ETag'] = etag
@@ -297,29 +297,25 @@ def map_data(request):
     return response
 
 
-def _localized_payload(payload):
-    """Русская версия payload карты: поверх канонического английского
-    накладываются имена, подписи, описания и заметки evidence."""
-    payload = localize_map_payload(payload)
-    meta = {f.key: ru for f in Feature.objects.exclude(metadata={})
-            if (ru := _feature_ru(f))}
-    if not meta:
-        return payload
-    ev_keys = {}
-    for e in Evidence.objects.order_by('order', 'key').values_list('feature_id', 'key', named=False):
-        ev_keys.setdefault(e[0], []).append(e[1])
+def _presented_payload(payload, ru):
+    """Payload карты для показа. Канонические данные английские; здесь
+    ссылки на роман становятся подписями глав (`refs`, позиции в тексте
+    отброшены), у периодов — короткое тире. На RU поверх идут имена, подписи,
+    заметки и переводы периодов и глав; на EN — русские имена как алиасы поиска."""
+    if ru:
+        payload = localize_map_payload(payload)
+        meta = {f.key: data for f in Feature.objects.exclude(metadata={})
+                if (data := _feature_ru(f))}
     for group in ('sites', 'unplaced'):
         for s in payload['data'][group]:
-            ru = meta.get(str(s['id']))
-            if not ru:
-                continue
-            if ru.get('note'):
-                s['note'] = ru['note']
-            notes = ru.get('evidence') or {}
-            # Порядок sources в payload повторяет сортировку Evidence по (order, key).
-            for src, ekey in zip(s['sources'], ev_keys.get(str(s['id']), [])):
-                if notes.get(ekey):
-                    src['note'] = notes[ekey]
+            s['refs'] = novel_references([src['reference'] for src in s.pop('sources', [])], ru)
+            s.pop('reference', None)
+            s['period'] = period_label(s.get('period', ''), ru)
+            if ru:
+                if note := meta.get(str(s['id']), {}).get('note'):
+                    s['note'] = note
+            else:
+                s['search_aliases'] = russian_search_terms(s['id'])
     return payload
 
 
@@ -453,31 +449,16 @@ def _place_number(feature):
 
 
 def _kind_label(feature):
+    """Короткая форма категории — для мета-строк."""
     if feature.object_type == 'unplaced':
         return _('Unlocated')
-    return {
-        'Homes': _('Homes'), 'Civic': _('Civic'), 'Barrens': _('Barrens'),
-        'Encounters': _('Encounters'), 'Historical': _('Historical'),
-        'Outlying': _('Outlying'),
-    }.get(feature.kind, feature.kind)
+    return kind_label(feature.kind, short=True)
 
 
-_CHAPTER = re.compile(r'^Ch\.\s*\d+\s*-\s*.+$', re.IGNORECASE)
-_INTERLUDE = re.compile(r'^(?:First|Second|Third|Fourth|Fifth)\s+Interlude$', re.IGNORECASE)
-_REFERENCE_SECTION = re.compile(r'\s*/\s*\d+\s*$')
-
-
-def _chapter_reference(reference):
-    """Return a stable key and display label for a novel chapter reference.
-
-    Evidence stores editorial strings such as ``Ch. 11 - Walking Tours / 4``.
-    The trailing section is intentionally removed so related places are joined
-    by chapter. Bare page/location references such as ``[1771]`` are ignored.
-    """
-    label = _REFERENCE_SECTION.sub('', ' '.join(reference.split()))
-    if not (_CHAPTER.fullmatch(label) or _INTERLUDE.fullmatch(label)):
-        return None
-    return label.casefold(), label
+def _chapter_keys(reference):
+    """Главы одной ссылки Evidence без раздела (§), чтобы места связывались
+    по главе. Позиции в тексте вида ``[1771]`` главами не считаются."""
+    return list(dict.fromkeys(key for key, section in parse_reference(reference)))
 
 
 def _reference_key(reference):
@@ -528,11 +509,11 @@ def _related_places(feature, current_evidence, limit=4):
     current_chapters = {}
     reference_chapters = {}
     for evidence in current_evidence:
-        parsed = _chapter_reference(evidence.reference)
-        if parsed:
-            key, label = parsed
-            current_chapters.setdefault(key, label)
-            reference_chapters[_reference_key(evidence.reference)] = key
+        keys = _chapter_keys(evidence.reference)
+        for key in keys:
+            current_chapters.setdefault(key, chapter_label(key))
+        if keys:
+            reference_chapters[_reference_key(evidence.reference)] = keys[0]
 
     semantic = {}
     if current_chapters:
@@ -540,14 +521,14 @@ def _related_places(feature, current_evidence, limit=4):
             feature__object_type__in=('site', 'unplaced')).exclude(feature=feature)
             .select_related('feature').order_by('feature_id', 'order', 'key'))
         for evidence in evidence_rows:
-            parsed = _chapter_reference(evidence.reference)
-            if not parsed or parsed[0] not in current_chapters:
+            keys = [key for key in _chapter_keys(evidence.reference) if key in current_chapters]
+            if not keys:
                 continue
             entry = semantic.setdefault(evidence.feature_id, {
                 'feature': evidence.feature, 'references': set(), 'chapters': set(),
             })
             entry['references'].add(_reference_key(evidence.reference))
-            entry['chapters'].add(parsed[0])
+            entry['chapters'].update(keys)
 
     def primary_chapter(entry):
         exact = current_exact & entry['references']
@@ -627,6 +608,7 @@ def places(request):
 
         search_text = ' '.join(filter(None, (
             feature.key, *feature_search_terms(feature), feature.kind, feature.period,
+            period_label(feature.period), str(kind_label(feature.kind)) if feature.kind else '',
             note, localized['about'], localized['confidence_explanation'],
         )))
         cards.append({
@@ -637,7 +619,8 @@ def places(request):
             'gallery_url': (_gallery_url(place=feature.key, place_feature=feature)
                             if feature_photos else ''),
             'mapped': mapped, 'note': note,
-            'confidence_label': CONFIDENCE.get(feature.confidence, ''),
+            'kind_label': kind_label(feature.kind, short=True) if feature.kind else '',
+            'confidence_label': confidence_label(feature.confidence) if feature.confidence else '',
             'photo_count': len(feature_photos), 'cover_count': len(feature_covers),
             'evidence_count': feature.evidence_count, 'image': image,
             'content_complete': content_complete, 'ru_complete': ru_complete,
@@ -665,7 +648,8 @@ def places(request):
             'Stephen King’s IT, with book evidence, location notes and photographs.',
             place_count) % {'count': place_count}
     context = {
-        'cards': cards, 'kinds': [(kind, kinds[kind]) for kind in kind_names],
+        'cards': cards,
+        'kinds': [(kind, kind_label(kind), kinds[kind]) for kind in kind_names],
         'place_count': place_count, 'mapped_count': mapped_count,
         'unlocated_count': unlocated_count,
         'confidence_counts': Counter(feature.confidence for feature in features),
@@ -953,11 +937,6 @@ def photo_page(request, photo_id):
     return response
 
 
-# Подписи уровней достоверности; совпадают с карточкой места на карте.
-CONFIDENCE = {'A': _('A · Text-anchored relationship'), 'B': _('B · Inferred position'),
-              'C': _('C · Proposed location'), 'U': _('U · Unlocated / off map')}
-
-
 def place_slug(feature):
     """Слаг страницы места: ключ + английское название, `12-neibolt-street`.
     Не хранится в БД — собирается из текущего названия; устаревший слаг
@@ -979,17 +958,9 @@ def place_page(request, slug):
     canonical = place_slug(feature)
     if slug != canonical:
         return redirect(reverse('place', args=[canonical]), permanent=True)
-    notes_ru = (_feature_ru(feature).get('evidence') or {}) if _is_ru() else {}
-    # Цитаты группируются по референсу, как в карточке на карте.
-    refs = []
+    # «In the novel»: главы и интерлюдии подписями из таблицы глав, как в карточке на карте.
     evidence = list(Evidence.objects.filter(feature=feature).order_by('order', 'key'))
-    for e in evidence:
-        note = notes_ru.get(e.key) or e.note
-        group = next((r for r in refs if r['reference'] == e.reference), None)
-        if group is None:
-            refs.append({'reference': e.reference, 'notes': [note] if note else []})
-        elif note:
-            group['notes'].append(note)
+    refs = novel_references([e.reference for e in evidence])
     photos = Photo.objects.filter(feature_key=feature.key)
     covers = [_cover_context(c) for c in PlaceCover.objects.filter(feature_key=feature.key)]
     latest_photo = photos.order_by('-modified').values_list('modified', flat=True).first()
@@ -1018,7 +989,8 @@ def place_page(request, slug):
     context = {
         'feature': feature, 'feature_name': display_name, 'note': _feature_note(feature),
         'page_title': page_title, 'meta_description': meta_description,
-        'confidence': CONFIDENCE.get(feature.confidence, ''), 'refs': refs,
+        'confidence': confidence_label(feature.confidence) if feature.confidence else '',
+        'refs': refs, 'period': period_label(feature.period),
         'place_about': place_content['about'],
         'confidence_explanation': place_content['confidence_explanation'],
         'nearby_places': nearby_places,
@@ -1063,6 +1035,7 @@ def method(request):
         'sources, evidence, confidence levels and mapping decisions.')
     response = render(request, 'atlas/method.html', {
         'method_geometry': geometry, 'sources': sources,
+        'confidence_levels': confidence_levels(),
         'page_title': page_title, 'meta_description': meta_description,
         'jsonld': schema.method(request, page_title, meta_description)})
     response['Cache-Control'] = 'no-cache'

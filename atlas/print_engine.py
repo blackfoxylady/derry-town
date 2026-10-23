@@ -13,12 +13,12 @@ STRINGS = {
     'en': {
         'book': 'S T E P H E N  K I N G  /  I T',
         'plate': 'PLATE {number:02d} / 04',
-        'periods': '1957-58 / 1984-85 / HISTORICAL SITES',
+        'periods': '1957–58 / 1984–85 / HISTORICAL SITES',
         'reading': 'READING THIS SHEET',
         'confidence': (
-            ('A', 'Text-anchored relationship'),
-            ('B', 'Inferred position'),
-            ('C', 'Proposed location'),
+            ('A', 'Named in the novel'),
+            ('B', 'Inferred'),
+            ('C', 'Proposed'),
         ),
         'confidence_note': ('All coordinates are reconstructed. A names a relationship stated '
                             'in the text; it does not certify an exact position.'),
@@ -74,9 +74,9 @@ STRINGS = {
         'periods': '1957–58 / 1984–85 / ИСТОРИЧЕСКИЕ МЕСТА',
         'reading': 'КАК ЧИТАТЬ ЭТОТ ЛИСТ',
         'confidence': (
-            ('A', 'Связь закреплена текстом'),
-            ('B', 'Положение выведено'),
-            ('C', 'Место предполагается'),
+            ('A', 'Названо в романе'),
+            ('B', 'Выведено'),
+            ('C', 'Предположено'),
         ),
         'confidence_note': ('Все координаты реконструированы. Уровень A означает, что взаимное '
                             'положение закреплено текстом, но не подтверждает точную координату.'),
@@ -320,7 +320,8 @@ def sidebar(s,view,sites):
                 line=(line+' '+word).strip()
             tail=label[len(line):].strip();s.text(x+25,y,line,size);y+=11.5;s.text(x+25,y,tail,size)
         else:s.text(x+25,y,label,size)
-        y+=11 if view['id']=='city' else 12
+        # The centre lists the most places: a slightly tighter step keeps RU names in the column.
+        y+=11 if view['id']=='city' else 11.5 if view['id']=='central' else 12
     if view['id']=='camp':
         y+=22;s.text(x,y,T['relationships'],10,'SansBold');y+=18
         for para in T['local_relationships']:

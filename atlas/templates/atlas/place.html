@@ -8,7 +8,7 @@
 {% include 'atlas/breadcrumbs.html' with section='places' current=feature_name only %}
 <div class="eyebrow">{% if feature.object_type == 'site' %}{% blocktranslate with number=feature.key %}Place {{ number }}{% endblocktranslate %}{% else %}{% trans "Unlocated place" %}{% endif %}</div>
 <h1>{{ feature_name }}</h1>
-{% if feature.period %}<p class="period">{{ feature.period }}</p>{% endif %}
+{% if period %}<p class="period">{{ period }}</p>{% endif %}
 {% if covers %}
 <div class="place-cover">
 {% for c in covers %}<img{% if forloop.first %} class="on"{% endif %} data-year="{{ c.year }}" src="{{ c.src }}" srcset="{{ c.srcset }}" sizes="(max-width:600px) 100vw, 640px" alt="{{ c.alt }}" width="{{ c.width }}" height="{{ c.height }}"{% if not forloop.first %} loading="lazy"{% endif %} decoding="async">{% endfor %}
@@ -42,7 +42,7 @@ imgs.forEach(function(im){im.classList.toggle('on',im.dataset.year===b.dataset.y
 {% if refs %}
 <h2>{% trans "Sources & evidence" %}</h2>
 <ul class="refs">
-{% for r in refs %}<li>{{ r.reference }}{% for n in r.notes %}<br>{{ n }}{% endfor %}</li>{% endfor %}
+{% for r in refs %}<li>{{ r }}</li>{% endfor %}
 </ul>
 {% endif %}
 {% if place_about or confidence_explanation %}
