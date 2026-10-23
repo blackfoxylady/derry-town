@@ -78,6 +78,6 @@ imgs.forEach(function(im){im.classList.toggle('on',im.dataset.year===b.dataset.y
 </div>
 </aside>
 {% endif %}
-{% include 'atlas/derry_explore.html' with current_hub='places' %}
+{% if feature.object_type == 'site' %}{% include 'atlas/derry_explore.html' with back_url=map_url back_name=feature_name %}{% else %}{% include 'atlas/derry_explore.html' %}{% endif %}
 </article>
 {% endblock %}

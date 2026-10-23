@@ -1,0 +1,17 @@
+{% load i18n %}{% with page=request.resolver_match.url_name|default:'' %}<header class="site-header">
+<a href="{% url 'index' %}" class="brand" aria-label="{% trans 'Derry, a literary atlas: home' %}">{% include 'atlas/icons/brand-mark.svg' %}<span class="brand__name">DERRY</span><span class="brand__tag">{% blocktranslate %}A literary atlas of Stephen King’s <i>IT</i> · reconstructed from the novel{% endblocktranslate %}</span></a>
+<nav class="nav" aria-label="{% trans 'Main' %}">
+<a href="{% url 'index' %}" class="nav__link"{% if page == 'index' %} aria-current="page"{% endif %}>{% trans "Map" %}</a>
+<a href="{% url 'places' %}" class="nav__link"{% if page == 'places' %} aria-current="page"{% elif page == 'place' %} aria-current="true"{% endif %}>{% trans "Places" %}</a>
+<a href="{% url 'gallery' %}" class="nav__link"{% if page == 'gallery' %} aria-current="page"{% elif page == 'gallery_place' or page == 'gallery_character' or page == 'gallery_tag' or page == 'gallery_year' or page == 'photo' %} aria-current="true"{% endif %}>{% trans "Photos" %}</a>
+<div class="nav__item" data-disclosure>
+<button type="button" class="nav__link nav__disclosure{% if page == 'derry_real' or page == 'derry_bangor' or page == 'derry_books' or page == 'printable_map' %} is-section{% endif %}" aria-expanded="false" aria-controls="about-menu">{% trans "About Derry" %}{% include 'atlas/icons/chevron-down.svg' %}</button>
+<div class="dropdown" id="about-menu" hidden>
+{% include 'atlas/about_links.html' with variant='dropdown' page=page %}
+</div>
+</div>
+<a href="{% url 'method' %}" class="nav__link"{% if page == 'method' %} aria-current="page"{% endif %}>{% trans "Method" %}</a>
+{% include 'atlas/lang_switch.html' %}
+</nav>
+<button type="button" class="menu-btn menu-btn--icon" aria-label="{% trans 'Menu' %}" aria-haspopup="dialog" aria-expanded="false" aria-controls="site-menu" data-menu-open>{% include 'atlas/icons/menu.svg' %}</button>
+</header>{% endwith %}

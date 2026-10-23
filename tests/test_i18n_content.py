@@ -128,7 +128,7 @@ class RuContentTests(TestCase):
         page = self.client.get(f'/ru/photos/{photo.id}/')
         self.assertContains(page, f'<h1>{translated}</h1>')
         self.assertContains(page, f'alt="{translated}"')
-        self.assertContains(page, '<a href="/ru/">Дерри</a>')
+        self.assertContains(page, 'aria-label="Хлебные крошки">\n<ol><li><a href="/ru/">Карта</a></li>')
         self.assertNotContains(page, mixed)
         self.assertContains(self.client.get('/ru/photos/'), translated)
 

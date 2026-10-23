@@ -71,26 +71,89 @@
     loadYandexMetrica();
   }
 
+  // Analytics cookies are first-party (_ga*, _gid, _ym_*). With the choice
+  // "rejected" they are removed for this host and its parent domains on every
+  // page load: scripts that were live before a reload may have rewritten them.
+  function clearAnalyticsCookies() {
+    var names = document.cookie.split(';').map(function (pair) {
+      return pair.split('=')[0].trim();
+    }).filter(function (name) {
+      return /^(_ga|_gid|_gat|_ym)/.test(name);
+    });
+    var parts = window.location.hostname.split('.');
+    var domains = [''];
+    for (var i = 0; i < parts.length - 1; i++) domains.push('; domain=.' + parts.slice(i).join('.'));
+    names.forEach(function (name) {
+      domains.forEach(function (domain) {
+        document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' + domain;
+      });
+    });
+    try {
+      Object.keys(window.localStorage).forEach(function (key) {
+        if (/^_ym/.test(key)) window.localStorage.removeItem(key);
+      });
+    } catch (error) {
+      // Storage may be disabled; there is nothing to remove then.
+    }
+  }
+
   function initConsent() {
     var notice = document.getElementById('cookieConsent');
     var choice = readChoice();
 
-    if (choice === 'accepted') {
-      loadAnalytics();
-      return;
-    }
-    if (choice === 'rejected' || !notice) return;
+    if (choice === 'accepted') loadAnalytics();
+    if (choice === 'rejected') clearAnalyticsCookies();
+    if (!notice) return;
 
-    notice.hidden = false;
-    notice.querySelector('[data-cookie-accept]').addEventListener('click', function () {
-      saveChoice('accepted');
+    var accept = notice.querySelector('[data-cookie-accept]');
+    var reject = notice.querySelector('[data-cookie-reject]');
+    var returnTo = null;  // where focus goes after a choice in a reopened notice
+
+    function hide() {
       notice.hidden = true;
+      if (returnTo && document.contains(returnTo)) returnTo.focus();
+      returnTo = null;
+    }
+
+    function show(stored) {
+      // Reopened from "Cookie settings": the stored choice is marked as pressed.
+      accept.removeAttribute('aria-pressed');
+      reject.removeAttribute('aria-pressed');
+      if (stored === 'accepted' || stored === 'rejected') {
+        accept.setAttribute('aria-pressed', String(stored === 'accepted'));
+        reject.setAttribute('aria-pressed', String(stored === 'rejected'));
+      }
+      notice.hidden = false;
+    }
+
+    accept.addEventListener('click', function () {
+      saveChoice('accepted');
+      hide();
       loadAnalytics();
     });
-    notice.querySelector('[data-cookie-reject]').addEventListener('click', function () {
+    reject.addEventListener('click', function () {
       saveChoice('rejected');
-      notice.hidden = true;
+      hide();
+      if (analyticsLoaded) {
+        // Loaded scripts cannot be switched off in place: stop GA, drop the cookies, reload.
+        if (googleId) window['ga-disable-' + googleId] = true;
+        clearAnalyticsCookies();
+        window.location.reload();
+      }
     });
+
+    // "Cookie settings" in the footer and the menu panel reopen the notice.
+    document.addEventListener('click', function (event) {
+      var opener = event.target.closest && event.target.closest('[data-cookie-settings]');
+      if (!opener) return;
+      // From the menu panel, focus later returns to the button that opened the panel.
+      returnTo = opener.closest('#site-menu') ? document.querySelector('[data-menu-open]') : opener;
+      document.dispatchEvent(new CustomEvent('derry:close-menu'));
+      show(readChoice());
+      (readChoice() === 'accepted' ? accept : reject).focus();
+    });
+
+    if (!choice) show(null);
   }
 
   if (document.readyState === 'loading') {

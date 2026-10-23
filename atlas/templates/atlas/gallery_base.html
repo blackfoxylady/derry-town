@@ -9,8 +9,12 @@
 <link rel="canonical" href="{% canonical_url %}"><link rel="alternate" hreflang="en" href="{% alternate_url 'en' %}"><link rel="alternate" hreflang="ru" href="{% alternate_url 'ru' %}"><link rel="alternate" hreflang="x-default" href="{% alternate_url 'en' %}">
 <link rel="icon" href="{% static 'atlas/favicon.ico' %}" sizes="32x32"><link rel="icon" type="image/svg+xml" href="{% static 'atlas/favicon.svg' %}"><link rel="icon" type="image/png" sizes="512x512" href="{% static 'atlas/favicon.png' %}"><link rel="apple-touch-icon" sizes="180x180" href="{% static 'atlas/apple-touch-icon.png' %}">
 <link rel="preload" href="{% static 'atlas/fonts/IBMPlexSans-Regular.woff2' %}" as="font" type="font/woff2" crossorigin><link rel="preload" href="{% static 'atlas/fonts/IBMPlexSansCondensed-SemiBold.woff2' %}" as="font" type="font/woff2" crossorigin>
-{% jsonld jsonld %}<link rel="stylesheet" href="{% static 'atlas/fonts.css' %}"><link rel="stylesheet" href="{% static 'atlas/tokens.css' %}"><link rel="stylesheet" href="{% static 'atlas/components.css' %}"><link rel="stylesheet" href="{% static 'atlas/gallery.css' %}"></head><body>
+{% jsonld jsonld %}<link rel="stylesheet" href="{% static 'atlas/fonts.css' %}"><link rel="stylesheet" href="{% static 'atlas/tokens.css' %}"><link rel="stylesheet" href="{% static 'atlas/components.css' %}"><link rel="stylesheet" href="{% static 'atlas/gallery.css' %}"></head><body class="shell">
+<a class="skip-link" href="#main">{% trans "Skip to content" %}</a>
 {% include 'atlas/cookie_notice.html' %}
-<header><div class="brand"><div class="wordmark"><a href="{% url 'index' %}">DERRY</a></div><p>{% blocktranslate %}A literary atlas of Stephen King’s <i>IT</i>{% endblocktranslate %}<br>1957–58 · 1984–85</p></div><div class="header-actions"><span class="pill">{% trans "NOVEL-BASED RECONSTRUCTION" %}</span><a class="quiet" href="{% url 'index' %}">{% trans "Map" %}</a><a class="quiet" href="{% url 'places' %}">{% trans "Places" %}</a><a class="quiet" href="{% url 'gallery' %}">{% trans "Photos" %}</a><span class="lang" aria-label="Language">{% if LANGUAGE_CODE == 'ru' %}<a href="{% lang_url 'en' %}" hreflang="en" lang="en">EN</a><b>RU</b>{% else %}<b>EN</b><a href="{% lang_url 'ru' %}" hreflang="ru" lang="ru">RU</a>{% endif %}</span></div></header>
-<main class="page">{% block content %}{% endblock %}</main>
+{% include 'atlas/site_header.html' %}
+<main class="page" id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+{% include 'atlas/site_footer.html' %}
+{% include 'atlas/menu_panel.html' %}
+<script src="{% static 'atlas/shell.js' %}" defer></script>
 </body></html>

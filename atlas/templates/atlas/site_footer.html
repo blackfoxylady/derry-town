@@ -1,0 +1,26 @@
+{% load i18n %}{% with page=request.resolver_match.url_name|default:'' %}<footer class="site-footer">
+<div class="site-footer__inner">
+<div class="site-footer__grid">
+<div class="site-footer__about">
+<span class="brand">{% include 'atlas/icons/brand-mark.svg' %}<span class="brand__name">DERRY</span></span>
+<p>{% blocktranslate %}<b>An unofficial fan project.</b> Not affiliated with Stephen King, his publishers or any film or TV adaptation. The town is reconstructed from the text of <i>IT</i> (1986) alone; no text of the novel is reproduced. Photographs are AI-generated period images.{% endblocktranslate %}</p>
+</div>
+<div><h2>{% trans "Atlas" %}</h2><ul>
+<li><a href="{% url 'index' %}"{% if page == 'index' %} aria-current="page"{% endif %}>{% trans "Map" %}</a></li>
+<li><a href="{% url 'places' %}"{% if page == 'places' %} aria-current="page"{% endif %}>{% trans "Places" %}</a></li>
+<li><a href="{% url 'gallery' %}"{% if page == 'gallery' %} aria-current="page"{% endif %}>{% trans "Photos" %}</a></li>
+</ul></div>
+<div><h2>{% trans "About Derry" %}</h2><ul>
+{% include 'atlas/about_links.html' with variant='footer' page=page %}
+</ul></div>
+<div><h2>{% trans "The project" %}</h2><ul>
+<li><a href="{% url 'method' %}"{% if page == 'method' %} aria-current="page"{% endif %}>{% trans "Sources & method" %}</a></li>
+<li><button type="button" class="cookie-settings" data-cookie-settings>{% trans "Cookie settings" %}</button></li>
+</ul></div>
+</div>
+<div class="site-footer__bottom">
+<span>© {% now "Y" %} derryfiles.space · {% trans "A literary atlas, not a film-location guide" %}</span>
+{% include 'atlas/lang_switch.html' with inverse=True %}
+</div>
+</div>
+</footer>{% endwith %}

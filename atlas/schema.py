@@ -15,7 +15,8 @@ def _root(request):
 
 
 def _breadcrumb_root_name():
-    return 'Дерри' if get_language() == 'ru' else 'Derry'
+    """Корень крошек — карта (как в видимых крошках, breadcrumbs.html)."""
+    return _('Map')
 
 
 def _graph(request, *nodes):

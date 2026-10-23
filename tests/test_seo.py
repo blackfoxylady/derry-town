@@ -227,22 +227,30 @@ class SeoTests(TestCase):
         self.assertContains(russian, 'hreflang="en" href="http://testserver/printable-derry-map/"')
 
     def test_town_navigation_links_hubs_and_places_but_not_homepage(self):
-        self.assertNotContains(self.client.get('/'), 'class="derry-explore"')
-        for path in ('/places/', '/places/12-derry-public-library/',
-                     '/is-derry-maine-real/', '/how-bangor-inspired-derry-maine/',
-                     '/books-set-in-derry-maine/', '/printable-derry-map/'):
+        self.assertNotContains(self.client.get('/'), 'class="explore"')
+        cards = {'/is-derry-maine-real/': 'Is Derry, Maine a real town?',
+                 '/how-bangor-inspired-derry-maine/': 'How Bangor inspired Derry',
+                 '/books-set-in-derry-maine/': 'Stephen King books set in Derry',
+                 '/printable-derry-map/': 'Printable map of Derry'}
+        for path in ('/places/', '/places/12-derry-public-library/', *cards):
             response = self.client.get(path)
-            self.assertContains(response, 'class="derry-explore"')
-            self.assertContains(response, 'Is Derry, Maine a real town?')
-            self.assertContains(response, 'How Bangor inspired Derry')
-            self.assertContains(response, 'Stephen King books set in Derry')
-            self.assertContains(response, 'Printable map of Derry')
-            self.assertContains(response, 'Map of Derry')
-            self.assertContains(response, 'All places')
+            self.assertContains(response, '<nav class="explore"')
+            explore = response.content.decode().split('<nav class="explore"')[1].split('</nav>')[0]
+            for href, title in cards.items():
+                # A page never links to itself; the old "All places" aria-current bug is gone.
+                self.assertEqual(f'href="{href}"' in explore, href != path, (path, href))
+                self.assertEqual(title in explore, href != path, (path, title))
+            self.assertNotIn('aria-current', explore)
+        place = self.client.get('/places/12-derry-public-library/')
+        self.assertContains(place, '<a href="/?place=12" class="link link--arrow">'
+                                   'Back to the map, at Derry Public Library</a>', html=True)
+        self.assertNotContains(self.client.get('/places/u3-tracker-brothers/'), 'Back to the map, at')
         russian = self.client.get('/ru/places/')
-        self.assertContains(russian, 'Узнать больше о Дерри')
+        self.assertContains(russian, 'Ещё о городе')
         self.assertContains(russian, 'Книги Стивена Кинга о Дерри')
         self.assertContains(russian, 'Карта Дерри для печати')
+        self.assertContains(self.client.get('/ru/places/12-derry-public-library/'),
+                            'Открыть на карте: Публичная библиотека Дерри')
 
     def test_approved_seo_templates_are_localized_in_russian(self):
         response = self.client.get('/ru/')
@@ -277,7 +285,7 @@ class SeoTests(TestCase):
         self.assertIn('A map of Derry from Stephen King’s <i>IT</i>', home)
         self.assertGreater(home.index('class="map-context"'), home.index('class="workspace"'))
         self.assertLess(home.index('class="map-context"'), home.index('class="place-directory"'))
-        self.assertNotIn('href="/is-derry-maine-real/"', home)
+        self.assertLess(home.index('class="place-directory"'), home.index('class="site-footer"'))
         places = self.client.get('/places/')
         self.assertContains(places, 'These are locations from the novel, not filming locations')
         self.assertContains(self.client.get('/ru/places/'),
@@ -362,7 +370,7 @@ class JsonLdTests(TestCase):
         self.assertEqual(gallery['url'], 'http://testserver/photos/')
         self.assertIn('CollectionPage', gallery['@type'])
         crumbs = node(gallery_data, 'BreadcrumbList')['itemListElement']
-        self.assertEqual([crumb['name'] for crumb in crumbs], ['Derry', 'Photographs'])
+        self.assertEqual([crumb['name'] for crumb in crumbs], ['Map', 'Photographs'])
         self.assertEqual(crumbs[0]['item'], 'http://testserver/')
         self.assertNotIn('item', crumbs[1])
         method = node(jsonld(self.client.get('/method/')), 'WebPage')
@@ -398,7 +406,7 @@ class JsonLdTests(TestCase):
         self.assertEqual(gallery['name'], 'Library photographs of Derry, Maine · Stephen King’s IT')
         crumbs = node(data, 'BreadcrumbList')['itemListElement']
         self.assertEqual([crumb['name'] for crumb in crumbs],
-                         ['Derry', 'Photographs', 'Library photographs'])
+                         ['Map', 'Photographs', 'Library photographs'])
         self.assertEqual(crumbs[1]['item'], 'http://testserver/photos/')
         self.assertNotIn('item', crumbs[2])
 
@@ -428,7 +436,7 @@ class JsonLdTests(TestCase):
         article = node(russian, 'Article')
         self.assertEqual(article['headline'], 'Публичная библиотека Дерри')
         crumbs = node(russian, 'BreadcrumbList')['itemListElement']
-        self.assertEqual(crumbs[0]['name'], 'Дерри')
+        self.assertEqual(crumbs[0]['name'], 'Карта')
         self.assertEqual(crumbs[2]['name'], 'Публичная библиотека Дерри')
 
     def test_photo_page_is_an_image_object(self):

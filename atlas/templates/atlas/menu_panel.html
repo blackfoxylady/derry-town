@@ -1,0 +1,22 @@
+{% load i18n %}{% with page=request.resolver_match.url_name|default:'' %}<div class="scrim" data-menu-scrim hidden></div>
+<div class="panel" id="site-menu" role="dialog" aria-modal="true" aria-label="{% trans 'Site menu' %}" hidden>
+<div class="panel__head">
+<a href="{% url 'index' %}" class="brand" aria-label="{% trans 'Derry, a literary atlas: home' %}">{% include 'atlas/icons/brand-mark.svg' %}<span class="brand__name">DERRY</span></a>
+<button type="button" class="btn btn--icon" aria-label="{% trans 'Close menu' %}" data-menu-close>{% include 'atlas/icons/close.svg' %}</button>
+</div>
+<nav class="panel__nav" aria-label="{% trans 'Main' %}">
+<a href="{% url 'index' %}"{% if page == 'index' %} aria-current="page"{% endif %}>{% trans "Map" %}</a>
+<a href="{% url 'places' %}"{% if page == 'places' %} aria-current="page"{% elif page == 'place' %} aria-current="true"{% endif %}>{% trans "Places" %}</a>
+<a href="{% url 'gallery' %}"{% if page == 'gallery' %} aria-current="page"{% elif page == 'gallery_place' or page == 'gallery_character' or page == 'gallery_tag' or page == 'gallery_year' or page == 'photo' %} aria-current="true"{% endif %}>{% trans "Photos" %}</a>
+<div class="panel__group" role="group" aria-labelledby="site-menu-about">
+<span class="eyebrow" id="site-menu-about">{% trans "About Derry" %}</span>
+{% include 'atlas/about_links.html' with variant='panel' page=page %}
+</div>
+<a href="{% url 'method' %}"{% if page == 'method' %} aria-current="page"{% endif %}>{% trans "Sources & method" %}</a>
+</nav>
+<div class="panel__foot">
+{% include 'atlas/lang_switch.html' %}
+<p>{% blocktranslate %}Reconstructed from the text of <i>IT</i> (1986). An unofficial fan project, not affiliated with Stephen King or his publishers.{% endblocktranslate %}</p>
+<button type="button" class="link cookie-settings" data-cookie-settings>{% trans "Cookie settings" %}</button>
+</div>
+</div>{% endwith %}

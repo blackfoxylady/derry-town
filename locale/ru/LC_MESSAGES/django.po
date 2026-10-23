@@ -490,9 +490,6 @@ msgstr ""
 "размещению объектов."
 
 #: place directory
-msgid "Breadcrumbs"
-msgstr "Хлебные крошки"
-
 msgid "Places in Derry, Maine"
 msgstr "Места Дерри, штат Мэн"
 
@@ -627,3 +624,128 @@ msgid_plural "Browse %(count)s places in Derry, Maine, reconstructed from Stephe
 msgstr[0] "Просматривайте %(count)s место Дерри, штат Мэн, реконструированное по роману Стивена Кинга «Оно». Поиск по названию, категории и достоверности привязки, с источниками и фотографиями."
 msgstr[1] "Просматривайте %(count)s места Дерри, штат Мэн, реконструированные по роману Стивена Кинга «Оно». Поиск по названию, категории и достоверности привязки, с источниками и фотографиями."
 msgstr[2] "Просматривайте %(count)s мест Дерри, штат Мэн, реконструированных по роману Стивена Кинга «Оно». Поиск по названию, категории и достоверности привязки, с источниками и фотографиями."
+
+#: atlas/templates/atlas (site shell, redesign block 02)
+msgid "Skip to content"
+msgstr "Перейти к содержанию"
+
+msgid "Derry, a literary atlas: home"
+msgstr "Дерри, литературный атлас: на главную"
+
+msgid "A literary atlas of Stephen King’s <i>IT</i> · reconstructed from the novel"
+msgstr "Литературный атлас романа Стивена Кинга <i>«Оно»</i> · реконструкция по тексту"
+
+msgid "Main"
+msgstr "Главное меню"
+
+msgid "About Derry"
+msgstr "О Дерри"
+
+msgid "Method"
+msgstr "Метод"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Menu"
+msgstr "Меню"
+
+msgid "Site menu"
+msgstr "Меню сайта"
+
+msgid "Close menu"
+msgstr "Закрыть меню"
+
+msgid "Reconstructed from the text of <i>IT</i> (1986). An unofficial fan project, not affiliated with Stephen King or his publishers."
+msgstr "Реконструкция по тексту романа <i>«Оно»</i> (1986). Неофициальный фанатский проект, не связан со Стивеном Кингом и его издателями."
+
+msgid "Cookie settings"
+msgstr "Настройки cookie"
+
+msgid "Is Derry, Maine real?"
+msgstr "Существует ли город Дерри, штат Мэн?"
+
+msgid "What is fictional and where King places the town"
+msgstr "Что здесь вымышлено и где Кинг помещает город"
+
+msgid "How Bangor inspired Derry"
+msgstr "Как Бангор вдохновил Дерри"
+
+msgid "The real landmarks behind the fictional town"
+msgstr "Реальные места за вымышленным городом"
+
+msgid "Books set in Derry"
+msgstr "Книги Стивена Кинга о Дерри"
+
+msgid "A spoiler-light reading path"
+msgstr "Маршрут чтения без спойлеров"
+
+msgid "Printable map"
+msgstr "Карта для печати"
+
+msgid "Four A2 sheets · PDF and SVG"
+msgstr "Четыре листа A2 · PDF и SVG"
+
+msgctxt "footer"
+msgid "Is Derry, Maine real?"
+msgstr "Существует ли Дерри?"
+
+msgctxt "footer"
+msgid "How Bangor inspired Derry"
+msgstr "Как Бангор вдохновил Дерри"
+
+msgctxt "footer"
+msgid "Books set in Derry"
+msgstr "Книги о Дерри"
+
+msgctxt "footer"
+msgid "Printable map"
+msgstr "Карта для печати"
+
+msgid "Breadcrumb"
+msgstr "Хлебные крошки"
+
+msgid "Atlas"
+msgstr "Атлас"
+
+msgid "The project"
+msgstr "Проект"
+
+msgid "<b>An unofficial fan project.</b> Not affiliated with Stephen King, his publishers or any film or TV adaptation. The town is reconstructed from the text of <i>IT</i> (1986) alone; no text of the novel is reproduced. Photographs are AI-generated period images."
+msgstr "<b>Неофициальный фанатский проект.</b> Не связан со Стивеном Кингом, его издателями или экранизациями. Город реконструирован только по тексту романа <i>«Оно»</i> (1986); текст романа не воспроизводится. Фотографии созданы ИИ."
+
+msgid "A literary atlas, not a film-location guide"
+msgstr "Литературный атлас, не путеводитель по местам съёмок"
+
+msgid "Read more about the town"
+msgstr "Ещё о городе"
+
+msgid "Back to the map, at %(name)s"
+msgstr "Открыть на карте: %(name)s"
+
+msgid "Is Derry, Maine a real town?"
+msgstr "Существует ли Дерри на самом деле?"
+
+msgid "What is fictional and where King places the town."
+msgstr "Что в городе вымышлено и где Кинг его разместил."
+
+msgid "The real landmarks behind the fictional town."
+msgstr "Реальные ориентиры за образом вымышленного города."
+
+msgid "Stephen King books set in Derry"
+msgstr "Книги Стивена Кинга о Дерри"
+
+msgid "A spoiler-light reading path through the town."
+msgstr "Маршрут чтения без спойлеров."
+
+msgid "Printable map of Derry"
+msgstr "Карта Дерри для печати"
+
+msgid "Four A2 sheets in PDF and SVG."
+msgstr "Четыре листа A2 в PDF и SVG."
+
+msgid "Read →"
+msgstr "Читать →"
+
+msgid "Download"
+msgstr "Скачать"

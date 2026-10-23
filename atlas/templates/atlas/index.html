@@ -48,6 +48,7 @@
 </div>
 </div>
 </section>
+{% include 'atlas/site_footer.html' %}
 <script>window.ATLAS_URLS={mapData:'{% url "map_data" %}',photoData:'{% url "photo_data" %}',gallery:'{% url "gallery" %}',photo:'{% url "photo" 0 %}',place:'{% url "place" "x" %}'}</script>
 <script src="{% url 'javascript-catalog' %}" defer></script>
 <script src="{% static 'atlas/litho.js' %}" defer></script>
