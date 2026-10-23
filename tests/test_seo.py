@@ -212,7 +212,8 @@ class SeoTests(TestCase):
     def test_printable_map_has_localized_downloads_and_print_guidance(self):
         english = self.client.get('/printable-derry-map/')
         self.assertEqual(english.status_code, 200)
-        self.assertContains(english, '<h1>Download a printable map of Derry, Maine</h1>', html=True)
+        self.assertContains(english, '<h1 class="t-h1">Download a printable map of Derry, Maine</h1>',
+                            html=True)
         self.assertContains(english, 'atlas/downloads/en/Derry_Print_Atlas.pdf')
         self.assertContains(english, 'atlas/downloads/en/derry_city.svg')
         self.assertContains(english, 'Photographs and photo markers are not included')
@@ -221,7 +222,7 @@ class SeoTests(TestCase):
 
         russian = self.client.get('/ru/printable-derry-map/')
         self.assertEqual(russian.status_code, 200)
-        self.assertContains(russian, '<h1>Скачать карту Дерри для печати</h1>', html=True)
+        self.assertContains(russian, '<h1 class="t-h1">Скачать карту Дерри для печати</h1>', html=True)
         self.assertContains(russian, 'atlas/downloads/ru/Derry_Print_Atlas.pdf')
         self.assertContains(russian, 'названия улиц и мест переведены на русский')
         self.assertContains(russian, 'Фотографии и их отметки в печатную версию не включены')
@@ -233,7 +234,8 @@ class SeoTests(TestCase):
                  '/how-bangor-inspired-derry-maine/': 'How Bangor inspired Derry',
                  '/books-set-in-derry-maine/': 'Stephen King books set in Derry',
                  '/printable-derry-map/': 'Printable map of Derry'}
-        for path in ('/places/', '/places/12-derry-public-library/', '/printable-derry-map/'):
+        # The printable map and method pages use "Keep reading" (test_articles).
+        for path in ('/places/', '/places/12-derry-public-library/'):
             response = self.client.get(path)
             self.assertContains(response, '<nav class="explore"')
             explore = response.content.decode().split('<nav class="explore"')[1].split('</nav>')[0]

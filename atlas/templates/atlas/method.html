@@ -1,22 +1,61 @@
 {% extends 'atlas/gallery_base.html' %}
-{% load i18n %}
+{% load i18n atlas_tags %}
+{% block main_class %}page page--editorial{% endblock %}
 {% block content %}
-<article class="method">
-<h1>{% trans "Built from the novel" %}</h1>
-<p>{% blocktranslate %}This is a reasoned reconstruction of fictional geography, not a canonical or surveyed map. It is inspired by Stephen King’s novel <i>IT</i>, and the novel’s own descriptions are its only literary source. Film and television geography has not been used.{% endblocktranslate %}</p>
-<p>{% blocktranslate %}The town plan combines both main periods and the historical interludes. Dates in the place cards distinguish former sites and replacements; the map does not depict a single historical day. It covers surface geography only.{% endblocktranslate %}</p>
-<h2>{% trans "What the symbols mean" %}</h2>
-<p>{% for level in confidence_levels %}<b>{{ level.letter }} · {{ level.label }}.</b> {{ level.explanation }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</p>
-<h2>{% trans "The novel" %}</h2>
-<p>{% blocktranslate %}Stephen King, <i>IT</i> (1986). References in the place cards name chapters and interludes. No text of the novel is reproduced on this website.{% endblocktranslate %}</p>
-<h2>{% trans "Where the book does not settle the geometry" %}</h2>
-{% if method_geometry %}<p>{{ method_geometry }}</p>{% endif %}
-<p>{% blocktranslate %}The original research notes record the reconstruction decisions and remaining contradictions. Current evidence is shown in the place cards.{% endblocktranslate %}</p>
-{% if sources %}
-<h2>{% trans "Open sources consulted" %}</h2>
-{% for s in sources %}<div class="source"><a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.key }} · {{ s.title }}</a><p>{{ s.role }}</p></div>{% endfor %}
-{% endif %}
-<p class="help">{% blocktranslate %}The map is served by this website. Optional source links open external websites. Drag to pan; use the wheel, buttons or pinch gesture to zoom. With the map focused, arrow keys pan and + / − zoom. The ruler measures straight-line distances in the reconstruction, not canonical travel distances. Press Escape to clear a measurement or close a place card.{% endblocktranslate %}</p>
+<article class="method-page">
+<div class="article__hero">
+<div class="article__intro">
+{% include 'atlas/breadcrumbs.html' with current=breadcrumb only %}
+<h1 class="t-h1">{% trans "Built from the novel" %}</h1>
+<p class="method-page__lead">{% blocktranslate %}This is a reasoned reconstruction of fictional geography, not a canonical or surveyed map. It is inspired by Stephen King’s novel <i>IT</i>, and the novel’s own descriptions are its only literary source. Film and television geography has not been used.{% endblocktranslate %}</p>
+<p class="method-page__text">{% blocktranslate %}The town plan combines both main periods and the historical interludes. Dates in the place cards distinguish former sites and replacements; the map does not depict a single historical day. It covers surface geography only.{% endblocktranslate %}</p>
+</div>
+<div class="article__aside">{% include 'atlas/map_card.html' %}</div>
+</div>
+
+<section class="method-page__section method-page__section--first" aria-labelledby="how-sure">
+<h2 id="how-sure">{% trans "How sure is each pin" %}</h2>
+<p class="method-page__text">{% trans "Every place on the map carries one of four marks. They say how much of its position comes from the text and how much the atlas worked out." %}</p>
+{% trans "Mark" as h_mark %}{% trans "What the text gives" as h_gives %}{% trans "What the atlas adds" as h_adds %}{% trans "Example" as h_example %}{% trans "Places" context "method matrix" as h_places %}
+<table class="matrix">
+<thead><tr><th scope="col">{{ h_mark }}</th><th scope="col">{{ h_gives }}</th><th scope="col">{{ h_adds }}</th><th scope="col">{{ h_example }}</th><th scope="col">{{ h_places }}</th></tr></thead>
+<tbody>
+{% for level in levels %}<tr class="matrix__row">
+<th scope="row" class="matrix__mark"><span class="matrix__glyph" aria-hidden="true">{% if level.letter == 'A' %}{% include 'atlas/icons/glyph-a.svg' %}{% elif level.letter == 'B' %}{% include 'atlas/icons/glyph-b.svg' %}{% elif level.letter == 'C' %}{% include 'atlas/icons/glyph-c.svg' %}{% else %}{% include 'atlas/icons/glyph-u.svg' %}{% endif %}</span><span class="visually-hidden">{{ level.letter }} · </span><b>{{ level.label }}</b></th>
+<td class="matrix__gives" data-label="{{ h_gives }}">{{ level.gives }}</td>
+<td class="matrix__adds" data-label="{{ h_adds }}">{{ level.adds }}</td>
+<td class="matrix__example">{% if level.example %}<a class="matrix__link" href="{{ level.example.url }}">{% if level.letter == 'U' %}<span class="matrix__crop matrix__crop--none"><span class="locator__glyph" aria-hidden="true">{% include 'atlas/icons/glyph-u.svg' %}</span>{% trans "Listed, not drawn" %}</span>{% else %}{% locator 'example' level.example.key as frame %}{% if frame %}<img class="matrix__crop" src="{{ frame.url }}" width="{{ frame.width }}" height="{{ frame.height }}" alt="" loading="lazy" decoding="async">{% else %}<span class="matrix__crop matrix__crop--none" aria-hidden="true"></span>{% endif %}{% endif %}<span class="matrix__name">{{ level.example.key }} {{ level.example.name }}</span></a>{% endif %}</td>
+<td class="matrix__count" data-label="{{ h_places }}"><span class="matrix__n">{{ level.count }}</span><span class="matrix__unit"> {% blocktranslate count counter=level.count %}place{% plural %}places{% endblocktranslate %}</span></td>
+</tr>{% endfor %}
+</tbody>
+</table>
+<div class="method-page__cards">
+<div class="method-card"><h3>{% trans "The novel" %}</h3><p>{% blocktranslate %}Stephen King, <i>IT</i> (1986). References in the place cards name chapters and interludes. No text of the novel is reproduced on this website.{% endblocktranslate %}</p></div>
+<div class="method-card"><h3>{% trans "Where the book does not settle the geometry" %}</h3>{% if method_geometry %}<p>{{ method_geometry }}</p>{% endif %}<p>{% trans "The relief is conceptual: contours and spot heights are approximate and not measured." %}</p></div>
+</div>
+</section>
+
+{% if sources %}<section class="method-page__section" aria-labelledby="sources">
+<h2 id="sources">{% trans "Open sources consulted" %}</h2>
+<p class="method-page__text">{% trans "Seven outside references. Each is used only for what its role allows: none of them supplies a street plan or a coordinate." %}</p>
+{% trans "(opens an external site)" as ext %}<ol class="source-list">
+{% for s in sources %}<li class="source-list__item">
+<span class="source-list__code">{{ s.key }}</span>
+<span class="source-list__main">{% if s.publisher %}<span class="t-meta">{{ s.publisher }}</span>{% endif %}<a class="source-list__title" href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.title }}<span class="ext" aria-hidden="true">↗</span><span class="visually-hidden"> {{ ext }}</span></a><span class="source-list__role">{{ s.role }}</span></span>
+{% if s.role_type %}<span class="source-list__chip"><span class="role-chip role-chip--{{ s.role_type }}">{{ s.role_label }}</span></span>{% endif %}
+</li>{% endfor %}
+</ol>
+</section>{% endif %}
+
+<section class="method-page__section" aria-labelledby="using">
+<h2 id="using">{% trans "Using the map" %}</h2>
+<ul class="usage">
+<li class="usage__card"><h3>{% trans "Move" context "using the map" %}</h3><p>{% trans "Drag the map, or use" %} <kbd>←</kbd> <kbd>→</kbd> <kbd>↑</kbd> <kbd>↓</kbd></p></li>
+<li class="usage__card"><h3>{% trans "Zoom" context "using the map" %}</h3><p>{% trans "Wheel, pinch, the + − buttons, or" %} <kbd>+</kbd> <kbd>−</kbd></p></li>
+<li class="usage__card"><h3>{% trans "Measure" context "using the map" %}</h3><p>{% trans "The ruler measures straight lines in the reconstruction, not travel distances" %}</p></li>
+<li class="usage__card"><h3>{% trans "Close" context "using the map" %}</h3><p>{% blocktranslate %}<kbd>Esc</kbd> clears a measurement or closes a place card{% endblocktranslate %}</p></li>
+</ul>
+</section>
 </article>
-{% include 'atlas/derry_explore.html' %}
+{% include 'atlas/derry_explore.html' with variant='reading' current_hub='method' %}
 {% endblock %}

@@ -41,11 +41,11 @@ button.chip{font-family:inherit;cursor:pointer}
 .facts dt{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding-top:2px}
 .facts dd{margin:0}
 @media(max-width:780px){.page{padding:14px 14px 40px}.frow{flex-wrap:wrap;gap:4px 10px}.fname{flex-basis:100%;padding-bottom:2px}.facts{grid-template-columns:1fr;gap:2px}.facts dd{margin-bottom:8px}}
-/* Place and method pages. */
+/* Place pages. */
 .gallery-title,.photo h1{font:700 30px var(--font-display);margin:6px 0 18px}
 .gallery-intro{max-width:720px;margin:-8px 0 20px;font-size:14px;line-height:1.6;color:#394d47}
-.place h1,.method h1{font:700 30px var(--font-display);margin:6px 0 10px}
-.place h2,.method h2{font:600 18px var(--font-display);margin:26px 0 10px}
+.place h1{font:700 30px var(--font-display);margin:6px 0 10px}
+.place h2{font:600 18px var(--font-display);margin:26px 0 10px}
 .eyebrow{font-size:10px;font-weight:700;line-height:1.45;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 .period{font-size:11px;color:#576a57;text-transform:uppercase;letter-spacing:.55px;margin:0 0 12px}
 .badge{font-size:11px;font-weight:700;padding:5px 7px;border:1px solid #b7c6ac;border-radius:4px;display:inline-block;background:#f6f6ec;min-height:0;line-height:1.45;white-space:normal}
@@ -85,48 +85,6 @@ button.chip{font-family:inherit;cursor:pointer}
 .related-map-link{align-self:flex-start;margin-top:auto;padding-top:11px;font-size:11px}
 .place-photo-filter{color:var(--muted)}
 @media(max-width:600px){.related-panels{grid-template-columns:1fr}}
-.source{padding:11px 0;border-top:1px solid #d6ddcd;max-width:640px}
-.source a{font-weight:650}
-.source p{font-size:12px;margin:5px 0;color:#586b59}
-.method p{max-width:640px;font-size:13px}
-.help{color:var(--muted);font-size:11px;margin-top:16px}
-
-/* Source-backed editorial hubs. */
-.editorial{max-width:760px;padding:8px 0 30px}
-.editorial-wide{max-width:900px}
-.editorial h1{max-width:850px;font:700 42px/1.08 var(--font-display);margin:6px 0 16px;letter-spacing:-.3px}
-.editorial h2{max-width:760px;font:650 23px/1.25 var(--font-display);margin:36px 0 12px}
-.editorial h3{font:650 18px/1.3 var(--font-display);margin:7px 0 8px}
-.editorial>p,.editorial-deck{max-width:760px;font-size:15px;line-height:1.72;margin:0 0 15px}
-.editorial .editorial-deck{font:400 19px/1.58 var(--font-read);color:#394d47;margin-bottom:24px}
-.editorial .screen-note{display:block;max-width:760px;margin:24px 0 30px;padding:17px 19px;border:1px solid #bdc8b7;border-left:4px solid #a88746;border-radius:6px;background:#faf8f1;font-size:14px;line-height:1.62;color:#394d47}
-.editorial .screen-note>b{display:block;margin-bottom:6px;font-size:11px;letter-spacing:1.05px;text-transform:uppercase}
-.printable-preview{max-width:900px;margin:27px 0 24px}
-.printable-preview a{display:block;border:1px solid #bdc8b7;border-radius:8px;overflow:hidden;background:#e7e4d6;box-shadow:0 8px 28px rgba(38,61,56,.09)}
-.printable-preview img{display:block;width:100%;height:auto;aspect-ratio:594/420;object-fit:cover}
-.printable-preview figcaption{margin-top:8px;color:var(--muted);font-size:11px}
-.download-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:900px;margin:25px 0 18px}
-.download-card{display:flex;min-width:0;flex-direction:column;border:1px solid var(--line);border-radius:8px;background:#faf8f1;padding:20px 21px}
-.download-card-primary{border-color:#9cae9a;background:#f0f2e8}
-.download-format{color:#64736b;font-size:10px;font-weight:750;letter-spacing:1.1px;text-transform:uppercase}
-.editorial .download-card h2{font-size:21px;margin:7px 0 9px}
-.download-card p{margin:0 0 16px;color:#394d47;font-size:13px;line-height:1.55}
-.download-card small{display:block;margin-top:10px;color:var(--muted);font-size:10px;line-height:1.45}
-.download-button{align-self:flex-start;border-radius:5px;background:#315e5a;color:#fff;padding:10px 16px;font-size:13px;font-weight:700;text-decoration:none}
-.download-button:hover{background:#264d49}
-.svg-downloads{list-style:none;margin:auto 0 0;padding:0;border-top:1px solid #dde0d5}
-.svg-downloads li{border-bottom:1px solid #dde0d5}
-.svg-downloads a{display:block;padding:8px 2px;font-size:12px;font-weight:650;text-decoration:none}
-.svg-downloads a:hover{text-decoration:underline}
-.download-language{max-width:900px!important;margin:0 0 34px!important;color:var(--muted);font-size:12px!important}
-@media(max-width:700px){
- .editorial h1{font-size:33px}.editorial h2{font-size:21px;margin-top:31px}
- .editorial>p,.editorial-deck{font-size:14px}
- .editorial .editorial-deck{font-size:17px}
- .editorial .screen-note{margin:20px 0 25px;padding:15px}
- .download-grid{grid-template-columns:1fr}.download-card{padding:17px}
-}
-
 /* Searchable place directory. The full list stays in the HTML; JS only filters and sorts it. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .places-hero{max-width:780px;padding:8px 0 23px}

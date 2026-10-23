@@ -1,0 +1,9 @@
+[
+  {"op": "update", "table": "source", "key": "W1", "values": {"metadata": {"ru": {"role": "Авторское объяснение: канал Бангора и библиотека детства в Стратфорде повлияли на роман. Используется, чтобы зафиксировать множественность реальных прообразов, а не уличные координаты."}, "role_type": "inspiration"}}},
+  {"op": "update", "table": "source", "key": "W2", "values": {"metadata": {"ru": {"role": "Общее авторское утверждение о связи Дерри и Бангора. Места из другой истории не добавлялись."}, "role_type": "inspiration"}}},
+  {"op": "update", "table": "source", "key": "W3", "values": {"metadata": {"ru": {"role": "Основной фон по городскому стоку и притокам. Использован только для проверки правдоподобия реконструированного наземного ландшафта."}, "role_type": "plausibility"}}},
+  {"op": "update", "table": "source", "key": "W4", "values": {"metadata": {"ru": {"role": "Официальная карта реального мира, изученная как аналог городского речного коридора. Её современная уличная геометрия, масштаб и ориентиры в Дерри не переносились."}, "role_type": "analogue"}}},
+  {"op": "update", "table": "source", "key": "W5", "values": {"metadata": {"ru": {"role": "Основной архитектурный аналог. Реальный резервуар отличается от заявленных в романе размеров и истории; книжные детали в приоритете."}, "role_type": "analogue"}}},
+  {"op": "update", "table": "source", "key": "W6", "values": {"metadata": {"ru": {"role": "Исторический картографический контекст и каталожная запись. Не использована как измеренная подложка."}, "role_type": "context"}}},
+  {"op": "update", "table": "source", "key": "W7", "values": {"metadata": {"ru": {"role": "Аудит источников: описывает карты, смешивающие роман, экранизации и другие романы. Такие карты исключены как географический авторитет."}, "role_type": "excluded"}, "role": "Source audit: describes maps mixing the novel, screen adaptations and other novels. Those maps were excluded as geographic authority."}}
+]

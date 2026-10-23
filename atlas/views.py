@@ -20,6 +20,7 @@ from .localized_photos import photo_caption
 from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
                      Revision, Setting, Source, Tag)
 from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
+from .locators import EXAMPLES as LOCATOR_EXAMPLES
 from .rendering import current_payload, RENDER_VERSION
 from .terms import (chapter_label, confidence_label, confidence_levels, kind_label,
                     novel_references, parse_reference, period_label)
@@ -1127,10 +1128,46 @@ def place_page(request, slug):
     return response
 
 
+# Матрица «How sure is each pin»: что даёт текст и что добавляет атлас, пример на уровень.
+METHOD_MATRIX = {
+    'A': (_('The street, a neighbour or a named site'), _('The exact lot and the building outline')),
+    'B': (_('Routes, distances, directions'), _('Which street, and the house itself')),
+    'C': (_('Only a description'), _('The whole position, as a plausible option')),
+    'U': (_('That the place exists'), _('Nothing: no point is drawn')),
+}
+# A/B/C — те же места, что кадры локаторов 'example' (locators.EXAMPLES); у U кадра нет.
+METHOD_EXAMPLES = {**dict(zip('ABC', LOCATOR_EXAMPLES)), 'U': 'U3'}
+# Роль внешнего источника (Source.metadata['role_type']) → чип на странице метода.
+SOURCE_ROLES = {
+    'inspiration': _('Inspiration'),
+    'plausibility': _('Plausibility check'),
+    'analogue': _('Analogue only'),
+    'context': _('Context'),
+    'excluded': _('Excluded as geography'),
+}
+
+
+def _method_levels():
+    """Четыре строки матрицы: уровень, число мест из БД и пример (кадр локатора или U)."""
+    places = Feature.objects.filter(object_type__in=('site', 'unplaced'))
+    counts = dict(places.order_by().values_list('confidence').annotate(n=Count('key')))
+    examples = {f.key: f for f in places.filter(key__in=METHOD_EXAMPLES.values())}
+    levels = []
+    for level in confidence_levels():
+        letter = level['letter']
+        gives, adds = METHOD_MATRIX[letter]
+        example = examples.get(METHOD_EXAMPLES[letter])
+        levels.append({**level, 'gives': gives, 'adds': adds, 'count': counts.get(letter, 0),
+                       'example': example and {
+                           'key': example.key, 'name': feature_name(example),
+                           'url': reverse('place', args=[place_slug(example)])}})
+    return levels
+
+
 @require_safe
 def method(request):
-    """Страница «Sources & method»: те же тексты, что раньше жили в диалоге
-    на карте, плюс method_geometry и веб-источники из настроек атласа."""
+    """Страница «Sources & method»: шкала A/B/C/U с примерами, роман и геометрия,
+    веб-источники из БД (роль — metadata['role_type']), «Using the map»."""
     setting = Setting.objects.filter(pk='atlas').first()
     cfg = setting.value if setting else {}
     geometry = cfg.get('method_geometry', '')
@@ -1142,18 +1179,29 @@ def method(request):
             geometry = ru.value.get('method_geometry') or geometry
     sources = []
     for s in Source.objects.filter(kind='web').order_by('key'):
-        ru = (s.metadata or {}).get('ru', {}) if _is_ru() and isinstance(s.metadata, dict) else {}
-        sources.append({'key': s.key, 'url': s.url, 'title': ru.get('title') or s.title,
-                        'role': ru.get('role') or s.role})
+        metadata = s.metadata if isinstance(s.metadata, dict) else {}
+        ru = metadata.get('ru', {}) if _is_ru() else {}
+        # «Stephen King - IT: Inspiration» → издатель над ссылкой и название ссылки.
+        title = ru.get('title') or s.title
+        publisher, _sep, short = title.partition(' - ')
+        role_type = metadata.get('role_type')
+        sources.append({'key': s.key, 'url': s.url,
+                        'publisher': publisher if short else '', 'title': short or title,
+                        'role': ru.get('role') or s.role,
+                        'role_type': role_type if role_type in SOURCE_ROLES else '',
+                        'role_label': SOURCE_ROLES.get(role_type, '')})
     page_title = _('Mapping Derry, Maine — Sources & Method · Stephen King’s IT')
     meta_description = _(
         'Learn how the map of Derry, Maine was reconstructed from Stephen King’s IT, including '
         'sources, evidence, confidence levels and mapping decisions.')
+    breadcrumb = _('Sources & method')
+    levels = _method_levels()
     response = render(request, 'atlas/method.html', {
         'method_geometry': geometry, 'sources': sources,
-        'confidence_levels': confidence_levels(),
+        'levels': levels, 'places_count': sum(level['count'] for level in levels),
+        'breadcrumb': breadcrumb, 'current_hub': 'method',
         'page_title': page_title, 'meta_description': meta_description,
-        'jsonld': schema.method(request, page_title, meta_description)})
+        'jsonld': schema.method(request, page_title, meta_description, breadcrumb)})
     response['Cache-Control'] = 'no-cache'
     return response
 

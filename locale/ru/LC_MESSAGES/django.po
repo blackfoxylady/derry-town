@@ -178,9 +178,6 @@ msgstr ""
 "в карточках мест различают прежние места и их замены; карта не изображает "
 "один исторический день. Она охватывает только наземную географию."
 
-msgid "What the symbols mean"
-msgstr "Что означают символы"
-
 msgid "The novel"
 msgstr "Роман"
 
@@ -194,29 +191,8 @@ msgstr ""
 msgid "Where the book does not settle the geometry"
 msgstr "Где книга не определяет географию"
 
-msgid ""
-"The original research notes record the reconstruction decisions and "
-"remaining contradictions. Current evidence is shown in the place cards."
-msgstr ""
-"Оригинальные исследовательские заметки фиксируют решения реконструкции и "
-"оставшиеся противоречия. Актуальные свидетельства показаны в карточках мест."
-
 msgid "Open sources consulted"
 msgstr "Использованные открытые источники"
-
-msgid ""
-"The map is served by this website. Optional source links open external "
-"websites. Drag to pan; use the wheel, buttons or pinch gesture to zoom. "
-"With the map focused, arrow keys pan and + / − zoom. The ruler measures "
-"straight-line distances in the reconstruction, not canonical travel "
-"distances. Press Escape to clear a measurement or close a place card."
-msgstr ""
-"Карту обслуживает этот сайт. Необязательные ссылки на источники открывают "
-"внешние сайты. Перетаскивайте, чтобы перемещаться; масштабируйте колесом, "
-"кнопками или щипком. Когда карта в фокусе, стрелки перемещают, а + / − "
-"масштабируют. Линейка измеряет расстояния по прямой в реконструкции, а не "
-"канонические дорожные расстояния. Escape сбрасывает измерение и закрывает "
-"карточку места."
 
 #: index.html
 msgid "A literary atlas of Stephen King’s <i>IT</i>"
@@ -877,3 +853,112 @@ msgstr "За пределами карты"
 
 msgid "No point on the map"
 msgstr "Точки на карте нет"
+
+# П6: печать и метод
+
+msgid "How sure is each pin"
+msgstr "Насколько точна каждая точка"
+
+msgid "Every place on the map carries one of four marks. They say how much of its position comes from the text and how much the atlas worked out."
+msgstr "У каждого места на карте одна из четырёх отметок. Она показывает, сколько в его положении взято из текста, а сколько достроил атлас."
+
+msgid "Mark"
+msgstr "Отметка"
+
+msgid "What the text gives"
+msgstr "Что даёт текст"
+
+msgid "What the atlas adds"
+msgstr "Что добавляет атлас"
+
+msgid "Example"
+msgstr "Пример"
+
+msgctxt "method matrix"
+msgid "Places"
+msgstr "Мест"
+
+msgid "Listed, not drawn"
+msgstr "В списке, но не на карте"
+
+msgid "place"
+msgid_plural "places"
+msgstr[0] "место"
+msgstr[1] "места"
+msgstr[2] "мест"
+
+msgid "The relief is conceptual: contours and spot heights are approximate and not measured."
+msgstr "Рельеф условный: горизонтали и отметки высот приблизительны, это не измерения."
+
+msgid "Seven outside references. Each is used only for what its role allows: none of them supplies a street plan or a coordinate."
+msgstr "Семь внешних источников. Каждый используется только в пределах своей роли: ни один не даёт плана улиц или координат."
+
+msgid "Using the map"
+msgstr "Как пользоваться картой"
+
+msgctxt "using the map"
+msgid "Move"
+msgstr "Перемещение"
+
+msgid "Drag the map, or use"
+msgstr "Перетащите карту или используйте"
+
+msgctxt "using the map"
+msgid "Zoom"
+msgstr "Масштаб"
+
+msgid "Wheel, pinch, the + − buttons, or"
+msgstr "Колесо, щипок, кнопки + − или клавиши"
+
+msgctxt "using the map"
+msgid "Measure"
+msgstr "Измерение"
+
+msgid "The ruler measures straight lines in the reconstruction, not travel distances"
+msgstr "Линейка меряет прямые в реконструкции, а не расстояния пути"
+
+msgctxt "using the map"
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "<kbd>Esc</kbd> clears a measurement or closes a place card"
+msgstr "<kbd>Esc</kbd> сбрасывает измерение или закрывает карточку места"
+
+msgid "The street, a neighbour or a named site"
+msgstr "Улицу или соседние места"
+
+msgid "The exact lot and the building outline"
+msgstr "Точный участок и контур здания"
+
+msgid "Routes, distances, directions"
+msgstr "Маршруты, расстояния, направления"
+
+msgid "Which street, and the house itself"
+msgstr "Улицу и сам дом"
+
+msgid "Only a description"
+msgstr "Только описание"
+
+msgid "The whole position, as a plausible option"
+msgstr "Всё положение — как правдоподобный вариант"
+
+msgid "That the place exists"
+msgstr "Что место существует"
+
+msgid "Nothing: no point is drawn"
+msgstr "Ничего: точка не рисуется"
+
+msgid "Inspiration"
+msgstr "Источник вдохновения"
+
+msgid "Plausibility check"
+msgstr "Проверка правдоподобия"
+
+msgid "Analogue only"
+msgstr "Только аналог"
+
+msgid "Context"
+msgstr "Контекст"
+
+msgid "Excluded as geography"
+msgstr "Не используется как география"

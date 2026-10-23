@@ -88,8 +88,11 @@ def places(request, name, description, cards):
                                (_('Places'), '')))
 
 
-def method(request, name, description):
-    return _graph(request, _page(request, 'WebPage', name, description))
+def method(request, name, description, breadcrumb):
+    """Sources & method: WebPage и крошки Map › Sources & method."""
+    return _graph(request, _page(request, 'WebPage', name, description),
+                  _breadcrumbs(request, (_breadcrumb_root_name(), reverse('index')),
+                               (str(breadcrumb), '')))
 
 
 def editorial(request, name, description, breadcrumb, published, in_articles=False):

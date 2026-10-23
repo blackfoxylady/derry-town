@@ -414,7 +414,7 @@ html.is-menu-open .cookie { display: none; } /* the notice must not sit over the
    EDITORIAL (block 03): article template, table of contents, answer box,
    map card, comparison table, screen note, book entries, reading order,
    sources, "Keep reading" and the /articles/ listing.
-   Printable map and method keep the old .editorial page CSS until pass 6.
+   Printable map and method pages (pass 6) share the hero, the map card and Keep reading.
    ========================================================================== */
 .page.page--editorial { max-width: var(--container); padding: var(--space-6) var(--gutter) var(--space-11); }
 body:has(> .page--editorial) { background: var(--color-paper); color: var(--color-ink); } /* beat gallery.css paper and ink */
@@ -539,6 +539,82 @@ body:has(> .page--editorial) { background: var(--color-paper); color: var(--colo
 .listing__topics li::before { content: ""; width: 4px; height: 4px; flex: none; border-radius: 50%; background: var(--color-control); }
 .listing__go { align-self: flex-start; margin-top: var(--space-1); font: var(--weight-semibold) var(--text-m) / 1.4 var(--font-ui); }
 
+/* Printable map: hero, sheet preview on a stack of sheets, PDF and SVG cards */
+.printable, .method-page { display: flex; flex-direction: column; gap: var(--space-4); }
+.printable__text a, .download-language a, .method-page__section a { color: var(--color-link); } /* beat gallery.css a{} in body text only */
+.printable__intro { display: flex; flex-direction: column; gap: 14px; }
+.printable__intro .t-lead { max-width: 760px; }
+.printable__grid { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: var(--space-8); align-items: start; margin-top: var(--space-6); }
+.sheet-preview { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.sheet-preview__stack { display: block; padding: 22px 30px 30px 22px; background: #EFEBDD; border-radius: var(--radius-2); }
+.sheet-preview__stack img { display: block; width: 100%; height: auto; max-height: 560px; aspect-ratio: 1200 / 848; object-fit: contain; background: #F6F2E6; box-shadow: 0 1px 3px rgb(31 48 41 / 0.3), 4px 4px 0 #FFFEF7, 5px 5px 0 #CFC6B2, 9px 9px 0 #FFFEF7, 10px 10px 0 #CFC6B2; }
+.printable__files { display: flex; flex-direction: column; gap: var(--space-5); }
+.download-card { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-6); background: var(--color-surface); border: var(--border-1) solid var(--color-line-strong); border-radius: var(--radius-2); }
+.download-card--primary { gap: 14px; border: var(--border-3) solid var(--color-ink); }
+.download-card h2 { margin: 0; font: var(--weight-semibold) 1.625rem / 1.2 var(--font-display); }
+.download-card > p { margin: 0; font: 1rem / 1.55 var(--font-read); color: var(--color-ink-2); }
+.download-card__button { align-self: flex-start; gap: var(--space-2); }
+.download-card__button svg { width: 18px; height: 18px; }
+.download-card > .download-card__tip { display: flex; gap: var(--space-2); font: var(--text-s) / 1.45 var(--font-ui); }
+.download-card__tip svg { width: 18px; height: 18px; flex: none; }
+.sheet-list { list-style: none; margin: 6px 0 0; padding: 0; }
+.printable .sheet-list__link { display: flex; align-items: center; gap: 14px; min-height: 56px; padding: var(--space-2) 0; border-top: var(--border-1) solid var(--color-line); color: var(--color-ink); text-decoration: none; }
+.sheet-list__num { width: 26px; flex: none; font: var(--weight-semibold) var(--text-m) / 1 var(--font-display); color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
+.sheet-list__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sheet-list__text b { font-size: 0.96875rem; font-weight: var(--weight-semibold); }
+.sheet-list__go { display: inline-flex; align-items: center; gap: 6px; flex: none; font: var(--weight-medium) var(--text-s) / 1 var(--font-ui); }
+.sheet-list__go svg { width: 16px; height: 16px; }
+.sheet-list__link:hover b { text-decoration: underline; text-decoration-color: var(--color-link-hover); text-underline-offset: 0.2em; }
+.download-language { margin: 0; font-size: var(--text-m); }
+.printable__text { max-width: 800px; display: flex; flex-direction: column; gap: 18px; margin-top: var(--space-6); }
+.printable__text h2, .method-page__section h2 { margin: var(--space-3) 0 0; font: var(--weight-semibold) 1.75rem / 1.15 var(--font-display); text-wrap: balance; scroll-margin-top: 80px; }
+.method-page__section h2 { font-size: 1.875rem; }
+.printable__text > p, .method-page__text { margin: 0; font: 1.125rem / 1.65 var(--font-read); }
+
+/* Method: intro, A/B/C/U matrix with map examples, sources with role chips, "Using the map" */
+.method-page__lead { margin: 0; font: 1.1875rem / 1.65 var(--font-read); }
+.method-page__section { display: flex; flex-direction: column; gap: var(--space-5); margin-top: var(--space-6); }
+.method-page__section--first { margin-top: var(--space-8); padding-top: 28px; border-top: var(--border-3) solid var(--color-ink); }
+.matrix { width: 100%; border-collapse: collapse; background: var(--color-surface); border: var(--border-1) solid var(--color-line); font-size: 0.96875rem; line-height: 1.5; }
+.matrix thead th { padding: var(--space-3) var(--space-4); background: var(--color-surface-sunk); text-align: left; font: var(--weight-semibold) var(--text-2xs) / 1.3 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; }
+.matrix tbody th, .matrix td { padding: var(--space-4); border-top: var(--border-1) solid var(--color-line); text-align: left; vertical-align: top; }
+.matrix__mark { width: 220px; }
+.matrix__mark b { font: var(--weight-semibold) var(--text-l) / 1.3 var(--font-display); vertical-align: middle; }
+.matrix__glyph { display: inline-block; margin-right: var(--space-3); vertical-align: middle; }
+.matrix__glyph svg { display: block; width: 26px; height: 26px; }
+.matrix__adds { color: var(--color-pencil); }
+.matrix__example { width: 240px; }
+.matrix__link { display: flex; flex-direction: column; gap: 6px; font-size: var(--text-s); text-decoration: none; }
+.matrix__name { text-decoration: underline; text-decoration-color: var(--color-link-underline); text-underline-offset: 0.2em; }
+.matrix__link:hover .matrix__name { text-decoration-color: var(--color-link-hover); }
+.matrix__crop { display: block; width: 220px; max-width: 100%; height: auto; aspect-ratio: 220 / 110; object-fit: cover; border: var(--border-1) solid var(--color-line); border-radius: var(--radius-1); background: var(--map-land); }
+.matrix__crop--none { box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: var(--space-2); border: 1.5px dashed var(--color-control); background: repeating-linear-gradient(135deg, var(--color-surface) 0 10px, var(--color-surface-sunk) 10px 20px); color: var(--color-ink-2); font-size: var(--text-xs); }
+.matrix__crop--none .locator__glyph svg { width: 22px; height: 22px; }
+.matrix__count { font: var(--weight-semibold) 1.125rem / 1.3 var(--font-display); font-variant-numeric: tabular-nums; }
+.matrix__unit { display: none; }
+.method-page__cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.method-card, .usage__card { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-5); background: var(--color-surface); border: var(--border-1) solid var(--color-line); border-radius: var(--radius-2); }
+.method-card h3 { margin: 0; font: var(--weight-semibold) 1.1875rem / 1.25 var(--font-display); }
+.method-card p { margin: 0; font: 1rem / 1.6 var(--font-read); color: var(--color-ink-2); }
+.source-list { list-style: none; margin: var(--space-1) 0 0; padding: 0; border-top: var(--border-3) solid var(--color-ink); }
+.source-list__item { display: grid; grid-template-columns: 56px minmax(0, 1fr) 200px; gap: var(--space-5); align-items: start; padding: var(--space-4) 0; border-bottom: var(--border-1) solid var(--color-line); }
+.source-list__code { font: var(--weight-semibold) var(--text-m) / 1.4 var(--font-display); color: var(--color-ink-2); }
+.source-list__main { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.source-list__title { font: var(--weight-semibold) var(--text-l) / 1.3 var(--font-display); text-underline-offset: 3px; text-decoration-color: var(--color-link-underline); }
+.source-list__title:hover { text-decoration-color: var(--color-link-hover); }
+.source-list__title .ext { margin-left: 0.3em; font-weight: var(--weight-regular); }
+.source-list__role { font: 0.96875rem / 1.55 var(--font-read); color: var(--color-ink-2); }
+.role-chip { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border: var(--border-1) solid var(--color-ink-2); border-radius: var(--radius-pill); color: var(--color-ink-2); font: var(--weight-medium) var(--text-xs) / 1.2 var(--font-ui); white-space: nowrap; }
+.role-chip--inspiration { border-color: var(--color-ink); color: var(--color-ink); }
+.role-chip--analogue { border-color: var(--color-pencil); color: var(--color-pencil); background: var(--color-pencil-tint); }
+.role-chip--excluded { border-style: dashed; border-color: var(--color-danger); color: var(--color-danger); }
+.usage { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); }
+.usage__card { padding: var(--space-4); }
+.usage__card h3 { margin: 0; font: var(--weight-semibold) var(--text-l) / 1.25 var(--font-display); }
+.usage__card p { margin: 0; font-size: var(--text-m); line-height: 1.8; color: var(--color-ink-2); }
+kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 26px; padding: 0 6px; border: var(--border-1) solid var(--color-line-strong); border-bottom-width: 2px; border-radius: 4px; background: var(--color-surface); color: var(--color-ink); font: var(--weight-semibold) var(--text-xs) / 1 var(--font-ui); }
+.explore--reading.explore--three .explore__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
 /* Tablet and phone: one column, the table of contents folds into <details> */
 @media (max-width: 63.99em) {
   .article__hero, .listing-hero { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
@@ -549,6 +625,23 @@ body:has(> .page--editorial) { background: var(--color-paper); color: var(--colo
   .article__body { display: block; margin-top: var(--space-6); padding-top: 0; border-top: 0; }
   .explore--reading .explore__grid { grid-template-columns: 1fr 1fr; }
   .explore--reading .explore__print { grid-column: 1 / -1; }
+  .printable__grid { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+  .usage { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* The matrix turns into one card per level */
+  .matrix, .matrix tbody, .matrix tr, .matrix th, .matrix td { display: block; width: auto; }
+  .matrix { background: none; border: 0; }
+  .matrix thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .matrix tbody { display: flex; flex-direction: column; gap: var(--space-3); }
+  .matrix tbody .matrix__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--space-3); padding-bottom: 14px; background: var(--color-surface); border: var(--border-1) solid var(--color-line); border-radius: var(--radius-2); overflow: hidden; }
+  .matrix tbody th, .matrix td { border: 0; padding: 0 var(--space-4); }
+  .matrix tbody .matrix__mark { grid-column: 1; grid-row: 1; padding: 14px 0 14px var(--space-4); }
+  .matrix .matrix__count { grid-column: 2; grid-row: 1; align-self: center; font: var(--text-xs) / 1.3 var(--font-ui); color: var(--color-ink-2); }
+  .matrix__unit { display: inline; }
+  .matrix__gives, .matrix__adds, .matrix__example { grid-column: 1 / -1; }
+  .matrix__gives, .matrix__adds { margin-bottom: var(--space-2); }
+  .matrix__gives::before, .matrix__adds::before { content: attr(data-label); display: block; font: var(--weight-semibold) var(--text-xs) / 1.2 var(--font-display); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--color-ink-2); }
+  .matrix__adds::before { color: var(--color-pencil); }
+  .matrix__crop { width: 100%; aspect-ratio: 324 / 120; }
 }
 @media (max-width: 37.49em) {
   .page.page--editorial { padding: var(--space-3) var(--gutter) var(--space-8); }
@@ -575,6 +668,20 @@ body:has(> .page--editorial) { background: var(--color-paper); color: var(--colo
   .listing { margin-top: var(--space-6); }
   .listing__item { padding: var(--space-6) 0; }
   .listing__title { font-size: 1.5rem; }
+  .printable__intro .t-h1 { font-size: 1.875rem; }
+  .sheet-preview__stack img { max-height: 250px; }
+  .download-card { padding: 18px; }
+  .download-card h2 { font-size: 1.375rem; }
+  .download-card__button { align-self: stretch; }
+  .sheet-list__text .t-meta { display: none; }
+  .printable__text h2 { font-size: 1.5rem; }
+  .method-page__section h2 { font-size: 1.625rem; }
+  .printable__text > p, .method-page__text { font-size: var(--text-l); }
+  .method-page__lead { font-size: 1.09375rem; }
+  .method-page__cards, .usage { grid-template-columns: minmax(0, 1fr); }
+  .explore--reading.explore--three .explore__grid { grid-template-columns: minmax(0, 1fr); }
+  .source-list__item { grid-template-columns: 40px minmax(0, 1fr); gap: 10px; }
+  .source-list__chip { grid-column: 2; }
 }
 @media print { .toc, .toc-details, .map-card, .explore { display: none !important; } }
 

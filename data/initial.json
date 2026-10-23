@@ -66213,7 +66213,9 @@
         "kind": "web",
         "url": "https://stephenking.com/works/novel/it.html",
         "role": "Author's explanation: Bangor's canal and a childhood library in Stratford informed the novel. Used to establish multiple real inspirations, not street coordinates.",
-        "metadata": {}
+        "metadata": {
+          "role_type": "inspiration"
+        }
       },
       {
         "key": "W2",
@@ -66221,7 +66223,9 @@
         "kind": "web",
         "url": "https://stephenking.com/works/short/fair-extension.html",
         "role": "Author's general statement connecting Derry and Bangor. No places from the other story were added.",
-        "metadata": {}
+        "metadata": {
+          "role_type": "inspiration"
+        }
       },
       {
         "key": "W3",
@@ -66229,7 +66233,9 @@
         "kind": "web",
         "url": "https://bangormaine.gov/313/Stormwater",
         "role": "Primary background for urban runoff and tributaries. Used only to check the plausibility of the reconstructed surface landscape.",
-        "metadata": {}
+        "metadata": {
+          "role_type": "plausibility"
+        }
       },
       {
         "key": "W4",
@@ -66237,7 +66243,9 @@
         "kind": "web",
         "url": "https://www.bangormaine.gov/DocumentCenter/View/1349/Downtown---Printer-Friendly-Version-PDF",
         "role": "Official real-world map inspected as an urban river-corridor analogue. Its modern street geometry, scale and landmarks were not transferred to Derry.",
-        "metadata": {}
+        "metadata": {
+          "role_type": "analogue"
+        }
       },
       {
         "key": "W5",
@@ -66245,7 +66253,9 @@
         "kind": "web",
         "url": "https://www.bangorwater.org/thomas-hill-standpipe",
         "role": "Primary architectural analogue. The real tank differs from the novel's stated dimensions and history; book details have priority.",
-        "metadata": {}
+        "metadata": {
+          "role_type": "analogue"
+        }
       },
       {
         "key": "W6",
@@ -66253,15 +66263,19 @@
         "kind": "web",
         "url": "https://bangorhistory.org/s/bpl/item/5477",
         "role": "Historical cartographic context and catalog record. Not used as a measured base map.",
-        "metadata": {}
+        "metadata": {
+          "role_type": "context"
+        }
       },
       {
         "key": "W7",
         "title": "Alissa Burger - Mapping Derry (15 December 2023)",
         "kind": "web",
         "url": "https://exploringkingsmaine.com/2023/12/15/mapping-derry/",
-        "role": "Source audit: describes maps mixing novel, screen adaptations and other novels. Those maps were excluded as geographic authority.",
-        "metadata": {}
+        "role": "Source audit: describes maps mixing the novel, screen adaptations and other novels. Those maps were excluded as geographic authority.",
+        "metadata": {
+          "role_type": "excluded"
+        }
       }
     ],
     "evidence": [

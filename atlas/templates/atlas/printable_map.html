@@ -1,92 +1,103 @@
-﻿{% extends 'atlas/gallery_base.html' %}
+{% extends 'atlas/gallery_base.html' %}
 {% load i18n static atlas_tags %}
+{% block main_class %}page page--editorial{% endblock %}
 {% block og_type %}article{% endblock %}
 {% block article_meta %}<meta property="article:published_time" content="{{ published_time }}"><meta property="article:modified_time" content="{{ published_time }}">{% endblock %}
 {% block og_image %}{% if LANGUAGE_CODE == 'ru' %}{% static 'atlas/downloads/ru/preview.jpg' as preview %}{% else %}{% static 'atlas/downloads/en/preview.jpg' as preview %}{% endif %}<meta property="og:image" content="{% absolute_url preview %}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="848">{% endblock %}
 {% block content %}
+<article class="printable">
 {% include 'atlas/breadcrumbs.html' with current=breadcrumb only %}
-<article class="editorial editorial-wide printable-map">
 {% if LANGUAGE_CODE == 'ru' %}
-<div class="eyebrow">Бесплатный печатный атлас</div>
-<h1>Скачать карту Дерри для печати</h1>
-<p class="editorial-deck">Четыре листа A2 с реконструкцией Дерри из романа Стивена Кинга «Оно». Скачайте готовый PDF для печати или отдельные масштабируемые листы SVG.</p>
+<div class="printable__intro">
+<span class="eyebrow">Бесплатный печатный атлас</span>
+<h1 class="t-h1">Скачать карту Дерри для печати</h1>
+<p class="t-lead">Четыре листа A2 с реконструкцией Дерри из романа Стивена Кинга «Оно». Скачайте готовый PDF для печати или отдельные масштабируемые листы SVG.</p>
+</div>
 
-<figure class="printable-preview">
-<a href="{% static 'atlas/downloads/ru/derry_city.svg' %}" aria-label="Открыть полный лист карты Дерри в SVG"><img src="{% static 'atlas/downloads/ru/preview.jpg' %}" width="1200" height="848" alt="Предварительный вид печатной карты Дерри" fetchpriority="high"></a>
-<figcaption>Лист 1 · Дерри, Пустоши и загородные дороги</figcaption>
+<div class="printable__grid">
+<figure class="sheet-preview">
+<a class="sheet-preview__stack" href="{% static 'atlas/downloads/ru/derry_city.svg' %}" aria-label="Открыть лист 1 в SVG"><img src="{% static 'atlas/downloads/ru/preview.jpg' %}" width="1200" height="848" alt="Лист 1 атласа для печати: Дерри, Пустошь и сельские окрестности" fetchpriority="high"></a>
+<figcaption class="t-meta">Лист 1 · Дерри, Пустоши и загородные дороги · открыть SVG</figcaption>
 </figure>
 
-<section class="download-grid" aria-label="Файлы карты для скачивания">
-<div class="download-card download-card-primary">
-<div class="download-format">PDF · 4 листа · A2</div>
-<h2>Печатный атлас на русском</h2>
+<div class="printable__files" role="group" aria-label="Файлы карты для скачивания">
+<section class="download-card download-card--primary" aria-labelledby="pdf-title">
+<span class="eyebrow">PDF · 4 листа · A2</span>
+<h2 id="pdf-title">Печатный атлас на русском</h2>
 <p>Заголовки, легенда, примечания, названия улиц и мест переведены на русский, как на интерактивной карте.</p>
-<a class="download-button" href="{% static 'atlas/downloads/ru/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-ru.pdf">Скачать PDF</a>
-<small>Печатайте в масштабе 100%, чтобы сохранить указанный масштаб карты.</small>
-</div>
-<div class="download-card">
-<div class="download-format">SVG · отдельные листы</div>
-<h2>Масштабируемые файлы</h2>
-<p>SVG подойдёт для типографии, редактора векторной графики или печати отдельного района.</p>
-<ul class="svg-downloads">
-<li><a href="{% static 'atlas/downloads/ru/derry_city.svg' %}" download="derry-map-full-ru.svg">01 · Весь Дерри</a></li>
-<li><a href="{% static 'atlas/downloads/ru/derry_central.svg' %}" download="derry-map-central-ru.svg">02 · Центр Дерри</a></li>
-<li><a href="{% static 'atlas/downloads/ru/derry_barrens.svg' %}" download="derry-map-barrens-ru.svg">03 · Пустоши</a></li>
-<li><a href="{% static 'atlas/downloads/ru/derry_camp.svg' %}" download="derry-map-losers-ground-ru.svg">04 · Поляна Неудачников</a></li>
-</ul>
-</div>
+<a class="btn btn--primary download-card__button" href="{% static 'atlas/downloads/ru/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-ru.pdf">{% include 'atlas/icons/download.svg' %}Скачать PDF</a>
+<p class="download-card__tip">{% include 'atlas/icons/printer.svg' %}<span>Печатайте в масштабе 100%, чтобы сохранить масштаб, указанный на каждом листе.</span></p>
 </section>
+<section class="download-card" aria-labelledby="svg-title">
+<span class="eyebrow">SVG · отдельные листы</span>
+<h2 id="svg-title">Масштабируемые файлы</h2>
+<p>Для типографии, векторного редактора или если нужна только часть атласа.</p>
+<ul class="sheet-list">
+<li><a class="sheet-list__link" href="{% static 'atlas/downloads/ru/derry_city.svg' %}" download="derry-map-full-ru.svg"><span class="sheet-list__num">01</span><span class="sheet-list__text"><b>Весь Дерри</b><span class="t-meta">Весь город, Пустошь и сельские окрестности</span></span><span class="sheet-list__go">{% include 'atlas/icons/download.svg' %}SVG</span></a></li>
+<li><a class="sheet-list__link" href="{% static 'atlas/downloads/ru/derry_central.svg' %}" download="derry-map-central-ru.svg"><span class="sheet-list__num">02</span><span class="sheet-list__text"><b>Центр Дерри</b><span class="t-meta">Центр, канал и Подъём-в-милю</span></span><span class="sheet-list__go">{% include 'atlas/icons/download.svg' %}SVG</span></a></li>
+<li><a class="sheet-list__link" href="{% static 'atlas/downloads/ru/derry_barrens.svg' %}" download="derry-map-barrens-ru.svg"><span class="sheet-list__num">03</span><span class="sheet-list__text"><b>Пустоши</b><span class="t-meta">Долина, Кендускиг и свалка</span></span><span class="sheet-list__go">{% include 'atlas/icons/download.svg' %}SVG</span></a></li>
+<li><a class="sheet-list__link" href="{% static 'atlas/downloads/ru/derry_camp.svg' %}" download="derry-map-losers-ground-ru.svg"><span class="sheet-list__num">04</span><span class="sheet-list__text"><b>Поляна Неудачников</b><span class="t-meta">Поляна, плотина и штаб</span></span><span class="sheet-list__go">{% include 'atlas/icons/download.svg' %}SVG</span></a></li>
+</ul>
+</section>
+<p class="download-language">Нужна английская версия? <a href="{% static 'atlas/downloads/en/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-en.pdf" lang="en">Скачать English PDF</a>.</p>
+</div>
+</div>
 
-<p class="download-language">Нужна английская версия? <a href="{% static 'atlas/downloads/en/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-en.pdf">Скачать English PDF</a>.</p>
-
+<div class="printable__text">
 <h2>Что входит в атлас</h2>
 <p>Первый лист показывает город целиком. Остальные подробнее раскрывают центр Дерри, Пустоши и поляну Неудачников. На листах отмечены места из книги, улицы, реки, мосты и уровни уверенности A, B и C. Фотографии и их отметки в печатную версию не включены.</p>
 
 <h2>Как печатать</h2>
 <p>Каждый лист рассчитан на альбомный формат A2 — 594 × 420 мм. Выберите фактический размер или масштаб 100% в настройках печати. Уменьшать лист можно, но подписи и заявленный масштаб при этом изменятся. Для домашней печати большой лист можно разбить на несколько страниц средствами программы просмотра PDF.</p>
 
-<aside class="screen-note"><b>О реконструкции</b>Карта передаёт внутреннюю географию романа, а не реальный или канонический план города. Координаты, часть геометрии и рельеф реконструированы; география экранизаций не использовалась. Подробнее — на странице <a href="{% url 'method' %}">«Источники и метод»</a>.</aside>
+<aside class="screen-note">{% include 'atlas/icons/screen.svg' %}<p><b>О реконструкции.</b> Карта передаёт внутреннюю географию романа, а не реальный или канонический план города. Координаты, часть геометрии и рельеф реконструированы; география экранизаций не использовалась. Подробнее — на странице <a href="{% url 'method' %}">«Источники и метод»</a>.</p></aside>
+</div>
 {% else %}
-<div class="eyebrow">Free printable atlas</div>
-<h1>Download a printable map of Derry, Maine</h1>
-<p class="editorial-deck">Four A2 sheets reconstructing Derry from Stephen King’s novel <i>IT</i>. Download the print-ready PDF or individual scalable SVG sheets.</p>
+<div class="printable__intro">
+<span class="eyebrow">Free printable atlas</span>
+<h1 class="t-h1">Download a printable map of Derry, Maine</h1>
+<p class="t-lead">Four A2 sheets reconstructing Derry from Stephen King’s novel <i>IT</i>. Download the print-ready PDF or individual scalable SVG sheets.</p>
+</div>
 
-<figure class="printable-preview">
-<a href="{% static 'atlas/downloads/en/derry_city.svg' %}" aria-label="Open the full Derry map sheet as SVG"><img src="{% static 'atlas/downloads/en/preview.jpg' %}" width="1200" height="848" alt="Preview of the printable map of Derry, Maine" fetchpriority="high"></a>
-<figcaption>Plate 1 · Derry, the Barrens and the rural approaches</figcaption>
+<div class="printable__grid">
+<figure class="sheet-preview">
+<a class="sheet-preview__stack" href="{% static 'atlas/downloads/en/derry_city.svg' %}" aria-label="Open sheet 1 as SVG"><img src="{% static 'atlas/downloads/en/preview.jpg' %}" width="1200" height="848" alt="Sheet 1 of the printable atlas: Derry, the Barrens and the rural approaches" fetchpriority="high"></a>
+<figcaption class="t-meta">Plate 1 · Derry, the Barrens and the rural approaches · open the SVG</figcaption>
 </figure>
 
-<section class="download-grid" aria-label="Map files to download">
-<div class="download-card download-card-primary">
-<div class="download-format">PDF · 4 sheets · A2</div>
-<h2>English print atlas</h2>
+<div class="printable__files" role="group" aria-label="Map files to download">
+<section class="download-card download-card--primary" aria-labelledby="pdf-title">
+<span class="eyebrow">PDF · 4 sheets · A2</span>
+<h2 id="pdf-title">English print atlas</h2>
 <p>The complete four-sheet atlas in one file, with map key, confidence levels, place index and reconstruction notes.</p>
-<a class="download-button" href="{% static 'atlas/downloads/en/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-en.pdf">Download PDF</a>
-<small>Print at 100% to preserve the scale stated on each sheet.</small>
-</div>
-<div class="download-card">
-<div class="download-format">SVG · individual sheets</div>
-<h2>Scalable files</h2>
-<p>Use SVG for a print shop, vector editor or when you only need one part of the atlas.</p>
-<ul class="svg-downloads">
-<li><a href="{% static 'atlas/downloads/en/derry_city.svg' %}" download="derry-map-full-en.svg">01 · Full Derry map</a></li>
-<li><a href="{% static 'atlas/downloads/en/derry_central.svg' %}" download="derry-map-central-en.svg">02 · Central Derry</a></li>
-<li><a href="{% static 'atlas/downloads/en/derry_barrens.svg' %}" download="derry-map-barrens-en.svg">03 · The Barrens</a></li>
-<li><a href="{% static 'atlas/downloads/en/derry_camp.svg' %}" download="derry-map-losers-ground-en.svg">04 · The Losers’ ground</a></li>
-</ul>
-</div>
+<a class="btn btn--primary download-card__button" href="{% static 'atlas/downloads/en/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-en.pdf">{% include 'atlas/icons/download.svg' %}Download PDF</a>
+<p class="download-card__tip">{% include 'atlas/icons/printer.svg' %}<span>Print at 100% to keep the scale stated on each sheet.</span></p>
 </section>
+<section class="download-card" aria-labelledby="svg-title">
+<span class="eyebrow">SVG · individual sheets</span>
+<h2 id="svg-title">Scalable files</h2>
+<p>For a print shop, a vector editor, or when you only need one part of the atlas.</p>
+<ul class="sheet-list">
+<li><a class="sheet-list__link" href="{% static 'atlas/downloads/en/derry_city.svg' %}" download="derry-map-full-en.svg"><span class="sheet-list__num">01</span><span class="sheet-list__text"><b>Full Derry map</b><span class="t-meta">The whole town, the Barrens and the rural approaches</span></span><span class="sheet-list__go">{% include 'atlas/icons/download.svg' %}SVG</span></a></li>
+<li><a class="sheet-list__link" href="{% static 'atlas/downloads/en/derry_central.svg' %}" download="derry-map-central-en.svg"><span class="sheet-list__num">02</span><span class="sheet-list__text"><b>Central Derry</b><span class="t-meta">Downtown, the canal and Up-Mile Hill</span></span><span class="sheet-list__go">{% include 'atlas/icons/download.svg' %}SVG</span></a></li>
+<li><a class="sheet-list__link" href="{% static 'atlas/downloads/en/derry_barrens.svg' %}" download="derry-map-barrens-en.svg"><span class="sheet-list__num">03</span><span class="sheet-list__text"><b>The Barrens</b><span class="t-meta">The valley, the Kenduskeag and the dump</span></span><span class="sheet-list__go">{% include 'atlas/icons/download.svg' %}SVG</span></a></li>
+<li><a class="sheet-list__link" href="{% static 'atlas/downloads/en/derry_camp.svg' %}" download="derry-map-losers-ground-en.svg"><span class="sheet-list__num">04</span><span class="sheet-list__text"><b>The Losers’ ground</b><span class="t-meta">The clearing, the dam and the clubhouse</span></span><span class="sheet-list__go">{% include 'atlas/icons/download.svg' %}SVG</span></a></li>
+</ul>
+</section>
+<p class="download-language">Looking for the Russian edition? <a href="{% static 'atlas/downloads/ru/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-ru.pdf" lang="ru">Download the Russian PDF</a>.</p>
+</div>
+</div>
 
-<p class="download-language">Looking for the Russian edition? <a href="{% static 'atlas/downloads/ru/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-ru.pdf">Download the Russian PDF</a>.</p>
-
+<div class="printable__text">
 <h2>What the atlas includes</h2>
 <p>The first sheet shows the whole town. The other sheets expand central Derry, the Barrens and the Losers’ ground. They include places from the novel, streets, waterways, bridges and A–C confidence levels. Photographs and photo markers are not included in the print edition.</p>
 
 <h2>How to print it</h2>
 <p>Each landscape sheet is designed for A2 paper at 594 × 420 mm. Select actual size or 100% in the print dialog. You can reduce the sheets, but labels and the stated scale will shrink with them. For a home printer, use your PDF reader’s poster or tile setting to split a large sheet across several pages.</p>
 
-<aside class="screen-note"><b>About the reconstruction</b>This map represents the novel’s internal geography, not a real or canonical town plan. Coordinates, some geometry and relief are inferred, and no screen-adaptation geography is used. Read more about the <a href="{% url 'method' %}">sources and method</a>.</aside>
+<aside class="screen-note">{% include 'atlas/icons/screen.svg' %}<p><b>About the reconstruction.</b> This map represents the novel’s internal geography, not a real or canonical town plan. Coordinates, some geometry and relief are inferred, and no screen-adaptation geography is used. Read more about the <a href="{% url 'method' %}">sources and method</a>.</p></aside>
+</div>
 {% endif %}
-{% include 'atlas/derry_explore.html' with current_hub='printable' %}
 </article>
+{% include 'atlas/derry_explore.html' with variant='reading' current_hub='printable' %}
 {% endblock %}
