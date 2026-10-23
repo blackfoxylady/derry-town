@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="32" height="32">
+  <!-- Simplified mark for 16–32px tabs: outline, river, A marker. Keep the PNG/ICO fallbacks for old browsers. -->
+  <style>
+    .edge { stroke: #18262E; }
+    @media (prefers-color-scheme: dark) { .edge { stroke: #ECE6D6; } }
+  </style>
+  <path class="edge" d="M5,10 L17,6 L31,10 L43,6 L43,40 L31,44 L17,40 L5,44 Z" fill="#F4F1E8" stroke-width="3.6" stroke-linejoin="round"/>
+  <path d="M5,27 C10,26 12,19 18,20 C24,21 25,30 31,29 C36,28 39,21 43,20" fill="none" stroke="#3F7896" stroke-width="5.5"/>
+  <circle cx="24" cy="13" r="6" fill="#C2512F"/>
+</svg>

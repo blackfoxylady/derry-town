@@ -1,0 +1,277 @@
+/* ==========================================================================
+   Derry: a literary atlas of Stephen King's IT. Design tokens v1.0 (handoff)
+   Direction A "Survey" + the "blue pencil" from direction B.
+   v1.0 changes against the stage-00 v0.1 file: the map palette now holds the
+   exact values the reference renderer draws (survey style), photo-layer
+   colours, and the dark photo-viewer palette (--viewer-*, stage 05).
+   Light theme is the reference. The dark block at the end is a provisional
+   draft taken from direction C and has not been designed yet.
+
+   Rules of the system
+   - Category colour says WHAT a place is. Shape says HOW SURE the novel is.
+     Blue pencil marks EVERYTHING the atlas reconstructed (B/C rings, notes).
+     All markers have the same size: confidence is never shown as importance.
+   - Nothing is set smaller than 12px, including the map key.
+   - Interactive targets are at least 44px (36px "compact" only for desktop
+     toolbars, with the hit area padded back to 44px).
+   - Plain CSS custom properties: no build step, no runtime dependencies.
+     Font files live in fonts.css (self-hosted WOFF2, all OFL, full Cyrillic).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* ---- Type families ---------------------------------------------------- */
+  --font-display: "IBM Plex Sans Condensed", "Roboto Condensed", "Arial Narrow", sans-serif;
+  --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-read: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+
+  /* ---- Type scale (1rem = 16px; headings fluid between 390 and 1440) ---- */
+  --text-2xs: 0.75rem;    /* 12: floor. Map key, tiny meta */
+  --text-xs: 0.8125rem;   /* 13: meta, captions, badges */
+  --text-s: 0.875rem;     /* 14: dense UI, chips, sidebar */
+  --text-m: 0.9375rem;    /* 15: UI default */
+  --text-l: 1.0625rem;    /* 17: reading body (serif) */
+  --text-xl: 1.1875rem;   /* 19: lead paragraph */
+  --h5: 1.125rem;                                   /* 18 */
+  --h4: 1.25rem;                                    /* 20 */
+  --h3: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);   /* 22 → 28 */
+  --h2: clamp(1.625rem, 1.3rem + 1.2vw, 2.25rem);   /* 26 → 36 */
+  --h1: clamp(2.125rem, 1.4rem + 2.6vw, 3.75rem);   /* 34 → 60 */
+  --display: clamp(2.75rem, 1.6rem + 4vw, 4.5rem);  /* 44 → 72 */
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.25;
+  --leading-ui: 1.45;
+  --leading-read: 1.62;
+  --tracking-caps: 0.12em;
+  --tracking-wordmark: 0.14em;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --measure: 66ch;        /* reading column width; set on the text element */
+
+  /* ---- UI colour --------------------------------------------------------- */
+  --color-paper: #F8F7F2;          /* page ground */
+  --color-surface: #FFFFFF;        /* panels, cards, inputs, map controls */
+  --color-surface-sunk: #F0F2F1;   /* selected row, quiet blocks */
+  --color-surface-inverse: #18262E;/* footer, primary button */
+  --color-ink: #18262E;            /* text, rules: 14.5:1 on paper */
+  --color-ink-hover: #2E414B;
+  --color-ink-2: #4D5C64;          /* secondary text: 6.4:1 on paper */
+  --color-ink-3: #66737A;          /* placeholders, disabled: 4.5:1 on paper, 4.9:1 on white */
+  --color-ink-inverse: #FFFFFF;
+  --color-ink-inverse-2: #C5CED1;
+  --color-line: #D9DDD8;           /* decorative dividers only */
+  --color-line-strong: #18262E;    /* header rule, table head rule */
+  --color-control: #879196;        /* input/chip borders: 3.2:1 on white */
+  --color-benchmark: #C2512F;      /* brand accent: current nav, logo */
+  --color-focus: #18262E;          /* quiet ink focus ring, 14.5:1 on paper. On dark
+                                      surfaces (footer, photo viewer) use white */
+  --focus-width: 2px;
+  --focus-offset: 3px;             /* the gap shows paper between ring and element */
+  --color-link: #18262E;
+  --color-link-underline: #879196;
+  --color-link-hover: #C2512F;     /* underline colour on hover */
+  --color-danger: #A8322A;
+
+  /* ---- Blue pencil: everything the atlas reconstructed ------------------- */
+  --color-pencil: #2F62B8;         /* 5.4:1 on paper, 5.0:1 on its tint */
+  --color-pencil-tint: #EAF0FA;
+
+  /* ---- Place categories (fill = WHAT). White text on each is ≥ 4.8:1 ---- */
+  --cat-civic: #1D6070;
+  --cat-homes: #6A4C93;
+  --cat-barrens: #3F7A3A;
+  --cat-encounters: #A8322A;
+  --cat-historical: #8A6A1F;
+  --cat-outlying: #5E6B70;
+
+  /* ---- Confidence (shape = HOW SURE) ------------------------------------- */
+  --marker-r: 12;                  /* SVG units at zoom 1 */
+  --halo-scale: 1.25;              /* B and C pencil ring: r × 1.25 = 15. Same size for
+                                      every level: confidence never changes marker size */
+  --halo-b-dash: 2 3;              /* B: dotted pencil ring */
+  --halo-c-dash: 5 3;              /* C: dashed pencil ring */
+  --marker-c-dash: 3 2;            /* C disc outline */
+  --marker-ring: #FFFFFF;          /* white keyline round A discs */
+
+  /* ---- Map palette (SVG fills/strokes), survey style --------------------- */
+  /* Values match blocks/12-cartography/renderer/derry-map.css (.dm--survey). */
+  --map-margin: #E9E5D8;           /* paper outside the sheet frame */
+  --map-land: #F4F1E8;
+  --map-grid: rgb(24 38 46 / 0.10);/* 1 km grid lines */
+  --map-frame: #18262E;
+  --map-park: #E2EBD2;
+  --map-yard: #E8DFCF;
+  --map-field: #EDEBDD;
+  --map-sand: #F0E8CF;
+  --map-valley: #E3ECD4;           /* soft band under the stream */
+  --map-contour: #D9B996;          /* drawn at opacity 0.55 */
+  --map-builtup: #EDDACC;          /* built-up tint, k < 0.8 */
+  --map-building: #D3AC97;         /* house footprints, k ≥ 0.8 */
+  --map-building-edge: #A27A66;
+  --map-building-landmark: #8E5E49;
+  --map-woods: #D3E2C2;
+  --map-woods-dot: #A9C397;
+  --map-woods-edge: #9FBB8B;
+  --map-tree: #8FA77E;             /* tree crowns, near zoom */
+  --map-veg: #7FA36F;              /* wet-ground ticks */
+  --map-water: #BBD6E3;
+  --map-water-edge: #6E9FB8;
+  --map-road: #FFFFFF;
+  --map-road-casing: #B8AFA2;
+  --map-road-major: #F6D9A6;
+  --map-path: #9A8F80;             /* tracks, lanes, footpaths */
+  --map-rail: #39434A;
+  --map-bridge: #39434A;
+  --map-dot: #FFFFFF;
+  --map-dot-edge: #7E8875;
+  --map-label: #18262E;
+  --map-label-area: #5B5248;
+  --map-label-barrens: #45663D;
+  --map-label-downtown: #7A4A3C;
+  --map-label-water: #356F8C;
+  --map-label-street: #6E6558;
+  --map-label-halo: #F4F1E8;       /* paint-order stroke behind labels */
+  --map-photo-pin: #18262E;
+  --map-photo-dot: #8A6A3E;        /* far zoom: "photos here" */
+  --map-print: #FFFEF7;            /* polaroid card */
+  --map-print-edge: #C9C0A4;
+  --map-print-shadow: rgb(31 48 41 / 0.22);
+  --map-print-caption: #6B5D49;
+  --map-print-leader: #8A7A5C;
+
+  /* ---- Photo viewer (stage 05): always a dark page ----------------------- */
+  --viewer-bg: #161A18;
+  --viewer-line: #2C322E;
+  --viewer-text: #EDE9DE;
+  --viewer-text-2: #A9B0A8;        /* facts, labels */
+  --viewer-text-3: #8E968E;        /* hints, counters */
+  --viewer-accent: #E9C46A;        /* "Show on the map" button, ink text on it */
+
+  /* ---- Spacing (4px base) ----------------------------------------------- */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4 */
+  --space-2: 0.5rem;    /* 8 */
+  --space-3: 0.75rem;   /* 12 */
+  --space-4: 1rem;      /* 16 */
+  --space-5: 1.25rem;   /* 20 */
+  --space-6: 1.5rem;    /* 24 */
+  --space-7: 2rem;      /* 32 */
+  --space-8: 2.5rem;    /* 40 */
+  --space-9: 3rem;      /* 48 */
+  --space-10: 4rem;     /* 64 */
+  --space-11: 5rem;     /* 80 */
+  --space-12: 6rem;     /* 96 */
+
+  /* ---- Layout ----------------------------------------------------------- */
+  /* Breakpoints (CSS variables can't be used in @media; use these values):
+     phone < 37.5em (600px) · tablet 37.5em–63.99em · desktop ≥ 64em (1024px)
+     · wide ≥ 90em (1440px). The map sidebar becomes a bottom sheet < 64em. */
+  --container: 75rem;                              /* 1200 content max width */
+  --gutter: clamp(1rem, 0.4rem + 2.4vw, 2rem);     /* 16 → 32 side padding */
+  --grid-columns: 12;                              /* 4 on phone, 8 on tablet */
+  --grid-gap: clamp(1rem, 0.6rem + 1.2vw, 1.5rem); /* 16 → 24 */
+  --header-h: 3.75rem;                             /* 60; 52 on phone */
+  --sidebar-w: 24rem;                              /* 384 map index panel */
+  --panel-w: 24rem;                                /* 384 menu panel (100% on phone) */
+  --scrim: rgb(24 38 46 / 0.35);                   /* behind the menu panel */
+  --target: 44px;
+  --target-compact: 36px;
+
+  /* ---- Shape ------------------------------------------------------------ */
+  --radius-1: 2px;      /* cards, photos, swatches */
+  --radius-2: 4px;      /* buttons, inputs, badges */
+  --radius-3: 6px;      /* floating map panels */
+  --radius-4: 14px;     /* bottom sheet top corners */
+  --radius-pill: 999px; /* chips */
+  --border-1: 1px;
+  --border-2: 1.5px;
+  --border-3: 2px;
+  /* Shadows only on HTML overlays, never on SVG map shapes */
+  --shadow-float: 0 1px 2px rgb(24 38 46 / 0.10), 0 6px 16px rgb(24 38 46 / 0.08);
+  --shadow-sheet: 0 -4px 20px rgb(24 38 46 / 0.12);
+
+  /* ---- Motion & layers ------------------------------------------------- */
+  --duration-1: 120ms;
+  --duration-2: 200ms;
+  --duration-3: 320ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --z-map-controls: 10;
+  --z-sheet: 20;
+  --z-header: 30;
+  --z-dialog: 40;
+  --z-toast: 50;
+}
+
+@media (max-width: 37.49em) {
+  :root { --header-h: 3.25rem; --grid-columns: 4; }
+}
+@media (min-width: 37.5em) and (max-width: 63.99em) {
+  :root { --grid-columns: 8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --duration-1: 0ms; --duration-2: 0ms; --duration-3: 0ms; }
+}
+
+/* ==========================================================================
+   DARK THEME: PROVISIONAL DRAFT from direction C "Nocturne".
+   Kept here so the token names are proven to theme. Not designed or
+   contrast-checked as a whole yet; not linked to prefers-color-scheme.
+   ========================================================================== */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: #0F181B;
+  --color-surface: #172327;
+  --color-surface-sunk: #1F2E33;
+  --color-surface-inverse: #ECE6D6;
+  --color-ink: #ECE6D6;
+  --color-ink-hover: #FFFFFF;
+  --color-ink-2: #A7B0AC;
+  --color-ink-3: #8D9894;
+  --color-ink-inverse: #0F181B;
+  --color-ink-inverse-2: #2E4045;
+  --color-line: #2E4045;
+  --color-line-strong: #ECE6D6;
+  --color-control: #66797E;
+  --color-benchmark: #F2B45A;
+  --color-focus: #ECE6D6;
+  --color-link: #ECE6D6;
+  --color-link-underline: #66797E;
+  --color-link-hover: #F2B45A;
+  --color-pencil: #8FB0EE;
+  --color-pencil-tint: #1B2A44;
+  --cat-civic: #8CC4DD;
+  --cat-homes: #C3A8E8;
+  --cat-barrens: #A4D08F;
+  --cat-encounters: #F2937A;
+  --cat-historical: #E8C66E;
+  --cat-outlying: #B8C2BF;
+  --marker-ring: #0F181B;
+  --map-land: #111C1F;
+  --map-grid: #18272B;
+  --map-contour: #2A3A3C;
+  --map-builtup: #172529;
+  --map-builtup-2: #152226;
+  --map-building: #22343A;
+  --map-woods: #13261F;
+  --map-woods-dot: #1D3A2C;
+  --map-water: #19333F;
+  --map-water-edge: #2D5566;
+  --map-road: #33464B;
+  --map-road-casing: #111C1F;
+  --map-road-major: #A77A3C;
+  --map-rail: #4A5A5E;
+  --map-label: #ECE6D6;
+  --map-label-area: #7C908C;
+  --map-label-barrens: #7FA486;
+  --map-label-downtown: #9C8C80;
+  --map-label-water: #6F9BAD;
+  --map-label-street: #7C908C;
+  --map-label-halo: #111C1F;
+  --map-photo-pin: #ECE6D6;
+  --shadow-float: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 16px rgb(0 0 0 / 0.3);
+  --scrim: rgb(0 0 0 / 0.55);
+}

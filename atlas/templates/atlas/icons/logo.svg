@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="Derry atlas">
+  <!-- Folded-map mark, redrawn from the original favicon. Use at 32px and up; see favicon.svg for smaller sizes. -->
+  <defs>
+    <clipPath id="derry-map"><path d="M5,10 L17,6 L31,10 L43,6 L43,40 L31,44 L17,40 L5,44 Z"/></clipPath>
+  </defs>
+  <g clip-path="url(#derry-map)">
+    <path d="M5,10 L17,6 L17,40 L5,44 Z" fill="#F4F1E8"/>
+    <path d="M17,6 L31,10 L31,44 L17,40 Z" fill="#E4DCC8"/>
+    <path d="M31,10 L43,6 L43,40 L31,44 Z" fill="#F4F1E8"/>
+    <path d="M3,33 C8,30 13,31 15,34 C16,38 12,41 8,41 L3,42 Z" fill="#A9C397"/>
+    <path d="M34,8 C38,7 45,8 45,11 L45,18 C41,19 36,17 35,13 Z" fill="#A9C397"/>
+    <path d="M3,27 C10,26 12,19 18,20 C24,21 25,30 31,29 C36,28 39,21 45,20" fill="none" stroke="#3F7896" stroke-width="3.4"/>
+  </g>
+  <path d="M17,6 V40 M31,10 V44" stroke="#18262E" stroke-width="1.2" stroke-opacity="0.5"/>
+  <path d="M5,10 L17,6 L31,10 L43,6 L43,40 L31,44 L17,40 L5,44 Z" fill="none" stroke="#18262E" stroke-width="2.2" stroke-linejoin="round"/>
+  <circle cx="24" cy="14.5" r="4.5" fill="#C2512F" stroke="#FFFFFF" stroke-width="1.6"/>
+</svg>

@@ -1,12 +1,12 @@
 /* Страницы фотогалереи; палитра и шапка согласованы с map.css. */
 :root{--paper:#f6f3e9;--ink:#263d38;--muted:#64736b;--line:#d3d6c8;--accent:#a34b35}
 *{box-sizing:border-box}
-body{margin:0;overflow-x:clip;background:var(--paper);color:var(--ink);font:14px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{margin:0;overflow-x:clip;background:var(--paper);color:var(--ink);font:14px/1.45 var(--font-ui)}button,input,select,textarea{font-family:inherit}
 a{color:#315e5a}
-a:focus-visible{outline:3px solid #a88746;outline-offset:2px}
+
 header{display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line);padding:10px 22px;background:#f8f6ee}
 .brand{display:flex;align-items:baseline;gap:20px}
-.brand .wordmark{font:700 34px Georgia,serif;letter-spacing:3px;margin:0}
+.brand .wordmark{font:700 34px var(--font-display);letter-spacing:3px;margin:0}
 /* The DERRY wordmark links home but keeps its plain-text look. */
 .brand .wordmark a{color:inherit;text-decoration:none}
 .brand p{margin:0;color:var(--muted);font-size:12px;max-width:380px}
@@ -19,7 +19,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;bo
 .frow:last-child{border-bottom:0}
 .fname{flex:0 0 84px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{display:inline-flex;align-items:center;gap:5px;border:1px solid #c7cebf;border-radius:12px;padding:3px 10px;font-size:12px;text-decoration:none;color:var(--ink);background:#fff}
+.chip{display:inline-flex;align-items:center;gap:5px;border:1px solid #c7cebf;border-radius:12px;padding:3px 10px;font-size:12px;font-weight:400;line-height:1.45;min-height:0;white-space:normal;text-decoration:none;color:var(--ink);background:#fff}
 .chip:hover{background:#efeee4}
 .chip.on{background:#315e5a;border-color:#315e5a;color:#fff}
 .chip .n{font-size:10px;color:var(--muted)}
@@ -37,7 +37,7 @@ button.chip{font-family:inherit;cursor:pointer}
 .card .meta{margin:0;padding:0 12px 11px;font-size:11px;color:var(--muted)}
 .empty{padding:30px 0;font-size:13px;color:#7a6752}
 .crumbs{font-size:12px;margin:0 0 14px;color:var(--muted)}
-.crumbs ol{display:flex;flex-wrap:wrap;gap:3px 7px;list-style:none;margin:0;padding:0}
+.crumbs ol{display:flex;flex-wrap:wrap;gap:3px 7px;list-style:none;margin:0;padding:0;font-size:inherit}
 .crumbs li{display:flex;min-width:0;align-items:baseline}
 .crumbs li+li::before{content:"›";margin-right:7px;color:#89938c}
 .crumbs [aria-current="page"]{overflow-wrap:anywhere}
@@ -45,7 +45,7 @@ button.chip{font-family:inherit;cursor:pointer}
 .photo figure{margin:0}
 /* Фото вписывается в экран: не выше ~3/4 вьюпорта, портретные не распирают страницу. */
 .photo img{display:block;max-width:100%;width:auto;height:auto;max-height:75vh;margin:0 auto;border:1px solid var(--line);border-radius:7px;background:#e8e4d4}
-.photo figcaption{font:600 17px/1.35 Georgia,serif;margin:14px 0 4px}
+.photo figcaption{font:600 17px/1.35 var(--font-read);margin:14px 0 4px}
 .facts{display:grid;grid-template-columns:110px 1fr;gap:8px 14px;margin:18px 0 0;font-size:13px}
 .facts dt{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding-top:2px}
 .facts dd{margin:0}
@@ -57,23 +57,23 @@ button.chip{font-family:inherit;cursor:pointer}
 .lang a,.lang b{padding:7px 9px;font-weight:400;color:inherit;text-decoration:none}
 .lang b{background:#315e5a;color:#fff;font-weight:600}
 /* Place and method pages. */
-.gallery-title,.photo h1{font:700 30px Georgia,serif;margin:6px 0 18px}
+.gallery-title,.photo h1{font:700 30px var(--font-display);margin:6px 0 18px}
 .gallery-intro{max-width:720px;margin:-8px 0 20px;font-size:14px;line-height:1.6;color:#394d47}
-.place h1,.method h1{font:700 30px Georgia,serif;margin:6px 0 10px}
-.place h2,.method h2{font:600 18px Georgia,serif;margin:26px 0 10px}
-.eyebrow{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+.place h1,.method h1{font:700 30px var(--font-display);margin:6px 0 10px}
+.place h2,.method h2{font:600 18px var(--font-display);margin:26px 0 10px}
+.eyebrow{font-size:10px;font-weight:700;line-height:1.45;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 .period{font-size:11px;color:#576a57;text-transform:uppercase;letter-spacing:.55px;margin:0 0 12px}
-.badge{font-size:11px;font-weight:700;padding:5px 7px;border:1px solid #b7c6ac;border-radius:4px;display:inline-block;background:#f6f6ec}
+.badge{font-size:11px;font-weight:700;padding:5px 7px;border:1px solid #b7c6ac;border-radius:4px;display:inline-block;background:#f6f6ec;min-height:0;line-height:1.45;white-space:normal}
 .place .note{max-width:640px;font-size:14px}
 /* Заглавное фото места: стопка изображений с кроссфейдом; переключатель годов — сегментный контрол в стиле .lang. */
 .place-cover{position:relative;max-width:640px;aspect-ratio:3/2;overflow:hidden;border:1px solid var(--line);border-radius:6px;background:#e8e4d4;margin:20px 0}
 .place-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s ease}
 .place-cover img.on{opacity:1}
 .cover-years{position:absolute;left:14px;bottom:14px;display:flex;background:#f8f6ee;border:1px solid #c7cebf;border-radius:5px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.18)}
-.cover-years button{border:0;margin:0;padding:7px 12px;background:transparent;color:var(--ink);font:600 15px/1 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;cursor:pointer}
+.cover-years button{border:0;margin:0;padding:7px 12px;background:transparent;color:var(--ink);font:600 15px/1 var(--font-ui);cursor:pointer}
 .cover-years button+button{border-left:1px solid #c7cebf}
 .cover-years button[aria-pressed="true"]{background:#315e5a;color:#fff}
-.cover-years button:focus-visible{outline:3px solid #a88746;outline-offset:-3px}
+.cover-years button:focus-visible{outline-offset:-4px}.cover-years button[aria-pressed="true"]:focus-visible{outline-color:var(--color-ink-inverse)}
 @media(prefers-reduced-motion:reduce){.place-cover img{transition:none}}
 /* Мобильный: фото от края до края, переключатель с зоной нажатия ≥44px. */
 @media(max-width:600px){.place-cover{max-width:none;margin:16px -14px 18px;border:0;border-radius:0}
@@ -89,10 +89,10 @@ button.chip{font-family:inherit;cursor:pointer}
 .related-places>h2{margin-top:24px}
 .related-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .related-panel{display:flex;min-width:0;flex-direction:column;border:1px solid var(--line);border-radius:7px;background:#faf8f1;padding:15px 16px}
-.related-panel h3{font:650 15px/1.3 Georgia,serif;margin:0 0 8px}
+.related-panel h3{font:650 15px/1.3 var(--font-display);margin:0 0 8px}
 .related-panel ul{list-style:none;margin:0;padding:0}
 .related-panel li{display:grid;grid-template-columns:34px minmax(0,1fr);gap:7px;padding:9px 0;border-top:1px solid #e1e3da}
-.related-number{font:700 12px/1.45 Georgia,serif;color:#79857d;padding-top:1px}
+.related-number{font:700 12px/1.45 var(--font-display);color:#79857d;padding-top:1px}
 .related-copy{min-width:0}
 .related-copy a{display:block;color:var(--ink);font-weight:650;text-decoration:none;overflow-wrap:anywhere}
 .related-copy a:hover{text-decoration:underline}
@@ -109,18 +109,18 @@ button.chip{font-family:inherit;cursor:pointer}
 /* Source-backed editorial hubs. */
 .editorial{max-width:760px;padding:8px 0 30px}
 .editorial-wide{max-width:900px}
-.editorial h1{max-width:850px;font:700 42px/1.08 Georgia,serif;margin:6px 0 16px;letter-spacing:-.3px}
-.editorial h2{max-width:760px;font:650 23px/1.25 Georgia,serif;margin:36px 0 12px}
-.editorial h3{font:650 18px/1.3 Georgia,serif;margin:7px 0 8px}
+.editorial h1{max-width:850px;font:700 42px/1.08 var(--font-display);margin:6px 0 16px;letter-spacing:-.3px}
+.editorial h2{max-width:760px;font:650 23px/1.25 var(--font-display);margin:36px 0 12px}
+.editorial h3{font:650 18px/1.3 var(--font-display);margin:7px 0 8px}
 .editorial>p,.editorial-deck,.editorial-note{max-width:760px;font-size:15px;line-height:1.72;margin:0 0 15px}
-.editorial .editorial-deck{font:400 19px/1.58 Georgia,serif;color:#394d47;margin-bottom:24px}
+.editorial .editorial-deck{font:400 19px/1.58 var(--font-read);color:#394d47;margin-bottom:24px}
 .answer-box,.screen-note{max-width:760px;margin:24px 0 30px;padding:17px 19px;border:1px solid #bdc8b7;border-left:4px solid #426650;border-radius:6px;background:#faf8f1}
 .answer-box>b,.screen-note>b{display:block;margin-bottom:6px;font-size:11px;letter-spacing:1.05px;text-transform:uppercase}
 .answer-box p,.screen-note{font-size:14px;line-height:1.62}
 .answer-box p{margin:0}
 .screen-note{border-left-color:#a88746;color:#394d47}
 .comparison-scroll{max-width:900px;overflow-x:auto;margin:14px 0 30px;border:1px solid var(--line);border-radius:7px;background:#faf8f1}
-.comparison-scroll:focus-visible{outline:3px solid #a88746;outline-offset:2px}
+
 .comparison-table{width:100%;min-width:760px;border-collapse:collapse;font-size:13px;line-height:1.5}
 .comparison-table th,.comparison-table td{padding:13px 14px;border-bottom:1px solid #dde0d5;border-right:1px solid #e3e5dc;text-align:left;vertical-align:top}
 .comparison-table th:last-child,.comparison-table td:last-child{border-right:0}
@@ -159,12 +159,12 @@ button.chip{font-family:inherit;cursor:pointer}
 .svg-downloads a:hover{text-decoration:underline}
 .download-language{max-width:900px!important;margin:0 0 34px!important;color:var(--muted);font-size:12px!important}
 .derry-explore{max-width:900px;margin-top:46px;padding:25px 0 4px;border-top:1px solid var(--line)}
-.derry-explore h2{margin:5px 0 15px;font:700 23px/1.2 Georgia,serif}
+.derry-explore h2{margin:5px 0 15px;font:700 23px/1.2 var(--font-display)}
 .derry-explore-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:0;padding:0;list-style:none}
 .derry-explore-grid li{min-width:0}
 .derry-explore-grid a,.derry-explore-current{display:flex;height:100%;min-height:91px;box-sizing:border-box;flex-direction:column;gap:7px;padding:14px 15px;border:1px solid var(--line);border-radius:7px;background:#faf8f1;text-decoration:none}
 .derry-explore-grid a:hover{border-color:#8ca096;background:#f4f3e9}
-.derry-explore-grid b{color:var(--ink);font:650 15px/1.3 Georgia,serif}
+.derry-explore-grid b{color:var(--ink);font:650 15px/1.3 var(--font-display)}
 .derry-explore-grid small{color:var(--muted);font-size:11px;line-height:1.4}
 .derry-explore-current{background:#edeee6;border-color:#d5d8cb}
 .derry-explore-current b,.derry-explore-current small{color:#6c756d}
@@ -184,7 +184,7 @@ button.chip{font-family:inherit;cursor:pointer}
 /* Searchable place directory. The full list stays in the HTML; JS only filters and sorts it. */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .places-hero{max-width:780px;padding:8px 0 23px}
-.places-hero h1{font:700 38px/1.12 Georgia,serif;margin:5px 0 12px}
+.places-hero h1{font:700 38px/1.12 var(--font-display);margin:5px 0 12px}
 .places-hero>p{max-width:720px;margin:0 0 13px;font-size:15px;line-height:1.65}
 .places-summary{color:var(--muted);font-size:12px!important;letter-spacing:.15px}
 .places-summary b{color:var(--ink)}
@@ -193,7 +193,7 @@ button.chip{font-family:inherit;cursor:pointer}
 .place-search-row{display:flex;gap:8px;padding-bottom:10px;border-bottom:1px solid #e4e5dc}
 .place-search{flex:1}
 .place-search input{width:100%;height:41px;border:1px solid #bcc6b8;border-radius:5px;background:#fff;color:var(--ink);padding:8px 12px;font:14px/1.2 inherit}
-.place-search input:focus{outline:3px solid rgba(168,135,70,.35);border-color:#8e784a}
+.place-search input:focus{border-color:var(--color-ink)}
 .clear-places{cursor:pointer;white-space:nowrap}
 .place-filter-row{display:flex;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid #e4e5dc}
 .place-filter-row .chip{font:inherit;cursor:pointer}
@@ -212,9 +212,9 @@ button.chip{font-family:inherit;cursor:pointer}
 .places-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .place-card{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:start;border:1px solid var(--line);border-radius:7px;background:#faf8f1;padding:15px 16px}
 .place-card[hidden]{display:none}
-.place-number{font:700 20px/1 Georgia,serif;color:#6d7a70;padding-top:4px;letter-spacing:.5px}
+.place-number{font:700 20px/1 var(--font-display);color:#6d7a70;padding-top:4px;letter-spacing:.5px}
 .place-card-title{display:flex;align-items:center;gap:9px;min-width:0}
-.place-card-title h2{font:650 20px/1.25 Georgia,serif;margin:0;min-width:0}
+.place-card-title h2{font:650 20px/1.25 var(--font-display);margin:0;min-width:0}
 .place-card-title h2 a{color:var(--ink);text-decoration:none}
 .place-card-title h2 a:hover{text-decoration:underline}
 .confidence-badge{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:25px;height:22px;border:1px solid #b7c6ac;border-radius:4px;background:#f6f6ec;font-size:10px;font-weight:750}
@@ -229,7 +229,7 @@ button.chip{font-family:inherit;cursor:pointer}
 .places-catalog.compact .places-list{gap:4px}
 .places-catalog.compact .place-card{padding:8px 11px;grid-template-columns:45px minmax(0,1fr)}
 .places-catalog.compact .place-number{font-size:15px;padding-top:3px}
-.places-catalog.compact .place-card-title h2{font:650 14px/1.25 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.places-catalog.compact .place-card-title h2{font:650 14px/1.25 var(--font-ui)}
 .places-catalog.compact .place-card-meta{display:inline;margin-right:10px}
 .places-catalog.compact .place-card-facts{display:inline-flex;margin:3px 0 0}
 .places-catalog.compact .place-card-excerpt,.places-catalog.compact .place-card-links,.places-catalog.compact .place-thumb{display:none}
