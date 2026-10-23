@@ -116,6 +116,14 @@ class PlacePageTests(TestCase):
         response = self.client.get('/ru/places/12/')
         self.assertRedirects(response, '/ru/places/12-derry-public-library/', status_code=301)
 
+    def test_retired_unplaced_key_redirects_to_new_place(self):
+        point = Geometry.objects.create(key='g:84', shape={'type': 'point', 'x': 10, 'y': 10})
+        Feature.objects.create(key='84', object_type='site', name='Cycle Shoppe', short='Cycle Shoppe',
+                               kind='Civic', confidence='A', geometry=point, metadata={})
+        for path, target in (('/places/u5-cycle-shoppe/', '/places/84-cycle-shoppe/'),
+                             ('/ru/places/U5/', '/ru/places/84-cycle-shoppe/')):
+            self.assertRedirects(self.client.get(path), target, status_code=301, msg_prefix=path)
+
     def test_unplaced_place_page(self):
         response = self.client.get('/places/u3-tracker-brothers/')
         self.assertEqual(response.status_code, 200)

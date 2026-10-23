@@ -966,9 +966,15 @@ def place_slug(feature):
     return feature.key.lower() + ('-' + name if name else '')
 
 
+# Ключи, которые сменились при переводе места на карту; старые адреса ведут на новые.
+# U5 Cycle Shoppe стал местом 84 по аудиту 27.09.
+LEGACY_PLACE_KEYS = {'u5': '84'}
+
+
 @require_safe
 def place_page(request, slug):
     key = slug.split('-', 1)[0]
+    key = LEGACY_PLACE_KEYS.get(key.lower(), key)
     feature = get_object_or_404(Feature, key__iexact=key, object_type__in=('site', 'unplaced'))
     canonical = place_slug(feature)
     if slug != canonical:
