@@ -1,3 +1,4 @@
+import json
 import tempfile
 from pathlib import Path
 
@@ -50,7 +51,7 @@ class PlaceIndexTests(TestCase):
         self.assertContains(response, 'data-sure="u" data-kind="" data-media=""')
         # Плитка — одна ссылка: номер маркера, имя, мета-строка словами.
         self.assertContains(response, '<span class="num num--a num--civic" aria-hidden="true">4</span>')
-        self.assertContains(response, '<h2 class="tile__name">Derry Elementary School</h2>')
+        self.assertContains(response, '<span class="visually-hidden">Place 4: </span>Derry Elementary School</h2>')
         self.assertContains(response, '<span class="tile__conf tile__conf--a">named in the novel</span>')
         self.assertContains(response, '/static/atlas/locators/4-tile.webp')
         self.assertContains(response, 'No point on the map')  # U3 — штриховка
@@ -81,10 +82,22 @@ class PlaceIndexTests(TestCase):
         self.assertContains(response, 'Owner mode · data audit')
         self.assertContains(response, 'data-audit="photos" aria-pressed="false">Photos <span class="chip__count">2</span>')
         self.assertContains(response, 'data-audit="one-source" aria-pressed="false">One source only '
-                                      '<span class="chip__count">1</span>')
+                                      '<span class="chip__count">2</span>')  # одна ссылка у школы, ноль у U3
         self.assertContains(response, 'data-missing="photos cover one-source"')
         self.assertContains(response, 'no photos · no cover · one source')
         self.assertContains(response, 'href="/places/">Exit owner mode</a>')
+
+    def test_filter_script_gets_its_strings(self):
+        response = self.client.get('/ru/places/')
+        self.assertContains(response, '<script id="placesStrings" type="application/json">')
+        self.assertContains(response, "document.documentElement.classList.add('js')")
+        self.assertContains(response, 'src="/static/atlas/places.js"')
+        strings = json.loads(response.content.decode().split(
+            '<script id="placesStrings" type="application/json">', 1)[1].split('</script>', 1)[0])
+        self.assertEqual(strings['places'], ['%(n)s место', '%(n)s места', '%(n)s мест'])
+        self.assertEqual(strings['of_total'][2], '%(n)s из %(total)s мест')
+        self.assertIn('«%(q)s»', strings['empty_in_kind'])
+        self.assertIn('<svg', strings['close_icon'])
 
     def test_place_cards_use_cover_then_photo(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -106,11 +119,11 @@ class PlaceIndexTests(TestCase):
         response = self.client.get('/ru/places/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<html lang="ru"')
-        self.assertContains(response, '<h2 class="tile__name">Начальная школа Дерри</h2>')
+        self.assertContains(response, '<span class="visually-hidden">Место 4: </span>Начальная школа Дерри</h2>')
         # Категории: полная форма на фильтре, короткая — в мета-строке плитки.
         self.assertContains(response, '<span class="filter-opt__label">Городские места</span>')
         self.assertContains(response, '<span class="t-meta tile__meta">Город · ')
-        self.assertContains(response, '<h2 class="tile__name">Городская ратуша Дерри</h2>')
+        self.assertContains(response, '</span>Городская ратуша Дерри</h2>')
         self.assertContains(response, 'Городской ориентир.')
         self.assertContains(response, 'Школа отмечает район.')
         self.assertContains(response, '<b>2</b> места · <b>1</b> на карте · <b>1</b> без координат')

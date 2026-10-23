@@ -1000,3 +1000,23 @@ msgstr "один источник"
 msgctxt "sort"
 msgid "Confidence"
 msgstr "Достоверность"
+
+# П9: фильтры указателя (places.js)
+
+msgid "%(n)s of %(counter)s place"
+msgid_plural "%(n)s of %(counter)s places"
+msgstr[0] "%(n)s из %(counter)s места"
+msgstr[1] "%(n)s из %(counter)s мест"
+msgstr[2] "%(n)s из %(counter)s мест"
+
+msgid "Nothing for “%(q)s” in %(kind)s. Search looks in names, descriptions and map numbers."
+msgstr "По запросу «%(q)s» в категории «%(kind)s» ничего нет. Поиск идёт по названиям, описаниям и номерам на карте."
+
+msgid "Nothing for “%(q)s”. Search looks in names, descriptions and map numbers."
+msgstr "По запросу «%(q)s» ничего нет. Поиск идёт по названиям, описаниям и номерам на карте."
+
+msgid "Filters, %(n)s"
+msgstr "Фильтры, %(n)s"
+
+msgid "Remove filter: %(name)s"
+msgstr "Убрать фильтр: %(name)s"

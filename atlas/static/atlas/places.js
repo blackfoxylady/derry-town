@@ -1,145 +1,341 @@
+// Place index (block 06): search, faceted filters (OR inside a group, AND between groups),
+// sort, Cards / Compact, URL state and the phone filter sheet. Every tile is in the HTML;
+// this script only hides, shows and reorders them.
 (function () {
   'use strict';
-
-  var search = document.getElementById('placeSearch');
+  var root = document.getElementById('placesCatalog');
   var list = document.getElementById('placesList');
-  var catalog = document.getElementById('placesCatalog');
-  if (!search || !list || !catalog) return;
-
-  var cards = Array.prototype.slice.call(list.querySelectorAll('.place-card'));
-  var total = cards.length;
-  var count = document.getElementById('placeResultCount');
+  if (!root || !list) return;
+  var T = JSON.parse(document.getElementById('placesStrings').textContent);
+  var lang = document.documentElement.lang === 'ru' ? 'ru' : 'en';
+  var tiles = Array.prototype.slice.call(list.children);
+  var total = tiles.length;
+  var GROUPS = ['sure', 'kind', 'media'];
+  var aside = document.getElementById('placeFilters');
+  var inputs = Array.prototype.slice.call(aside.querySelectorAll('.filter-opt__input'));
+  var searches = [document.getElementById('placeSearch'), document.getElementById('placeSearchPhone')].filter(Boolean);
+  var status = document.getElementById('placeStatus');
+  var chips = document.getElementById('activeChips');
   var empty = document.getElementById('placesEmpty');
-  var sort = document.getElementById('placeSort');
-  var clear = document.getElementById('clearPlaces');
-  var params = new URLSearchParams(window.location.search);
-  var state = {
-    q: params.get('q') || '',
-    location: params.get('location') || '',
-    confidence: params.get('confidence') || '',
-    kind: params.get('kind') || '',
-    media: params.get('media') || '',
-    audit: params.get('audit') || '',
-    sort: params.get('sort') === 'name' ? 'name' : 'number',
-    view: params.get('view') === 'compact' ? 'compact' : 'cards'
-  };
+  var auditChips = Array.prototype.slice.call(document.querySelectorAll('[data-audit]'));
+  var sortButton = document.getElementById('sortButton');
+  var sortMenu = document.getElementById('sortMenu');
+  var openFilters = document.getElementById('openFilters');
+  var phone = window.matchMedia('(max-width: 47.99em)');
 
-  function normalized(value) {
-    return (value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+  // ---- plural forms prepared by the server: [one, few, many] (RU) or [one, other] (EN)
+  function pluralIndex(n) {
+    if (lang === 'ru') return n % 10 === 1 && n % 100 !== 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 1 : 2;
+    return n === 1 ? 0 : 1;
+  }
+  function plural(forms, n) { return fill(forms[pluralIndex(n)], { n: n }); }
+  function fill(template, values) {
+    return template.replace(/%\((\w+)\)s/g, function (all, key) { return key in values ? values[key] : all; });
+  }
+  function norm(text) {
+    return (text || '').toLowerCase().replace(/ё/g, 'е').normalize('NFD').replace(/[̀-ͯ]/g, '');
   }
 
-  cards.forEach(function (card) {
-    card._search = normalized(card.dataset.search);
+  // ---- data per tile
+  var data = tiles.map(function (li) {
+    return {
+      li: li, order: +li.dataset.order, name: li.dataset.name, search: norm(li.dataset.search),
+      sure: li.dataset.sure, kind: li.dataset.kind,
+      media: (li.dataset.media || '').split(' ').filter(Boolean),
+      missing: (li.dataset.missing || '').split(' ').filter(Boolean)
+    };
   });
 
-  function mediaMatches(card) {
-    var photos = Number(card.dataset.photos);
-    var covers = Number(card.dataset.covers);
-    if (state.media === 'photos') return photos > 0;
-    if (state.media === 'cover') return covers > 0;
-    if (state.media === 'none') return photos === 0 && covers === 0;
+  // ---- state
+  var state = { q: '', sure: [], kind: [], media: [], missing: [], sort: 'number', view: 'cards' };
+
+  function readUrl() {
+    var params = new URLSearchParams(location.search);
+    function list(name) { return (params.get(name) || '').toLowerCase().split(',').filter(Boolean); }
+    state.q = params.get('q') || '';
+    state.sure = list('sure');
+    state.kind = list('kind');
+    state.media = list('media').filter(function (m) { return m === 'photos' || m === 'cover'; });
+    state.missing = list('missing');
+    // Old links: ?confidence=A&location=unlocated|mapped
+    list('confidence').forEach(function (c) { if (state.sure.indexOf(c) < 0) state.sure.push(c); });
+    var location_ = list('location');
+    if (location_.indexOf('unlocated') >= 0 && state.sure.indexOf('u') < 0) state.sure.push('u');
+    if (location_.indexOf('mapped') >= 0 && !state.sure.length) state.sure = ['a', 'b', 'c'];
+    state.sort = ['number', 'name', 'confidence'].indexOf(params.get('sort')) >= 0 ? params.get('sort') : 'number';
+    state.view = params.get('view') === 'compact' ? 'compact' : 'cards';
+    // Keep only values that exist on the page.
+    GROUPS.forEach(function (g) {
+      var known = inputs.filter(function (i) { return i.name === g; }).map(function (i) { return i.value; });
+      state[g] = state[g].filter(function (v, idx, all) { return known.indexOf(v) >= 0 && all.indexOf(v) === idx; });
+    });
+    var audits = auditChips.map(function (c) { return c.dataset.audit; });
+    state.missing = state.missing.filter(function (v) { return audits.indexOf(v) >= 0; });
+  }
+
+  function writeUrl() {
+    var params = new URLSearchParams(location.search);
+    ['q', 'sure', 'kind', 'media', 'missing', 'sort', 'view', 'confidence', 'location'].forEach(function (k) { params.delete(k); });
+    if (state.q) params.set('q', state.q);
+    GROUPS.concat('missing').forEach(function (g) { if (state[g].length) params.set(g, state[g].join(',')); });
+    if (state.sort !== 'number') params.set('sort', state.sort);
+    if (state.view !== 'cards') params.set('view', state.view);
+    var query = params.toString().replace(/%2C/g, ',');
+    var url = location.pathname + (query ? '?' + query : '') + location.hash;
+    if (url !== location.pathname + location.search + location.hash) history.replaceState(history.state, '', url);
+  }
+
+  // ---- matching
+  function matches(d, skip) {
+    if (state.q) {
+      var words = norm(state.q).split(/\s+/).filter(Boolean);
+      for (var i = 0; i < words.length; i++) if (d.search.indexOf(words[i]) < 0) return false;
+    }
+    if (skip !== 'sure' && state.sure.length && state.sure.indexOf(d.sure) < 0) return false;
+    if (skip !== 'kind' && state.kind.length && state.kind.indexOf(d.kind) < 0) return false;
+    if (skip !== 'media' && state.media.length && !state.media.some(function (m) { return d.media.indexOf(m) >= 0; })) return false;
+    if (skip !== 'missing' && state.missing.length && !state.missing.some(function (m) { return d.missing.indexOf(m) >= 0; })) return false;
     return true;
   }
-
-  function auditMatches(card) {
-    if (state.audit === 'photos') return Number(card.dataset.photos) === 0;
-    if (state.audit === 'cover') return Number(card.dataset.covers) === 0;
-    if (state.audit === 'content') return card.dataset.contentComplete === '0';
-    if (state.audit === 'ru') return card.dataset.ruComplete === '0';
-    if (state.audit === 'sources') return Number(card.dataset.sources) === 0;
-    return true;
+  function has(d, group, value) {
+    return group === 'sure' ? d.sure === value : group === 'kind' ? d.kind === value
+      : (group === 'media' ? d.media : d.missing).indexOf(value) >= 0;
   }
 
-  function matches(card) {
-    var terms = normalized(state.q).split(/\s+/).filter(Boolean);
-    return terms.every(function (term) { return card._search.indexOf(term) !== -1; }) &&
-      (!state.location || card.dataset.location === state.location) &&
-      (!state.confidence || card.dataset.confidence === state.confidence) &&
-      (!state.kind || card.dataset.kind === state.kind) &&
-      mediaMatches(card) && auditMatches(card);
+  function activeCount() {
+    return state.sure.length + state.kind.length + state.media.length + state.missing.length;
+  }
+  function labelOf(group, value) {
+    var input = inputs.filter(function (i) { return i.name === group && i.value === value; })[0];
+    if (input) return input.closest('.filter-opt').querySelector('.filter-opt__label').textContent;
+    var chip = auditChips.filter(function (c) { return c.dataset.audit === value; })[0];
+    return chip ? chip.firstChild.textContent.trim() : value;
   }
 
-  function updateUrl() {
-    var url = new URL(window.location.href);
-    ['q', 'location', 'confidence', 'kind', 'media', 'audit', 'sort', 'view'].forEach(function (key) {
-      url.searchParams.delete(key);
+  // ---- render
+  function render() {
+    var shown = 0;
+    data.forEach(function (d) {
+      var ok = matches(d);
+      d.li.hidden = !ok;
+      if (ok) shown++;
     });
-    if (state.q) url.searchParams.set('q', state.q);
-    ['location', 'confidence', 'kind', 'media', 'audit'].forEach(function (key) {
-      if (state[key]) url.searchParams.set(key, state[key]);
+    // Faceted counts: how many places each option would hold, given the other groups.
+    inputs.forEach(function (input) {
+      var group = input.name, value = input.value;
+      var n = data.filter(function (d) { return matches(d, group) && has(d, group, value); }).length;
+      input.checked = state[group].indexOf(value) >= 0;
+      input.disabled = !n && !input.checked;
+      input.closest('.filter-opt').querySelector('[data-count]').textContent = n;
     });
-    if (state.sort !== 'number') url.searchParams.set('sort', state.sort);
-    if (state.view !== 'cards') url.searchParams.set('view', state.view);
-    history.replaceState(null, '', url.pathname + url.search + url.hash);
+    auditChips.forEach(function (chip) {
+      var value = chip.dataset.audit;
+      chip.setAttribute('aria-pressed', String(state.missing.indexOf(value) >= 0));
+      chip.querySelector('.chip__count').textContent =
+        data.filter(function (d) { return matches(d, 'missing') && has(d, 'missing', value); }).length;
+    });
+    var filtered = shown !== total || activeCount() || state.q;
+    status.textContent = filtered && shown !== total
+      ? fill(T.of_total[pluralIndex(total)], { n: shown, total: total })
+      : plural(T.places, total);
+    renderChips();
+    var any = activeCount() > 0 || !!state.q;
+    document.querySelectorAll('[data-clear]').forEach(function (b) {
+      if (b.closest('#placesEmpty')) return;
+      if (b.classList.contains('index-results__clear')) b.hidden = !activeCount(); else b.disabled = !any;
+    });
+    // Empty state
+    empty.hidden = shown > 0;
+    if (!shown) {
+      var text = '';
+      if (state.q && state.kind.length === 1) text = fill(T.empty_in_kind, { q: state.q, kind: labelOf('kind', state.kind[0]) });
+      else if (state.q) text = fill(T.empty_query, { q: state.q });
+      empty.querySelector('[data-empty-text]').textContent = text;
+      empty.querySelector('[data-empty-text]').hidden = !text;
+      empty.querySelector('[data-drop-kind]').hidden = !(state.q && state.kind.length);
+    }
+    // Phone: the Filters button and the sheet's "Show N places"
+    var n = activeCount();
+    var badge = openFilters && openFilters.querySelector('[data-filter-count]');
+    if (badge) {
+      badge.hidden = !n;
+      badge.textContent = n;
+      openFilters.classList.toggle('btn--primary', n > 0);
+      openFilters.classList.toggle('btn--quiet', !n);
+      openFilters.setAttribute('aria-label', n ? fill(T.filters_n, { n: n }) : T.filters);
+    }
+    var show = aside.querySelector('[data-show-count]');
+    if (show) show.textContent = plural(T.show, shown);
+    sortAndView();
+    writeUrl();
   }
 
-  function syncControls() {
-    search.value = state.q;
-    sort.value = state.sort;
-    document.querySelectorAll('[data-filter-group]').forEach(function (group) {
-      var value = state[group.dataset.filterGroup] || '';
-      group.querySelectorAll('.chip').forEach(function (button) {
-        var on = button.dataset.value === value;
-        button.classList.toggle('on', on);
-        button.setAttribute('aria-pressed', String(on));
+  function renderChips() {
+    chips.textContent = '';
+    GROUPS.concat('missing').forEach(function (group) {
+      state[group].forEach(function (value) {
+        var label = labelOf(group, value);
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'chip chip--set';
+        b.setAttribute('aria-label', fill(T.remove, { name: label }));
+        b.innerHTML = '<span></span>' + T.close_icon;
+        b.firstChild.textContent = label;
+        b.addEventListener('click', function () {
+          toggle(group, value, false);
+          (chips.querySelector('.chip') || status).focus();
+        });
+        chips.appendChild(b);
       });
     });
-    document.querySelectorAll('.view-switch button').forEach(function (button) {
-      var on = button.dataset.view === state.view;
-      button.classList.toggle('on', on);
-      button.setAttribute('aria-pressed', String(on));
-    });
-    catalog.classList.toggle('compact', state.view === 'compact');
-    var audit = document.querySelector('.audit-filters');
-    if (audit && state.audit) audit.open = true;
   }
 
-  function render(writeUrl) {
-    cards.sort(function (a, b) {
-      if (state.sort === 'name') return a.dataset.name.localeCompare(b.dataset.name, document.documentElement.lang);
-      return Number(a.dataset.order) - Number(b.dataset.order);
-    }).forEach(function (card) { list.appendChild(card); });
-
-    var visible = 0;
-    cards.forEach(function (card) {
-      var show = matches(card);
-      card.hidden = !show;
-      if (show) visible += 1;
+  var currentOrder = '';
+  function sortAndView() {
+    var key = state.sort + (state.sort === 'name' ? lang : '');
+    if (key !== currentOrder) {
+      currentOrder = key;
+      var sorted = data.slice().sort(function (a, b) {
+        if (state.sort === 'name') return a.name.localeCompare(b.name, lang) || a.order - b.order;
+        if (state.sort === 'confidence') return a.sure.localeCompare(b.sure) || a.order - b.order;
+        return a.order - b.order;
+      });
+      sorted.forEach(function (d) { list.appendChild(d.li); });
+    }
+    list.classList.toggle('index-list--compact', state.view === 'compact');
+    document.querySelectorAll('[data-view]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.view === state.view)); });
+    document.querySelectorAll('[data-sort]').forEach(function (el) {
+      var on = el.dataset.sort === state.sort;
+      el.setAttribute(el.getAttribute('role') === 'option' ? 'aria-selected' : 'aria-pressed', String(on));
+      if (on && el.getAttribute('role') === 'option') sortButton.querySelector('[data-sort-label]').textContent = el.textContent;
     });
-    count.innerHTML = '<b>' + visible + '</b> / ' + total;
-    empty.hidden = visible !== 0;
-    syncControls();
-    if (writeUrl) updateUrl();
   }
 
-  search.addEventListener('input', function () {
-    state.q = search.value.trim();
-    render(true);
+  function toggle(group, value, on) {
+    var values = state[group];
+    var i = values.indexOf(value);
+    if (on && i < 0) values.push(value);
+    if (!on && i >= 0) values.splice(i, 1);
+    render();
+  }
+  function clearAll() {
+    state.q = ''; state.sure = []; state.kind = []; state.media = []; state.missing = [];
+    searches.forEach(function (s) { s.value = ''; });
+    render();
+  }
+
+  // ---- events
+  inputs.forEach(function (input) {
+    input.addEventListener('change', function () { toggle(input.name, input.value, input.checked); });
   });
-  sort.addEventListener('change', function () {
-    state.sort = sort.value;
-    render(true);
+  auditChips.forEach(function (chip) {
+    chip.addEventListener('click', function () { toggle('missing', chip.dataset.audit, chip.getAttribute('aria-pressed') !== 'true'); });
   });
-  document.querySelectorAll('[data-filter-group] .chip').forEach(function (button) {
-    button.addEventListener('click', function () {
-      state[button.closest('[data-filter-group]').dataset.filterGroup] = button.dataset.value;
-      render(true);
+  var timer;
+  searches.forEach(function (search) {
+    search.addEventListener('input', function () {
+      searches.forEach(function (other) { if (other !== search) other.value = search.value; });
+      clearTimeout(timer);
+      timer = setTimeout(function () { state.q = search.value.trim(); render(); }, 150);
+    });
+    search.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && search.value) {
+        event.preventDefault();
+        event.stopPropagation();
+        searches.forEach(function (s) { s.value = ''; });
+        state.q = '';
+        render();
+      }
     });
   });
-  document.querySelectorAll('.view-switch button').forEach(function (button) {
-    button.addEventListener('click', function () {
-      state.view = button.dataset.view;
-      render(true);
-    });
+  document.querySelectorAll('[data-clear]').forEach(function (b) { b.addEventListener('click', clearAll); });
+  empty.querySelector('[data-drop-kind]').addEventListener('click', function () { state.kind = []; render(); });
+  document.querySelectorAll('[data-view]').forEach(function (b) {
+    b.addEventListener('click', function () { state.view = b.dataset.view; render(); });
   });
-  clear.addEventListener('click', function () {
-    state.q = '';
-    state.location = state.confidence = state.kind = state.media = state.audit = '';
-    state.sort = 'number';
-    state.view = 'cards';
-    render(true);
-    search.focus();
+  aside.querySelectorAll('.chip[data-sort]').forEach(function (b) {
+    b.addEventListener('click', function () { state.sort = b.dataset.sort; render(); });
   });
 
-  render(false);
+  // Sort listbox: button opens it, ↑/↓ move, Enter/Space choose, Esc closes.
+  var options = Array.prototype.slice.call(sortMenu.querySelectorAll('[role="option"]'));
+  function openSort(open) {
+    sortMenu.hidden = !open;
+    sortButton.setAttribute('aria-expanded', String(open));
+    if (open) (options.filter(function (o) { return o.dataset.sort === state.sort; })[0] || options[0]).focus();
+  }
+  sortButton.addEventListener('click', function () { openSort(sortMenu.hidden); });
+  options.forEach(function (option, index) {
+    function choose() { state.sort = option.dataset.sort; openSort(false); sortButton.focus(); render(); }
+    option.addEventListener('click', choose);
+    option.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        options[(index + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length].focus();
+      } else if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault(); choose();
+      } else if (event.key === 'Escape' || event.key === 'Tab') {
+        openSort(false); if (event.key === 'Escape') sortButton.focus();
+      }
+    });
+  });
+  document.addEventListener('click', function (event) {
+    if (!sortMenu.hidden && !sortMenu.contains(event.target) && !sortButton.contains(event.target)) openSort(false);
+  });
+
+  // ---- phone filter sheet: a modal dialog over the page; changes apply at once
+  var lastFocus = null;
+  function focusables() {
+    return Array.prototype.slice.call(aside.querySelectorAll('button, input, [href], [tabindex]:not([tabindex="-1"])'))
+      .filter(function (el) { return !el.disabled && el.offsetParent !== null; });
+  }
+  function setSheet(open) {
+    aside.classList.toggle('is-sheet-open', open);
+    document.documentElement.classList.toggle('has-sheet', open);
+    if (open) {
+      lastFocus = document.activeElement;
+      aside.setAttribute('role', 'dialog');
+      aside.setAttribute('aria-modal', 'true');
+      aside.setAttribute('aria-labelledby', 'filtersTitle');
+      aside.removeAttribute('aria-label');
+      openFilters.setAttribute('aria-expanded', 'true');
+      (aside.querySelector('[data-close-filters]') || aside).focus();
+    } else {
+      aside.removeAttribute('role');
+      aside.removeAttribute('aria-modal');
+      aside.removeAttribute('aria-labelledby');
+      aside.setAttribute('aria-label', T.filters);
+      openFilters.setAttribute('aria-expanded', 'false');
+      if (lastFocus) lastFocus.focus();
+    }
+  }
+  if (openFilters) {
+    openFilters.setAttribute('aria-expanded', 'false');
+    openFilters.addEventListener('click', function () { setSheet(true); });
+    aside.querySelectorAll('[data-close-filters]').forEach(function (b) { b.addEventListener('click', function () { setSheet(false); }); });
+    aside.addEventListener('keydown', function (event) {
+      if (!aside.classList.contains('is-sheet-open')) return;
+      if (event.key === 'Escape') { event.preventDefault(); setSheet(false); return; }
+      if (event.key !== 'Tab') return;
+      var f = focusables();
+      if (!f.length) return;
+      if (event.shiftKey && document.activeElement === f[0]) { event.preventDefault(); f[f.length - 1].focus(); }
+      else if (!event.shiftKey && document.activeElement === f[f.length - 1]) { event.preventDefault(); f[0].focus(); }
+    });
+    // Swipe down on the sheet head closes it.
+    var head = aside.querySelector('.index-filters__head'), startY = null;
+    head.addEventListener('touchstart', function (e) { startY = e.touches[0].clientY; }, { passive: true });
+    head.addEventListener('touchend', function (e) {
+      if (startY !== null && e.changedTouches[0].clientY - startY > 60) setSheet(false);
+      startY = null;
+    });
+    // Leaving the phone layout closes the sheet.
+    (phone.addEventListener ? phone.addEventListener.bind(phone, 'change') : phone.addListener.bind(phone))(function () {
+      if (!phone.matches && aside.classList.contains('is-sheet-open')) setSheet(false);
+    });
+  }
+
+  readUrl();
+  searches.forEach(function (s) { s.value = state.q; });
+  render();
 }());

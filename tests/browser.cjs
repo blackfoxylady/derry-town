@@ -99,20 +99,40 @@ const path=require('node:path');
   const url=process.env.DERRY_URL||'http://127.0.0.1:8765';
   assert.equal(await page.locator('header a:has-text("Sources & method")').getAttribute('href'),'/method/');
   await page.goto(url+'/method/',{waitUntil:'networkidle'});
-  assert.match(await page.locator('.method h1').innerText(),/Built from the novel/);
-  assert.equal(await page.locator('.source').count(),7);
-  // Dedicated place directory: all links are server-rendered, controls enhance them locally.
+  assert.match(await page.locator('.method-page h1').innerText(),/Built from the novel/);
+  assert.equal(await page.locator('.source-list__item').count(),7);
+  assert.equal(await page.locator('.matrix__row').count(),4);
+  // Place index: all tiles are server-rendered; places.js filters, sorts and keeps the URL.
   await page.goto(url+'/places/',{waitUntil:'networkidle'});
-  assert.equal(await page.locator('.place-card').count(),92);
-  await page.locator('#placeSearch').fill('library');
-  assert.equal(await page.locator('.place-card:visible').filter({hasText:'Derry Public Library'}).count(),1);
-  await page.locator('#clearPlaces').click();
-  await page.locator('[data-filter-group="location"] [data-value="unlocated"]').click();
-  assert.equal(await page.locator('.place-card:visible').count(),8);
-  await page.locator('[data-view="compact"]').click();
-  assert.equal(await page.locator('#placesCatalog').evaluate(n=>n.classList.contains('compact')),true);
-  assert.match(page.url(),/location=unlocated/);
+  assert.equal(await page.locator('.tile').count(),92);
+  const search=name==='mobile'?'#placeSearchPhone':'#placeSearch';
+  await page.locator(search).fill('library');
+  await page.waitForFunction(()=>/library/.test(location.search));
+  assert.equal(await page.locator('.tile:visible').filter({hasText:'Derry Public Library'}).count(),1);
+  await page.locator(search).press('Escape');
+  await page.waitForFunction(()=>!/q=/.test(location.search));
+  if(name==='mobile'){
+    await page.locator('#openFilters').click();
+    assert.equal(await page.locator('#placeFilters[role="dialog"]').count(),1);
+  }
+  await page.locator('#placeFilters label:has(input[name="sure"][value="u"])').click();
+  assert.equal(await page.locator('.tile:visible').count(),8);
+  assert.match(page.url(),/sure=u/);
+  // Faceted counts: with "No location" checked the categories count only U places (none have one).
+  assert.equal(await page.locator('#placeFilters input[name="kind"]:disabled').count(),
+               await page.locator('#placeFilters input[name="kind"]').count());
+  await page.locator((name==='mobile'?'#placeFilters':'.index-results__tools')+' [data-view="compact"]').click();
+  assert.equal(await page.locator('#placesList').evaluate(n=>n.classList.contains('index-list--compact')),true);
+  if(name==='mobile'){
+    await page.locator('#placeFilters .index-filters__foot [data-close-filters]').click();
+    assert.equal(await page.locator('#openFilters').evaluate(b=>b.classList.contains('btn--primary')),true);
+  }
   assert.match(page.url(),/view=compact/);
+  // Old links keep working: ?confidence=U&location=unlocated → sure=u
+  await page.goto(url+'/places/?confidence=U&location=unlocated',{waitUntil:'networkidle'});
+  assert.equal(await page.locator('.tile:visible').count(),8);
+  assert.match(page.url(),/sure=u/);
+  assert.doesNotMatch(page.url(),/confidence=|location=/);
   // Photo gallery: map deep link and back; a fresh install may hold zero photos.
   await page.goto(url+'/?place=12',{waitUntil:'networkidle'});
   await page.waitForFunction(()=>window.DerryAtlas?.view.selected===12,{timeout:120000});
@@ -121,10 +141,10 @@ const path=require('node:path');
   const placeHref=await page.locator('#detail .card-page a').getAttribute('href');
   assert.match(placeHref,/^\/places\/12(-|\/)/);
   await page.goto(url+placeHref,{waitUntil:'networkidle'});
-  assert.match(await page.locator('.place h1').innerText(),/\S/);
+  assert.match(await page.locator('.place-page h1').innerText(),/\S/);
   assert.equal(await page.locator('.crumbs li').count(),3);
-  assert.equal(await page.locator('.related-panel').count(),2);
-  const relatedHrefs=await page.locator('.related-panel li a').evaluateAll(links=>links.map(a=>a.getAttribute('href')));
+  assert.equal(await page.locator('.related__row').count(),2);
+  const relatedHrefs=await page.locator('.related__list a').evaluateAll(links=>links.map(a=>a.getAttribute('href')));
   assert.equal(relatedHrefs.length,8);
   assert.equal(new Set(relatedHrefs).size,relatedHrefs.length);
   // The Russian version serves the same map under /ru/.

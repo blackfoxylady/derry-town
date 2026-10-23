@@ -2,6 +2,7 @@
 {% load i18n static atlas_tags %}
 {% block main_class %}page page--index{% endblock %}
 {% block content %}
+<script>document.documentElement.classList.add('js')</script>
 <div class="index-hero">
 {% include 'atlas/breadcrumbs.html' with section='places' only %}
 <h1 class="t-h1">{% trans "Places in Derry, Maine" %}</h1>
@@ -60,17 +61,17 @@
 <ul class="index-list" id="placesList">
 {% for c in cards %}<li class="tile{% if c.image %} tile--picture{% endif %}" data-order="{{ c.order }}" data-name="{{ c.name }}" data-search="{{ c.search_text }}" data-sure="{{ c.sure }}" data-kind="{{ c.kind_value }}" data-media="{{ c.media|join:' ' }}"{% if audit %} data-missing="{{ c.missing|join:' ' }}"{% endif %}>
 <a class="tile__link" href="{{ c.url }}">
-<span class="tile__media">{% if c.image %}<img class="tile__img" src="{{ c.image.src }}" srcset="{{ c.image.srcset }}" sizes="(max-width: 37.49em) calc(100vw - 32px), 360px" alt="" width="{{ c.image.width }}" height="{{ c.image.height }}" loading="lazy" decoding="async">{% elif c.mapped %}{% include 'atlas/locator.html' with preset='tile' key=c.feature.key name=c.name link=False decorative=True %}{% else %}{% include 'atlas/locator_none.html' with key=c.feature.key preset='tile' %}{% endif %}</span>
-<span class="tile__body">
+<div class="tile__media">{% if c.image %}<img class="tile__img" src="{{ c.image.src }}" srcset="{{ c.image.srcset }}" sizes="(max-width: 37.49em) calc(100vw - 32px), 360px" alt="" width="{{ c.image.width }}" height="{{ c.image.height }}" loading="lazy" decoding="async">{% elif c.mapped %}{% include 'atlas/locator.html' with preset='tile' key=c.feature.key name=c.name link=False decorative=True %}{% else %}<div aria-hidden="true">{% include 'atlas/locator_none.html' with key=c.feature.key preset='tile' %}</div>{% endif %}</div>
+<div class="tile__body">
 <span class="num num--{{ c.sure }}{% if c.kind_value %} num--{{ c.kind_value }}{% endif %}" aria-hidden="true">{{ c.feature.key }}</span>
-<span class="tile__text">
-<h2 class="tile__name">{{ c.name }}</h2>
+<div class="tile__text">
+<h2 class="tile__name"><span class="visually-hidden">{% blocktranslate with number=c.feature.key %}Place {{ number }}:{% endblocktranslate %} </span>{{ c.name }}</h2>
 <span class="t-meta tile__meta">{% if c.kind_label %}{{ c.kind_label }} · {% endif %}{% if c.period %}{{ c.period }} · {% endif %}<span class="tile__conf tile__conf--{{ c.sure }}">{{ c.conf_meta }}</span></span>
 {% if c.note %}<span class="tile__note">{{ c.note }}</span>{% endif %}
 {% if audit and c.missing_labels %}<span class="tile__audit">{{ c.missing_labels|join:' · ' }}</span>{% endif %}
-</span>
+</div>
 {% if c.image %}<span class="card-photo tile__polaroid" aria-hidden="true"><img src="{{ c.image.thumb }}" alt="" width="{{ c.image.width }}" height="{{ c.image.height }}" loading="lazy" decoding="async"></span>{% endif %}
-</span>
+</div>
 </a>
 </li>{% endfor %}
 </ul>
@@ -94,3 +95,4 @@
 </section>
 {% include 'atlas/derry_explore.html' %}
 {% endblock %}
+{% block scripts %}{{ js_strings|json_script:'placesStrings' }}<script src="{% static 'atlas/places.js' %}" defer></script>{% endblock %}

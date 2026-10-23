@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db.models import Count
 from django.http import FileResponse, Http404, JsonResponse, HttpResponse, HttpResponseNotModified
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse, translate_url
 from django.utils._os import safe_join
 from django.utils.text import slugify
@@ -691,6 +692,29 @@ AUDIT_TILE_NOTES = {
 }
 
 
+def _plural_forms(singular, plural, counter='%(n)s'):
+    """Формы ngettext для JS: [одна, несколько, много] (RU) или [одна, много, много] (EN).
+    Числа подставляет браузер: %(n)s, а счётчик формы — вместо `counter`."""
+    return [ngettext(singular, plural, n) % {'counter': counter, 'n': '%(n)s'} for n in (1, 2, 5)]
+
+
+def _places_js_strings():
+    """Строки places.js: статус, пустое состояние, чипы, кнопки шторки."""
+    return {
+        'places': _plural_forms('%(counter)s place', '%(counter)s places'),
+        'of_total': _plural_forms('%(n)s of %(counter)s place', '%(n)s of %(counter)s places',
+                                  counter='%(total)s'),
+        'show': _plural_forms('Show %(counter)s place', 'Show %(counter)s places'),
+        'empty_in_kind': str(_('Nothing for “%(q)s” in %(kind)s. Search looks in names, '
+                               'descriptions and map numbers.')),
+        'empty_query': str(_('Nothing for “%(q)s”. Search looks in names, descriptions and '
+                             'map numbers.')),
+        'filters': str(_('Filters')), 'filters_n': str(_('Filters, %(n)s')),
+        'remove': str(_('Remove filter: %(name)s')),
+        'close_icon': render_to_string('atlas/icons/close.svg').strip(),
+    }
+
+
 def _places_sort_options():
     return [('number', _('Map number')), ('name', _('Name A–Z')),
             ('confidence', pgettext('sort', 'Confidence'))]
@@ -754,7 +778,7 @@ def places(request):
             ('photos', not feature_photos), ('cover', not feature_covers),
             ('content', not (feature.note and feature.about and feature.confidence_explanation)),
             ('ru', not all(ru.get(field) for field in ('note', 'about', 'confidence_explanation'))),
-            ('one-source', feature.evidence_count == 1),
+            ('one-source', feature.evidence_count <= 1),  # 0 тоже: старый фильтр «Sources»
         ) if gap]
         audit_counts.update(missing)
 
@@ -806,6 +830,7 @@ def places(request):
         'audit_counts': [{'key': key, 'label': label, 'count': audit_counts[key]}
                          for key, label in AUDIT_CHECKS],
         'sort_options': _places_sort_options(),
+        'js_strings': _places_js_strings(),
         'place_count': place_count, 'mapped_count': mapped_count,
         'unlocated_count': unlocated_count,
         'page_title': page_title, 'meta_description': meta_description,
