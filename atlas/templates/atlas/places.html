@@ -49,7 +49,7 @@
 <button type="button" class="btn btn--quiet index-phonebar__filters" id="openFilters" aria-haspopup="dialog" aria-controls="placeFilters">{% include 'atlas/icons/filter.svg' %}<span>{% trans "Filters" %}</span><span class="index-phonebar__n" data-filter-count hidden></span></button>
 </div>
 <div class="index-results__head">
-<span class="index-results__status" id="placeStatus" role="status" aria-live="polite">{% blocktranslate count counter=place_count %}{{ counter }} place{% plural %}{{ counter }} places{% endblocktranslate %}</span>
+<span class="index-results__status" id="placeStatus" role="status" aria-live="polite" tabindex="-1">{% blocktranslate count counter=place_count %}{{ counter }} place{% plural %}{{ counter }} places{% endblocktranslate %}</span>
 <span class="index-results__chips js-only" id="activeChips"></span>
 <button type="button" class="index-results__clear js-only" data-clear hidden>{% trans "Clear all" %}</button>
 <span class="index-results__tools js-only">

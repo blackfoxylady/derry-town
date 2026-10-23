@@ -724,7 +724,9 @@ def _places_sort_options():
 def places(request):
     """Указатель мест (блок 06): все плитки в HTML в порядке номеров; поиск, фасеты,
     сортировка и вид — в places.js. ?audit=1 — режим владельца (noindex)."""
-    audit = request.GET.get('audit') == '1'
+    # ?audit=1; старые ссылки владельца ?audit=photos|cover|content|ru|sources тоже (places.js
+    # переводит их в ?audit=1&missing=…).
+    audit = request.GET.get('audit') in ('1', 'photos', 'cover', 'content', 'ru', 'sources')
     features = list(
         Feature.objects.filter(object_type__in=('site', 'unplaced'))
         .annotate(evidence_count=Count('evidence'))

@@ -86,6 +86,9 @@ class PlaceIndexTests(TestCase):
         self.assertContains(response, 'data-missing="photos cover one-source"')
         self.assertContains(response, 'no photos · no cover · one source')
         self.assertContains(response, 'href="/places/">Exit owner mode</a>')
+        # Старые ссылки владельца тоже открывают режим аудита.
+        self.assertContains(self.client.get('/places/', {'audit': 'sources'}), 'Owner mode · data audit')
+        self.assertNotContains(self.client.get('/places/', {'audit': 'yes'}), 'owner-bar')
 
     def test_filter_script_gets_its_strings(self):
         response = self.client.get('/ru/places/')

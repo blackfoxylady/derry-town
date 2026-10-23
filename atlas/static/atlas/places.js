@@ -52,7 +52,7 @@
   function readUrl() {
     var params = new URLSearchParams(location.search);
     function list(name) { return (params.get(name) || '').toLowerCase().split(',').filter(Boolean); }
-    state.q = params.get('q') || '';
+    state.q = (params.get('q') || '').trim();
     state.sure = list('sure');
     state.kind = list('kind');
     state.media = list('media').filter(function (m) { return m === 'photos' || m === 'cover'; });
@@ -69,13 +69,17 @@
       var known = inputs.filter(function (i) { return i.name === g; }).map(function (i) { return i.value; });
       state[g] = state[g].filter(function (v, idx, all) { return known.indexOf(v) >= 0 && all.indexOf(v) === idx; });
     });
+    // Old owner links: ?audit=photos|cover|content|ru|sources → ?audit=1&missing=…
+    var oldAudit = (params.get('audit') || '').toLowerCase();
+    if (oldAudit && oldAudit !== '1' && !state.missing.length) state.missing = [oldAudit === 'sources' ? 'one-source' : oldAudit];
     var audits = auditChips.map(function (c) { return c.dataset.audit; });
-    state.missing = state.missing.filter(function (v) { return audits.indexOf(v) >= 0; });
+    state.missing = state.missing.filter(function (v, idx, all) { return audits.indexOf(v) >= 0 && all.indexOf(v) === idx; });
   }
 
   function writeUrl() {
     var params = new URLSearchParams(location.search);
     ['q', 'sure', 'kind', 'media', 'missing', 'sort', 'view', 'confidence', 'location'].forEach(function (k) { params.delete(k); });
+    if (params.get('audit')) params.set('audit', '1');
     if (state.q) params.set('q', state.q);
     GROUPS.concat('missing').forEach(function (g) { if (state[g].length) params.set(g, state[g].join(',')); });
     if (state.sort !== 'number') params.set('sort', state.sort);
@@ -86,11 +90,9 @@
   }
 
   // ---- matching
+  var words = [];
   function matches(d, skip) {
-    if (state.q) {
-      var words = norm(state.q).split(/\s+/).filter(Boolean);
-      for (var i = 0; i < words.length; i++) if (d.search.indexOf(words[i]) < 0) return false;
-    }
+    for (var i = 0; i < words.length; i++) if (d.search.indexOf(words[i]) < 0) return false;
     if (skip !== 'sure' && state.sure.length && state.sure.indexOf(d.sure) < 0) return false;
     if (skip !== 'kind' && state.kind.length && state.kind.indexOf(d.kind) < 0) return false;
     if (skip !== 'media' && state.media.length && !state.media.some(function (m) { return d.media.indexOf(m) >= 0; })) return false;
@@ -114,6 +116,7 @@
 
   // ---- render
   function render() {
+    words = norm(state.q).split(/\s+/).filter(Boolean);
     var shown = 0;
     data.forEach(function (d) {
       var ok = matches(d);
@@ -125,7 +128,7 @@
       var group = input.name, value = input.value;
       var n = data.filter(function (d) { return matches(d, group) && has(d, group, value); }).length;
       input.checked = state[group].indexOf(value) >= 0;
-      input.disabled = !n && !input.checked;
+      input.disabled = !n && !input.checked && input !== document.activeElement;
       input.closest('.filter-opt').querySelector('[data-count]').textContent = n;
     });
     auditChips.forEach(function (chip) {
@@ -135,9 +138,10 @@
         data.filter(function (d) { return matches(d, 'missing') && has(d, 'missing', value); }).length;
     });
     var filtered = shown !== total || activeCount() || state.q;
-    status.textContent = filtered && shown !== total
+    var text = filtered && shown !== total
       ? fill(T.of_total[pluralIndex(total)], { n: shown, total: total })
       : plural(T.places, total);
+    if (status.textContent !== text) status.textContent = text;
     renderChips();
     var any = activeCount() > 0 || !!state.q;
     document.querySelectorAll('[data-clear]').forEach(function (b) {
@@ -183,7 +187,8 @@
         b.firstChild.textContent = label;
         b.addEventListener('click', function () {
           toggle(group, value, false);
-          (chips.querySelector('.chip') || status).focus();
+          var next = chips.querySelector('.chip');
+          if (next) next.focus(); else focusAfterClear();
         });
         chips.appendChild(b);
       });
@@ -222,6 +227,14 @@
     state.q = ''; state.sure = []; state.kind = []; state.media = []; state.missing = [];
     searches.forEach(function (s) { s.value = ''; });
     render();
+    focusAfterClear();
+  }
+  // Clearing disables or hides the button that was pressed: keep focus somewhere useful
+  // (inside the sheet while it is open, so the focus trap still holds).
+  function focusAfterClear() {
+    if (aside.classList.contains('is-sheet-open')) { aside.querySelector('[data-close-filters]').focus(); return; }
+    var visible = searches.filter(function (s) { return s.offsetParent !== null; })[0];
+    (visible || status).focus();
   }
 
   // ---- events
@@ -249,7 +262,7 @@
     });
   });
   document.querySelectorAll('[data-clear]').forEach(function (b) { b.addEventListener('click', clearAll); });
-  empty.querySelector('[data-drop-kind]').addEventListener('click', function () { state.kind = []; render(); });
+  empty.querySelector('[data-drop-kind]').addEventListener('click', function () { state.kind = []; render(); focusAfterClear(); });
   document.querySelectorAll('[data-view]').forEach(function (b) {
     b.addEventListener('click', function () { state.view = b.dataset.view; render(); });
   });
@@ -289,8 +302,17 @@
     return Array.prototype.slice.call(aside.querySelectorAll('button, input, [href], [tabindex]:not([tabindex="-1"])'))
       .filter(function (el) { return !el.disabled && el.offsetParent !== null; });
   }
+  // Everything outside the sheet is inert while it is open (aria-modal alone is not enough on iOS).
+  function setInert(on) {
+    for (var node = aside; node && node !== document.body; node = node.parentElement) {
+      Array.prototype.forEach.call(node.parentElement.children, function (sibling) {
+        if (sibling !== node && sibling.tagName !== 'SCRIPT') sibling.inert = on;
+      });
+    }
+  }
   function setSheet(open) {
     aside.classList.toggle('is-sheet-open', open);
+    setInert(open);
     document.documentElement.classList.toggle('has-sheet', open);
     if (open) {
       lastFocus = document.activeElement;
@@ -331,7 +353,11 @@
     });
     // Leaving the phone layout closes the sheet.
     (phone.addEventListener ? phone.addEventListener.bind(phone, 'change') : phone.addListener.bind(phone))(function () {
-      if (!phone.matches && aside.classList.contains('is-sheet-open')) setSheet(false);
+      if (!phone.matches && aside.classList.contains('is-sheet-open')) {
+        lastFocus = document.getElementById('placeSearch');
+        setSheet(false);
+      }
+      if (!sortMenu.hidden) openSort(false);
     });
   }
 
