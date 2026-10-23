@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, translate_url
 from django.utils._os import safe_join
 from django.utils.text import slugify
-from django.utils.translation import get_language, gettext_lazy as _, ngettext
+from django.utils.translation import get_language, gettext_lazy as _, ngettext, pgettext
 from django.views.decorators.http import require_safe
 from . import schema
 from .covers import COVER_LARGE_SIZE, COVER_MEDIUM_SIZE, relative_paths as cover_relative_paths
@@ -22,7 +22,7 @@ from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
 from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
 from .locators import EXAMPLES as LOCATOR_EXAMPLES
 from .rendering import current_payload, RENDER_VERSION
-from .terms import (CONFIDENCE_EXPLANATIONS, CONFIDENCE_LABELS,
+from .terms import (CONFIDENCE_EXPLANATIONS, CONFIDENCE_LABELS, CONFIDENCE_META,
                     chapter_short, confidence_label, confidence_levels, kind_label,
                     novel_reference_rows, novel_references, parse_reference, period_label,
                     same_chapters_heading)
@@ -678,9 +678,29 @@ def _related_places(feature, current_evidence, limit=4):
     return nearby, same_chapters
 
 
+# Порядок категорий в фильтре указателя и на карте.
+KIND_ORDER = ('Homes', 'Civic', 'Barrens', 'Encounters', 'Historical', 'Outlying')
+# Пробелы в данных для режима владельца (?audit=1): ключ фильтра → подпись.
+AUDIT_CHECKS = (
+    ('photos', _('Photos')), ('cover', _('Cover')), ('content', _('Descriptions')),
+    ('ru', _('Russian text')), ('one-source', _('One source only')),
+)
+AUDIT_TILE_NOTES = {
+    'photos': _('no photos'), 'cover': _('no cover'),
+    'content': _('text incomplete'), 'ru': _('RU incomplete'), 'one-source': _('one source'),
+}
+
+
+def _places_sort_options():
+    return [('number', _('Map number')), ('name', _('Name A–Z')),
+            ('confidence', pgettext('sort', 'Confidence'))]
+
+
 @require_safe
 def places(request):
-    """Server-rendered directory of every place, progressively enhanced with local filters."""
+    """Указатель мест (блок 06): все плитки в HTML в порядке номеров; поиск, фасеты,
+    сортировка и вид — в places.js. ?audit=1 — режим владельца (noindex)."""
+    audit = request.GET.get('audit') == '1'
     features = list(
         Feature.objects.filter(object_type__in=('site', 'unplaced'))
         .annotate(evidence_count=Count('evidence'))
@@ -696,11 +716,16 @@ def places(request):
 
     cards = []
     kinds = Counter()
+    sure_counts = Counter()
+    media_counts = Counter()
+    audit_counts = Counter()
     mapped_count = 0
     for order, feature in enumerate(features):
         mapped = feature.object_type == 'site'
         mapped_count += int(mapped)
-        if mapped and feature.kind:
+        letter = feature.confidence or 'U'
+        sure_counts[letter] += 1
+        if feature.kind:
             kinds[feature.kind] += 1
         feature_photos = photos_by_feature.get(feature.key, [])
         feature_covers = covers_by_feature.get(feature.key, [])
@@ -708,48 +733,54 @@ def places(request):
         display_name = feature_name(feature)
         note = _feature_note(feature)
         ru = _feature_ru(feature)
-        content_complete = bool(feature.note and feature.about and feature.confidence_explanation)
-        ru_complete = all(ru.get(field) for field in
-                          ('note', 'about', 'confidence_explanation'))
 
+        # Картинка плитки: обложка (1958, иначе самый ранний год) → первое фото → кадр карты.
         image = None
         if feature_covers:
-            cover = _cover_context(feature_covers[0])
-            image = {'src': cover['src'], 'srcset': cover['srcset'],
-                     'alt': cover['alt'], 'width': cover['width'], 'height': cover['height']}
+            cover = next((c for c in feature_covers if c.year == 1958), feature_covers[0])
+            context = _cover_context(cover)
+            image = {'src': context['src'], 'srcset': context['srcset'], 'thumb': context['src'],
+                     'width': context['width'], 'height': context['height']}
         elif feature_photos:
             photo = feature_photos[0]
             photo_image = _card_image(photo)
-            image = {**photo_image, 'src': photo_image['thumb'],
-                     'alt': _photo_alt(photo, feature),
-                     'width': photo.width, 'height': photo.height}
+            image = {'src': photo_image['medium'], 'srcset': photo_image['srcset'],
+                     'thumb': photo_image['thumb'], 'width': photo.width, 'height': photo.height}
 
+        media = [name for name, present in (('photos', feature_photos), ('cover', feature_covers))
+                 if present]
+        media_counts.update(media)
+        missing = [key for key, gap in (
+            ('photos', not feature_photos), ('cover', not feature_covers),
+            ('content', not (feature.note and feature.about and feature.confidence_explanation)),
+            ('ru', not all(ru.get(field) for field in ('note', 'about', 'confidence_explanation'))),
+            ('one-source', feature.evidence_count == 1),
+        ) if gap]
+        audit_counts.update(missing)
+
+        # Поиск широкий (D19): номер, имена EN/RU и алиасы, категория, период, все тексты.
         search_text = ' '.join(filter(None, (
             feature.key, *feature_search_terms(feature), feature.kind, feature.period,
             period_label(feature.period), str(kind_label(feature.kind)) if feature.kind else '',
             note, localized['about'], localized['confidence_explanation'],
         )))
         cards.append({
-            'feature': feature, 'name': display_name,
-            'number': _place_number(feature),
+            'feature': feature, 'name': display_name, 'number': _place_number(feature),
             'url': reverse('place', args=[place_slug(feature)]),
-            'map_url': reverse('index') + '?place=' + feature.key if mapped else '',
-            'gallery_url': (_gallery_url(place=feature.key, place_feature=feature)
-                            if feature_photos else ''),
-            'mapped': mapped, 'note': note,
+            'mapped': mapped, 'note': note, 'image': image,
+            'sure': letter.lower(), 'conf_meta': CONFIDENCE_META[letter],
+            'kind_value': feature.kind.lower() if feature.kind else '',
             'kind_label': kind_label(feature.kind, short=True) if feature.kind else '',
-            'confidence_label': confidence_label(feature.confidence) if feature.confidence else '',
-            'photo_count': len(feature_photos), 'cover_count': len(feature_covers),
-            'evidence_count': feature.evidence_count, 'image': image,
-            'content_complete': content_complete, 'ru_complete': ru_complete,
+            'period': period_label(feature.period),
+            'media': media, 'missing': missing,
+            'missing_labels': [AUDIT_TILE_NOTES[key] for key in missing],
             'search_text': search_text, 'order': order,
         })
 
     place_count = len(cards)
     unlocated_count = place_count - mapped_count
-    kind_order = ('Homes', 'Civic', 'Barrens', 'Encounters', 'Historical', 'Outlying')
-    kind_names = [kind for kind in kind_order if kinds[kind]]
-    kind_names += sorted(kind for kind in kinds if kind not in kind_order)
+    kind_names = [kind for kind in KIND_ORDER if kinds[kind]]
+    kind_names += sorted(kind for kind in kinds if kind not in KIND_ORDER)
     page_title = _('Places in Derry, Maine — Stephen King’s IT Literary Atlas')
     if _is_ru():
         place_noun = _ru_plural(place_count, 'место и ориентир', 'места и ориентира',
@@ -766,16 +797,26 @@ def places(request):
             'Stephen King’s IT, with book evidence, location notes and photographs.',
             place_count) % {'count': place_count}
     context = {
-        'cards': cards,
-        'kinds': [(kind, kind_label(kind), kinds[kind]) for kind in kind_names],
+        'cards': cards, 'audit': audit,
+        'levels': [{'letter': level, 'label': CONFIDENCE_LABELS[level],
+                    'count': sure_counts[level]} for level in 'ABCU'],
+        'kinds': [{'value': kind.lower(), 'label': kind_label(kind), 'count': kinds[kind]}
+                  for kind in kind_names],
+        'media_counts': media_counts,
+        'audit_counts': [{'key': key, 'label': label, 'count': audit_counts[key]}
+                         for key, label in AUDIT_CHECKS],
+        'sort_options': _places_sort_options(),
         'place_count': place_count, 'mapped_count': mapped_count,
         'unlocated_count': unlocated_count,
-        'confidence_counts': Counter(feature.confidence for feature in features),
         'page_title': page_title, 'meta_description': meta_description,
+        # Режим владельца не индексируется (решение 23.10, D49).
+        'robots_meta': 'noindex, nofollow' if audit else '',
     }
     context['jsonld'] = schema.places(request, page_title, meta_description, cards)
     response = render(request, 'atlas/places.html', context)
     response['Cache-Control'] = 'no-cache'
+    if audit:
+        response['X-Robots-Tag'] = 'noindex, nofollow'
     return response
 
 

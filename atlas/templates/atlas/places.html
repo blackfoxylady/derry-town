@@ -1,73 +1,96 @@
 {% extends 'atlas/gallery_base.html' %}
 {% load i18n static atlas_tags %}
+{% block main_class %}page page--index{% endblock %}
 {% block content %}
+<div class="index-hero">
 {% include 'atlas/breadcrumbs.html' with section='places' only %}
-<div class="places-hero">
-<div class="eyebrow">{% trans "The places remembered" %}</div>
-<h1>{% trans "Places in Derry, Maine" %}</h1>
-{% if LANGUAGE_CODE == 'ru' %}
-<p>Полный каталог улиц, домов, школ, общественных зданий, предприятий, водоёмов и окраинных мест, названных в романе Стивена Кинга <i>«Оно»</i>. Это места книги, а не съёмочные локации экранизаций. Каждая страница отделяет то, что прямо закреплено текстом, от реконструкции: улица или соседний ориентир могут быть известны, даже если точный участок, координата или контур здания не указаны. Используйте поиск и фильтры по категории, достоверности и наличию материалов. Места без достаточных пространственных данных сохранены в каталоге как не локализованные, а не размещены на карте произвольно.</p>
-{% else %}
-<p>A complete directory of the streets, homes, schools, civic buildings, businesses, waterways and outlying sites named in Stephen King’s <i>IT</i>. These are locations from the novel, not filming locations from screen adaptations. Each page separates what the text establishes from what the atlas reconstructs: a street or neighboring landmark may be known even when an exact lot, coordinate or building outline is not. Search and filter by category, mapping confidence and available material. Places without enough spatial evidence remain in the directory as unlocated rather than being assigned an arbitrary point.</p>
-{% endif %}
-<p class="places-summary"><b>{{ place_count }}</b> {% trans "places" %} · <b>{{ mapped_count }}</b> {% trans "mapped" %} · <b>{{ unlocated_count }}</b> {% trans "unlocated" %}</p>
-<p class="places-hero-links"><a class="quiet" href="{% url 'index' %}">{% trans "Open the map" %}</a><a class="quiet" href="{% url 'method' %}">{% trans "Sources & method" %}</a><a class="quiet" href="{% url 'printable_map' %}">{% if LANGUAGE_CODE == 'ru' %}Карта для печати{% else %}Printable map{% endif %}</a></p>
+<h1 class="t-h1">{% trans "Places in Derry, Maine" %}</h1>
+<p class="t-lead index-hero__lead">{% if LANGUAGE_CODE == 'ru' %}Полный каталог улиц, домов, школ, общественных зданий, предприятий, водоёмов и окраинных мест, названных в романе Стивена Кинга <i>«Оно»</i>. Это места книги, а не съёмочные локации экранизаций.{% else %}A complete directory of the streets, homes, schools, civic buildings, businesses, waterways and outlying sites named in Stephen King’s <i>IT</i>. These are locations from the novel, not filming locations from screen adaptations.{% endif %} <a class="index-hero__more" href="#about-list">{% trans "More about this list ↓" %}</a></p>
+<div class="index-hero__facts">
+<span>{% blocktranslate count counter=place_count %}<b>{{ counter }}</b> place{% plural %}<b>{{ counter }}</b> places{% endblocktranslate %} · {% blocktranslate count counter=mapped_count %}<b>{{ counter }}</b> on the map{% plural %}<b>{{ counter }}</b> on the map{% endblocktranslate %} · {% blocktranslate count counter=unlocated_count %}<b>{{ counter }}</b> without a point{% plural %}<b>{{ counter }}</b> without a point{% endblocktranslate %}</span>
+<a class="link link--arrow" href="{% url 'index' %}">{% trans "Open the map" %}</a>
+<a class="link link--arrow" href="{% url 'method' %}#how-sure">{% trans "How sure is each pin" %}</a>
+</div>
 </div>
 
-<section class="place-tools" aria-label="{% trans 'Place filters' %}">
-<div class="place-search-row">
-<label class="place-search"><span class="sr-only">{% trans "Search places" %}</span><input id="placeSearch" type="search" placeholder="{% trans 'Search by name, description or number…' %}" autocomplete="off"></label>
-<button type="button" class="quiet clear-places" id="clearPlaces">{% trans "Clear all" %}</button>
-</div>
-<div class="place-filter-row" data-filter-group="location"><span class="fname">{% trans "Location" %}</span><span class="chips">
-<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %} <span class="n">{{ place_count }}</span></button>
-<button type="button" class="chip" data-value="mapped" aria-pressed="false">{% trans "Mapped" %} <span class="n">{{ mapped_count }}</span></button>
-<button type="button" class="chip" data-value="unlocated" aria-pressed="false">{% trans "Unlocated" %} <span class="n">{{ unlocated_count }}</span></button>
-</span></div>
-<div class="place-filter-row" data-filter-group="confidence"><span class="fname">{% trans "Confidence" %}</span><span class="chips">
-<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %}</button>
-{% for value in 'ABCU' %}<button type="button" class="chip" data-value="{{ value }}" aria-pressed="false">{{ value }} <span class="n">{% if value == 'A' %}{{ confidence_counts.A }}{% elif value == 'B' %}{{ confidence_counts.B }}{% elif value == 'C' %}{{ confidence_counts.C }}{% else %}{{ confidence_counts.U }}{% endif %}</span></button>{% endfor %}
-</span></div>
-{% if kinds %}<div class="place-filter-row" data-filter-group="kind"><span class="fname">{% trans "Category" %}</span><span class="chips">
-<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %}</button>
-{% for kind, label, count in kinds %}<button type="button" class="chip" data-value="{{ kind }}" aria-pressed="false">{{ label }} <span class="n">{{ count }}</span></button>{% endfor %}
-</span></div>{% endif %}
-<div class="place-filter-row" data-filter-group="media"><span class="fname">{% trans "Media" %}</span><span class="chips">
-<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "All" %}</button>
-<button type="button" class="chip" data-value="photos" aria-pressed="false">{% trans "With photographs" %}</button>
-<button type="button" class="chip" data-value="cover" aria-pressed="false">{% trans "With a cover" %}</button>
-<button type="button" class="chip" data-value="none" aria-pressed="false">{% trans "Without images" %}</button>
-</span></div>
-<details class="audit-filters"><summary>{% trans "Data audit" %}</summary><div class="place-filter-row" data-filter-group="audit"><span class="fname">{% trans "Missing" %}</span><span class="chips">
-<button type="button" class="chip on" data-value="" aria-pressed="true">{% trans "Nothing" %}</button>
-<button type="button" class="chip" data-value="photos" aria-pressed="false">{% trans "Photographs" %}</button>
-<button type="button" class="chip" data-value="cover" aria-pressed="false">{% trans "Cover" %}</button>
-<button type="button" class="chip" data-value="content" aria-pressed="false">{% trans "Descriptions" %}</button>
-<button type="button" class="chip" data-value="ru" aria-pressed="false">{% trans "Russian text" %}</button>
-<button type="button" class="chip" data-value="sources" aria-pressed="false">{% trans "Sources" %}</button>
-</span></div></details>
-<div class="place-tool-footer">
-<span id="placeResultCount" class="place-result-count" aria-live="polite"><b>{{ place_count }}</b> / {{ place_count }}</span>
-<span class="place-display-controls"><label>{% trans "Sort" %} <select id="placeSort"><option value="number">{% trans "Map number" %}</option><option value="name">{% trans "Name A–Z" %}</option></select></label><span class="view-switch" role="group" aria-label="{% trans 'View' %}"><button type="button" data-view="cards" class="on" aria-pressed="true">{% trans "Cards" %}</button><button type="button" data-view="compact" aria-pressed="false">{% trans "Compact" %}</button></span></span>
-</div>
-</section>
+{% if audit %}<div class="owner-bar" role="region" aria-label="{% trans 'Owner mode · data audit' %}">
+<span class="owner-bar__title">{% trans "Owner mode · data audit" %}</span>
+<span class="owner-bar__label">{% trans "Missing:" %}</span>
+<span class="owner-bar__chips">{% for item in audit_counts %}<button type="button" class="chip chip--pencil" data-audit="{{ item.key }}" aria-pressed="false">{{ item.label }} <span class="chip__count">{{ item.count }}</span></button>{% endfor %}</span>
+<a class="owner-bar__exit" href="{% url 'places' %}">{% trans "Exit owner mode" %}</a>
+</div>{% endif %}
 
-<section id="placesCatalog" class="places-catalog" data-total="{{ place_count }}">
-<ul id="placesList" class="places-list">
-{% for c in cards %}<li class="place-card{% if c.image %} has-image{% endif %}" data-order="{{ c.order }}" data-name="{{ c.name }}" data-search="{{ c.search_text }}" data-location="{% if c.mapped %}mapped{% else %}unlocated{% endif %}" data-confidence="{{ c.feature.confidence }}" data-kind="{{ c.feature.kind }}" data-photos="{{ c.photo_count }}" data-covers="{{ c.cover_count }}" data-content-complete="{{ c.content_complete|yesno:'1,0' }}" data-ru-complete="{{ c.ru_complete|yesno:'1,0' }}" data-sources="{{ c.evidence_count }}">
-<div class="place-number">{{ c.number }}</div>
-<div class="place-card-body">
-<div class="place-card-title"><h2><a href="{{ c.url }}">{{ c.name }}</a></h2><span class="confidence-badge confidence-{{ c.feature.confidence|lower }}" title="{{ c.confidence_label }}">{{ c.feature.confidence }}</span></div>
-<p class="place-card-meta">{% if c.kind_label %}{{ c.kind_label }}{% else %}{% trans "Unlocated" %}{% endif %}{% if c.feature.period %} · {{ c.feature.period|period }}{% endif %}</p>
-{% if c.note %}<p class="place-card-excerpt">{{ c.note }}</p>{% endif %}
-<p class="place-card-facts"><span title="{% trans 'Sources' %}">{% blocktranslate count n=c.evidence_count %}{{ n }} source{% plural %}{{ n }} sources{% endblocktranslate %}</span><span title="{% trans 'Photographs' %}">{% blocktranslate count n=c.photo_count %}{{ n }} photo{% plural %}{{ n }} photos{% endblocktranslate %}</span><span title="{% trans 'Covers' %}">{% blocktranslate count n=c.cover_count %}{{ n }} cover{% plural %}{{ n }} covers{% endblocktranslate %}</span>{% if not c.content_complete %}<span class="data-warning">{% trans "text incomplete" %}</span>{% endif %}{% if not c.ru_complete %}<span class="data-warning">{% trans "RU incomplete" %}</span>{% endif %}</p>
-<p class="place-card-links"><a href="{{ c.url }}">{% trans "About the place" %}</a>{% if c.map_url %}<a href="{{ c.map_url }}">{% trans "Show on the map" %}</a>{% endif %}{% if c.gallery_url %}<a href="{{ c.gallery_url }}">{% trans "Photographs" %}</a>{% endif %}</p>
+<div class="index-layout" id="placesCatalog" data-total="{{ place_count }}">
+<aside class="index-filters js-only" id="placeFilters" aria-label="{% trans 'Filters' %}">
+<div class="index-filters__head"><span class="index-filters__grabber" aria-hidden="true"></span><h2 class="index-filters__title" id="filtersTitle">{% trans "Filters" %}</h2><button type="button" class="btn btn--quiet btn--compact index-filters__clear" data-clear disabled>{% trans "Clear all" %}</button><button type="button" class="icon-btn index-filters__close" data-close-filters aria-label="{% trans 'Close' %}">{% include 'atlas/icons/close.svg' %}</button></div>
+<div class="index-filters__body">
+<div class="search index-filters__search"><span class="search__icon">{% include 'atlas/icons/search.svg' %}</span><input class="input" id="placeSearch" type="search" aria-label="{% trans 'Search places' %}" placeholder="{% trans 'Search by name, description or number…' %}" autocomplete="off"></div>
+<fieldset class="index-sheet-only index-filters__group" data-sheet-sort><legend class="eyebrow">{% trans "Sort" %}</legend><div class="chip-group">{% for value, label in sort_options %}<button type="button" class="chip" data-sort="{{ value }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">{{ label }}</button>{% endfor %}</div></fieldset>
+<fieldset class="index-sheet-only index-filters__group"><legend class="eyebrow">{% trans "View" %}</legend><div class="segmented segmented--fill" role="group" aria-label="{% trans 'View' %}"><button type="button" data-view="cards" aria-pressed="true">{% trans "Cards" %}</button><button type="button" data-view="compact" aria-pressed="false">{% trans "Compact" %}</button></div></fieldset>
+<fieldset class="index-filters__group" data-group="sure"><legend class="eyebrow">{% trans "How sure" %}</legend>
+{% for level in levels %}<label class="filter-opt"><input type="checkbox" class="filter-opt__input" name="sure" value="{{ level.letter|lower }}"><span class="menu__box" aria-hidden="true">{% include 'atlas/icons/check.svg' %}</span><span class="filter-opt__lead" aria-hidden="true">{% include 'atlas/place_glyph.html' with letter=level.letter %}</span><span class="filter-opt__label">{{ level.label }}</span><span class="chip__count" data-count>{{ level.count }}</span></label>{% endfor %}
+</fieldset>
+<fieldset class="index-filters__group" data-group="kind"><legend class="eyebrow">{% trans "Category" %}</legend>
+{% for kind in kinds %}<label class="filter-opt"><input type="checkbox" class="filter-opt__input" name="kind" value="{{ kind.value }}"><span class="menu__box" aria-hidden="true">{% include 'atlas/icons/check.svg' %}</span><span class="filter-opt__lead" aria-hidden="true"><span class="filter-opt__dot cat--{{ kind.value }}"></span></span><span class="filter-opt__label">{{ kind.label }}</span><span class="chip__count" data-count>{{ kind.count }}</span></label>{% endfor %}
+</fieldset>
+<fieldset class="index-filters__group" data-group="media"><legend class="eyebrow">{% trans "Media" %}</legend>
+<label class="filter-opt"><input type="checkbox" class="filter-opt__input" name="media" value="photos"><span class="menu__box" aria-hidden="true">{% include 'atlas/icons/check.svg' %}</span><span class="filter-opt__label">{% trans "With photos" %}</span><span class="chip__count" data-count>{{ media_counts.photos }}</span></label>
+<label class="filter-opt"><input type="checkbox" class="filter-opt__input" name="media" value="cover"><span class="menu__box" aria-hidden="true">{% include 'atlas/icons/check.svg' %}</span><span class="filter-opt__label">{% trans "With a cover" %}</span><span class="chip__count" data-count>{{ media_counts.cover }}</span></label>
+</fieldset>
+<button type="button" class="btn btn--quiet index-filters__clear-all" data-clear disabled>{% trans "Clear all" %}</button>
 </div>
-{% if c.image %}<a class="place-thumb" href="{{ c.url }}" tabindex="-1" aria-hidden="true"><img src="{{ c.image.src }}" srcset="{{ c.image.srcset }}" sizes="112px" alt="" width="{{ c.image.width }}" height="{{ c.image.height }}" loading="lazy" decoding="async"></a>{% endif %}
+<div class="index-filters__foot index-sheet-only"><button type="button" class="btn btn--primary btn--block" data-close-filters data-show-count>{% blocktranslate count counter=place_count %}Show {{ counter }} place{% plural %}Show {{ counter }} places{% endblocktranslate %}</button></div>
+</aside>
+
+<div class="index-results">
+<div class="index-phonebar js-only">
+<div class="search"><span class="search__icon">{% include 'atlas/icons/search.svg' %}</span><input class="input" id="placeSearchPhone" type="search" aria-label="{% trans 'Search places' %}" placeholder="{% trans 'Search places…' %}" autocomplete="off"></div>
+<button type="button" class="btn btn--quiet index-phonebar__filters" id="openFilters" aria-haspopup="dialog" aria-controls="placeFilters">{% include 'atlas/icons/filter.svg' %}<span>{% trans "Filters" %}</span><span class="index-phonebar__n" data-filter-count hidden></span></button>
+</div>
+<div class="index-results__head">
+<span class="index-results__status" id="placeStatus" role="status" aria-live="polite">{% blocktranslate count counter=place_count %}{{ counter }} place{% plural %}{{ counter }} places{% endblocktranslate %}</span>
+<span class="index-results__chips js-only" id="activeChips"></span>
+<button type="button" class="index-results__clear js-only" data-clear hidden>{% trans "Clear all" %}</button>
+<span class="index-results__tools js-only">
+<span class="index-sort"><button type="button" class="sort-btn" id="sortButton" aria-haspopup="listbox" aria-expanded="false" aria-controls="sortMenu">{% include 'atlas/icons/sort.svg' %}<span class="visually-hidden">{% trans "Sort:" %} </span><span data-sort-label>{{ sort_options.0.1 }}</span>{% include 'atlas/icons/chevron-down.svg' %}</button>
+<span class="menu index-sort__menu" id="sortMenu" role="listbox" aria-label="{% trans 'Sort' %}" hidden>{% for value, label in sort_options %}<span class="menu__opt" role="option" tabindex="-1" data-sort="{{ value }}" aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">{% include 'atlas/icons/check.svg' %}{{ label }}</span>{% endfor %}</span></span>
+<span class="segmented" role="group" aria-label="{% trans 'View' %}"><button type="button" data-view="cards" aria-pressed="true">{% trans "Cards" %}</button><button type="button" data-view="compact" aria-pressed="false">{% trans "Compact" %}</button></span>
+</span>
+</div>
+<ul class="index-list" id="placesList">
+{% for c in cards %}<li class="tile{% if c.image %} tile--picture{% endif %}" data-order="{{ c.order }}" data-name="{{ c.name }}" data-search="{{ c.search_text }}" data-sure="{{ c.sure }}" data-kind="{{ c.kind_value }}" data-media="{{ c.media|join:' ' }}"{% if audit %} data-missing="{{ c.missing|join:' ' }}"{% endif %}>
+<a class="tile__link" href="{{ c.url }}">
+<span class="tile__media">{% if c.image %}<img class="tile__img" src="{{ c.image.src }}" srcset="{{ c.image.srcset }}" sizes="(max-width: 37.49em) calc(100vw - 32px), 360px" alt="" width="{{ c.image.width }}" height="{{ c.image.height }}" loading="lazy" decoding="async">{% elif c.mapped %}{% include 'atlas/locator.html' with preset='tile' key=c.feature.key name=c.name link=False decorative=True %}{% else %}{% include 'atlas/locator_none.html' with key=c.feature.key preset='tile' %}{% endif %}</span>
+<span class="tile__body">
+<span class="num num--{{ c.sure }}{% if c.kind_value %} num--{{ c.kind_value }}{% endif %}" aria-hidden="true">{{ c.feature.key }}</span>
+<span class="tile__text">
+<h2 class="tile__name">{{ c.name }}</h2>
+<span class="t-meta tile__meta">{% if c.kind_label %}{{ c.kind_label }} · {% endif %}{% if c.period %}{{ c.period }} · {% endif %}<span class="tile__conf tile__conf--{{ c.sure }}">{{ c.conf_meta }}</span></span>
+{% if c.note %}<span class="tile__note">{{ c.note }}</span>{% endif %}
+{% if audit and c.missing_labels %}<span class="tile__audit">{{ c.missing_labels|join:' · ' }}</span>{% endif %}
+</span>
+{% if c.image %}<span class="card-photo tile__polaroid" aria-hidden="true"><img src="{{ c.image.thumb }}" alt="" width="{{ c.image.width }}" height="{{ c.image.height }}" loading="lazy" decoding="async"></span>{% endif %}
+</span>
+</a>
 </li>{% endfor %}
 </ul>
-<p id="placesEmpty" class="empty" hidden>{% trans "No places match these filters. Try a shorter search or clear some filters." %}</p>
+<div class="index-empty" id="placesEmpty" hidden>
+<h2 class="index-empty__title">{% trans "No places match" %}</h2>
+<p class="index-empty__text" data-empty-text></p>
+<p class="index-empty__actions"><button type="button" class="btn btn--quiet" data-drop-kind hidden>{% trans "Search all categories" %}</button><button type="button" class="btn btn--quiet" data-clear>{% trans "Clear all" %}</button></p>
+</div>
+</div>
+</div>
+
+<section class="index-about" id="about-list" aria-labelledby="about-list-title">
+<h2 id="about-list-title" class="t-h2">{% trans "About this list" %}</h2>
+<div class="prose">
+{% if LANGUAGE_CODE == 'ru' %}<p>Полный каталог улиц, домов, школ, общественных зданий, предприятий, водоёмов и окраинных мест, названных в романе Стивена Кинга <i>«Оно»</i>. Это места книги, а не съёмочные локации экранизаций.</p>
+<p>Каждая страница отделяет то, что прямо закреплено текстом, от реконструкции: улица или соседний ориентир могут быть известны, даже если точный участок, координата или контур здания не указаны. Используйте поиск и фильтры по категории, достоверности и наличию материалов. Места без достаточных пространственных данных сохранены в каталоге как не локализованные, а не размещены на карте произвольно.</p>
+{% else %}<p>A complete directory of the streets, homes, schools, civic buildings, businesses, waterways and outlying sites named in Stephen King’s <i>IT</i>. These are locations from the novel, not filming locations from screen adaptations.</p>
+<p>Each page separates what the text establishes from what the atlas reconstructs: a street or neighboring landmark may be known even when an exact lot, coordinate or building outline is not. Search and filter by category, mapping confidence and available material. Places without enough spatial evidence remain in the directory as unlocated rather than being assigned an arbitrary point.</p>
+{% endif %}<p><a href="{% url 'method' %}">{% trans "Sources & method" %}</a> · <a href="{% url 'printable_map' %}">{% trans "Printable map" %}</a></p>
+</div>
 </section>
 {% include 'atlas/derry_explore.html' %}
-<script src="{% static 'atlas/places.js' %}" defer></script>
 {% endblock %}

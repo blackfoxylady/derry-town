@@ -37,8 +37,8 @@ class PlaceIndexTests(TestCase):
     def test_index_is_server_rendered_and_excludes_non_places(self):
         response = self.client.get('/places/')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<h1>Places in Derry, Maine</h1>')
-        self.assertContains(response, '<li class="place-card', count=2)
+        self.assertContains(response, '<h1 class="t-h1">Places in Derry, Maine</h1>', html=True)
+        self.assertContains(response, '<li class="tile', count=2)
         self.assertContains(response, '/places/4-derry-elementary-school/')
         self.assertContains(response, '/places/u3-tracker-brothers/')
         self.assertNotContains(response, 'Main Street')
@@ -46,9 +46,26 @@ class PlaceIndexTests(TestCase):
         self.assertContains(
             response,
             'data-search="4 Derry Elementary School School Начальная школа Дерри Civic')
-        self.assertContains(response, 'data-sources="1"')
-        self.assertContains(response, 'data-location="unlocated"')
-        self.assertContains(response, 'src="/static/atlas/places.js"')
+        self.assertContains(response, 'data-sure="a" data-kind="civic" data-media=""')
+        self.assertContains(response, 'data-sure="u" data-kind="" data-media=""')
+        # Плитка — одна ссылка: номер маркера, имя, мета-строка словами.
+        self.assertContains(response, '<span class="num num--a num--civic" aria-hidden="true">4</span>')
+        self.assertContains(response, '<h2 class="tile__name">Derry Elementary School</h2>')
+        self.assertContains(response, '<span class="tile__conf tile__conf--a">named in the novel</span>')
+        self.assertContains(response, '/static/atlas/locators/4-tile.webp')
+        self.assertContains(response, 'No point on the map')  # U3 — штриховка
+        # Сводка и ссылки hero; фильтры, сортировка и вид — только с JS.
+        self.assertContains(response, '<b>2</b> places · <b>1</b> on the map · <b>1</b> without a point')
+        self.assertContains(response, 'href="/method/#how-sure"')
+        self.assertContains(response, 'class="index-filters js-only"')
+        self.assertContains(response, 'name="sure" value="u"')
+        self.assertContains(response, 'name="kind" value="civic"')
+        self.assertContains(response, '<section class="index-about" id="about-list"')
+        # Аудит публично не виден.
+        self.assertNotContains(response, 'owner-bar')
+        self.assertNotContains(response, 'data-missing')
+        self.assertNotContains(response, 'text incomplete')
+        self.assertNotContains(response, 'name="robots"')
 
     def test_query_state_keeps_full_server_html_and_canonical(self):
         response = self.client.get('/places/', {'q': 'school', 'confidence': 'A'})
@@ -56,6 +73,18 @@ class PlaceIndexTests(TestCase):
         self.assertContains(response, 'Tracker Brothers')
         self.assertContains(response, '<link rel="canonical" href="http://testserver/places/">')
         self.assertContains(response, 'href="/ru/places/?q=school&amp;confidence=A"')
+
+    def test_audit_mode_is_noindex_and_marks_gaps(self):
+        response = self.client.get('/places/', {'audit': '1'})
+        self.assertContains(response, '<meta name="robots" content="noindex, nofollow">')
+        self.assertEqual(response['X-Robots-Tag'], 'noindex, nofollow')
+        self.assertContains(response, 'Owner mode · data audit')
+        self.assertContains(response, 'data-audit="photos" aria-pressed="false">Photos <span class="chip__count">2</span>')
+        self.assertContains(response, 'data-audit="one-source" aria-pressed="false">One source only '
+                                      '<span class="chip__count">1</span>')
+        self.assertContains(response, 'data-missing="photos cover one-source"')
+        self.assertContains(response, 'no photos · no cover · one source')
+        self.assertContains(response, 'href="/places/">Exit owner mode</a>')
 
     def test_place_cards_use_cover_then_photo(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -68,21 +97,24 @@ class PlaceIndexTests(TestCase):
                 response = self.client.get('/places/')
         self.assertContains(response, '/media/covers/medium/')
         self.assertNotContains(response, '/media/photos/thumb/')
-        self.assertContains(response, 'data-photos="1"')
-        self.assertContains(response, 'data-covers="1"')
-        self.assertContains(response, '/photos/place/4-derry-elementary-school/')
+        self.assertContains(response, 'data-media="photos cover"')
+        self.assertContains(response, '<li class="tile tile--picture"')
+        self.assertContains(response, 'class="card-photo tile__polaroid"')  # компактный вид
+        self.assertNotContains(response, '/static/atlas/locators/4-tile.webp')
 
     def test_russian_page_uses_localized_copy_and_search_data(self):
         response = self.client.get('/ru/places/')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<html lang="ru"')
-        self.assertContains(response, '>Начальная школа Дерри</a>')
-        # Категории: полная форма на фильтре, короткая — в мета-строке карточки.
-        self.assertContains(response, '>Городские места <span class="n">')
-        self.assertContains(response, '<p class="place-card-meta">Город · ')
-        self.assertContains(response, '>Городская ратуша Дерри</a>')
+        self.assertContains(response, '<h2 class="tile__name">Начальная школа Дерри</h2>')
+        # Категории: полная форма на фильтре, короткая — в мета-строке плитки.
+        self.assertContains(response, '<span class="filter-opt__label">Городские места</span>')
+        self.assertContains(response, '<span class="t-meta tile__meta">Город · ')
+        self.assertContains(response, '<h2 class="tile__name">Городская ратуша Дерри</h2>')
         self.assertContains(response, 'Городской ориентир.')
         self.assertContains(response, 'Школа отмечает район.')
+        self.assertContains(response, '<b>2</b> места · <b>1</b> на карте · <b>1</b> без координат')
+        self.assertContains(response, 'без координат</span>')
         self.assertContains(
             response,
             'data-search="4 Derry Elementary School School Начальная школа Дерри')

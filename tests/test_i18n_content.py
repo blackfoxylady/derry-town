@@ -65,7 +65,7 @@ class RuContentTests(TestCase):
         self.assertNotContains(russian, '/places/12-publichnaia-biblioteka-derri/')
 
         catalog = self.client.get('/ru/places/')
-        self.assertContains(catalog, '>Публичная библиотека Дерри</a>')
+        self.assertContains(catalog, '<h2 class="tile__name">Публичная библиотека Дерри</h2>')
         self.assertContains(
             catalog,
             'data-search="12 Derry Public Library Library Публичная библиотека Дерри')
