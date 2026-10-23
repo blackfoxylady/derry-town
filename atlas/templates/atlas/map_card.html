@@ -1,0 +1,4 @@
+{% load i18n static %}{# The same door into the map on every editorial page. The crop is a board snapshot until the locators of block 04 (pass 5). #}<a href="{% url 'index' %}" class="map-card" aria-label="{% trans 'Open the map of Derry' %}">
+<img class="map-card__img" src="{% static 'atlas/editorial/map-card.jpg' %}" width="800" height="340" alt="">
+<span class="map-card__body"><span class="map-card__text"><b class="map-card__title">{% trans "Open the map of Derry" %}</b><span class="t-meta">{% blocktranslate count counter=places_count %}{{ counter }} place, drawn from the novel{% plural %}{{ counter }} places, drawn from the novel{% endblocktranslate %}</span></span><span class="map-card__arrow" aria-hidden="true">→</span></span>
+</a>

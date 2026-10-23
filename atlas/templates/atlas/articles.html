@@ -1,0 +1,22 @@
+{% extends 'atlas/gallery_base.html' %}
+{% load i18n %}
+{% block main_class %}page page--editorial{% endblock %}
+{% block content %}
+<div class="listing-hero">
+<div class="listing-hero__intro">
+{% include 'atlas/breadcrumbs.html' with section='articles' only %}
+<span class="eyebrow">{% trans "About Derry" %}</span>
+<h1 class="t-h1">{% trans "Articles about Derry, Maine" %}</h1>
+<p class="t-lead">{% blocktranslate %}Guides to the Derry of Stephen King’s <i>IT</i>: whether the town is real, where it came from, and which books take you back to it. Each one starts with a short answer.{% endblocktranslate %}</p>
+</div>
+{% include 'atlas/map_card.html' %}
+</div>
+<ol class="listing">
+{% for article in articles %}<li><article class="listing__item">
+<span class="eyebrow">{{ article.eyebrow }}</span>
+<h2 class="listing__title"><a href="{{ article.url }}">{{ article.heading }}</a></h2>
+<ul class="listing__topics">{% for topic in article.topics %}<li>{{ topic }}</li>{% endfor %}</ul>
+<a href="{{ article.url }}" class="link link--arrow listing__go">{% trans "Read the article" %}<span class="visually-hidden">: {{ article.heading }}</span></a>
+</article></li>{% endfor %}
+</ol>
+{% endblock %}

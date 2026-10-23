@@ -42,6 +42,32 @@ HUB_PAGES = {
                    'Бангор повлиял на образ города и что реконструирует этот атлас.'),
         },
         'breadcrumb': {'en': 'Is Derry, Maine real?', 'ru': 'Существует ли Дерри, штат Мэн?'},
+        'url_name': 'derry_real',
+        'eyebrow': {'en': 'A guide to the Derry of the novel',
+                    'ru': 'Путеводитель по книжному Дерри'},
+        'heading': {'en': 'Is Derry, Maine a real town?', 'ru': 'Существует ли Дерри, штат Мэн?'},
+        'answer_label': {'en': 'Short answer', 'ru': 'Краткий ответ'},
+        # Оглавление строится по H2 статьи (решение 23.10): подписи повторяют заголовки.
+        'toc': {
+            'en': (('where', 'Where is Derry supposed to be?'),
+                   ('bangor', 'Is Bangor the real Derry?'),
+                   ('census', 'Does Derry have a population, county or ZIP code?'),
+                   ('visit', 'Can you visit Derry?'),
+                   ('map', 'What does this map show?'),
+                   ('sources', 'Sources')),
+            'ru': (('where', 'Где находится Дерри?'),
+                   ('bangor', 'Бангор — это настоящий Дерри?'),
+                   ('census', 'Есть ли у Дерри население, округ и почтовый индекс?'),
+                   ('visit', 'Можно ли посетить Дерри?'),
+                   ('map', 'Что показывает эта карта?'),
+                   ('sources', 'Источники')),
+        },
+        'topics': {
+            'en': ('Where King places Derry', 'Is Bangor the real Derry',
+                   'County, population and ZIP code', 'Can you visit'),
+            'ru': ('Где Кинг помещает Дерри', 'Бангор — это настоящий Дерри?',
+                   'Округ, население и почтовый индекс', 'Можно ли туда поехать'),
+        },
     },
     'bangor': {
         'template': 'atlas/derry_bangor.html',
@@ -52,10 +78,33 @@ HUB_PAGES = {
         'description': {
             'en': ('Compare fictional Derry with Bangor, Maine: the canal, Kenduskeag Stream, '
                    'Thomas Hill Standpipe, library and other real-world echoes behind IT.'),
-            'ru': ('Сравнение вымышленного Дерри с Бангором: канал, Kenduskeag Stream, '
-                   'Thomas Hill Standpipe, библиотека и другие реальные истоки романа «Оно».'),
+            'ru': ('Сравнение вымышленного Дерри с Бангором: канал, ручей Кендускиг, '
+                   'водонапорная башня на Томас-Хилл, библиотека и другие реальные истоки '
+                   'романа «Оно».'),
         },
         'breadcrumb': {'en': 'How Bangor inspired Derry', 'ru': 'Как Бангор вдохновил Дерри'},
+        'url_name': 'derry_bangor',
+        'eyebrow': {'en': 'The real city and the literary geography',
+                    'ru': 'Реальный город и литературная география'},
+        'heading': {'en': 'How Bangor inspired Derry, Maine',
+                    'ru': 'Как Бангор вдохновил Дерри, штат Мэн'},
+        'answer_label': {'en': 'The central point', 'ru': 'Главный вывод'},
+        'toc': {
+            'en': (('king', 'What King has said'), ('compare', 'Derry vs Bangor'),
+                   ('canal', 'The canal and the stream'), ('standpipe', 'The Standpipe'),
+                   ('library', 'The library'), ('atlas', 'How this informs the atlas'),
+                   ('sources', 'Sources')),
+            'ru': (('king', 'Что говорил Кинг'), ('compare', 'Дерри и Бангор'),
+                   ('canal', 'Канал и ручей'), ('standpipe', 'Водонапорная башня'),
+                   ('library', 'Библиотека'), ('atlas', 'Как это используется в атласе'),
+                   ('sources', 'Источники')),
+        },
+        'topics': {
+            'en': ('What King has said', 'Derry vs Bangor, side by side',
+                   'The canal and the Standpipe', 'The library'),
+            'ru': ('Что говорил Кинг', 'Дерри и Бангор бок о бок',
+                   'Канал и водонапорная башня', 'Библиотека'),
+        },
     },
     'books': {
         'template': 'atlas/derry_books.html',
@@ -70,6 +119,25 @@ HUB_PAGES = {
                    'происходит в Дерри или связано с ним: от «Оно» до «Бессонницы» и «11/22/63».'),
         },
         'breadcrumb': {'en': 'Books set in Derry', 'ru': 'Книги о Дерри'},
+        'url_name': 'derry_books',
+        'eyebrow': {'en': 'A spoiler-light reading path',
+                    'ru': 'Маршрут чтения без крупных спойлеров'},
+        'heading': {'en': 'Stephen King books set in Derry, Maine',
+                    'ru': 'Книги Стивена Кинга о Дерри, штат Мэн'},
+        'answer_label': {'en': 'Where to begin', 'ru': 'С чего начать'},
+        'toc': {
+            'en': (('setting', 'Derry as the setting'), ('return', 'Books that return'),
+                   ('distant', 'More distant connections'), ('order', 'Reading order'),
+                   ('sources', 'Sources')),
+            'ru': (('setting', 'Дерри как место действия'),
+                   ('return', 'Книги, которые возвращаются в Дерри'),
+                   ('distant', 'Более далёкие связи'), ('order', 'Порядок чтения'),
+                   ('sources', 'Источники')),
+        },
+        'topics': {
+            'en': ('Seven books and stories', 'Where Derry is the setting', 'A reading order'),
+            'ru': ('Семь книг и рассказов', 'Где Дерри — место действия', 'Порядок чтения'),
+        },
     },
     'printable': {
         'template': 'atlas/printable_map.html',
@@ -88,6 +156,25 @@ HUB_PAGES = {
 }
 
 
+# Статьи в редакционном порядке: /articles/ и «Keep reading» идут по нему.
+ARTICLES = ('real', 'bangor', 'books')
+ARTICLES_PAGE = {
+    'title': {'en': 'Articles about Derry, Maine · Derry atlas',
+              'ru': 'Статьи о Дерри, штат Мэн · Атлас Дерри'},
+    'description': {
+        'en': ('Guides to Stephen King’s Derry: is the town real, how Bangor inspired it, '
+               'and which books return to it.'),
+        'ru': ('Путеводитель по Дерри Стивена Кинга: существует ли город, как его вдохновил '
+               'Бангор и в каких книгах он появляется.'),
+    },
+}
+
+
+def _places_count():
+    """Все места атласа (на карте и без точки) — для карточки «Open the map»."""
+    return Feature.objects.filter(object_type__in=('site', 'unplaced')).count()
+
+
 def _hub_page(request, key):
     """Render a static editorial hub in either complete editorial language version."""
     config = HUB_PAGES[key]
@@ -95,15 +182,44 @@ def _hub_page(request, key):
     page_title = config['title'][language]
     meta_description = config['description'][language]
     breadcrumb = config['breadcrumb'][language]
+    is_article = key in ARTICLES
     context = {
         'page_title': page_title,
         'meta_description': meta_description,
         'breadcrumb': breadcrumb,
         'published_time': HUB_LASTMOD.isoformat(),
+        'current_hub': key,
     }
+    if is_article:
+        context.update({
+            'eyebrow': config['eyebrow'][language],
+            'heading': config['heading'][language],
+            'answer_label': config['answer_label'][language],
+            'toc': [{'id': anchor, 'label': label} for anchor, label in config['toc'][language]],
+            'places_count': _places_count(),
+        })
     context['jsonld'] = schema.editorial(
-        request, page_title, meta_description, breadcrumb, HUB_LASTMOD)
+        request, page_title, meta_description, breadcrumb, HUB_LASTMOD, in_articles=is_article)
     response = render(request, config['template'], context)
+    response['Cache-Control'] = 'no-cache'
+    return response
+
+
+@require_safe
+def articles(request):
+    """/articles/: список статей в редакционном порядке. В навигации его нет,
+    сюда ведут крошки статей и sitemap."""
+    language = 'ru' if _is_ru() else 'en'
+    page_title = ARTICLES_PAGE['title'][language]
+    meta_description = ARTICLES_PAGE['description'][language]
+    items = [{'url': reverse(HUB_PAGES[key]['url_name']),
+              'eyebrow': HUB_PAGES[key]['eyebrow'][language],
+              'heading': HUB_PAGES[key]['heading'][language],
+              'topics': HUB_PAGES[key]['topics'][language]} for key in ARTICLES]
+    response = render(request, 'atlas/articles.html', {
+        'page_title': page_title, 'meta_description': meta_description,
+        'articles': items, 'places_count': _places_count(),
+        'jsonld': schema.articles(request, page_title, meta_description, items)})
     response['Cache-Control'] = 'no-cache'
     return response
 
@@ -1081,6 +1197,7 @@ def sitemap(request):
         (reverse('places'), max(place_index_dates) if place_index_dates else None, []),
         (reverse('gallery'), max(gallery_dates) if gallery_dates else None, []),
         (reverse('method'), scene_modified, []),
+        (reverse('articles'), HUB_LASTMOD, []),
         (reverse('derry_real'), HUB_LASTMOD, []),
         (reverse('derry_bangor'), HUB_LASTMOD, []),
         (reverse('derry_books'), HUB_LASTMOD, []),

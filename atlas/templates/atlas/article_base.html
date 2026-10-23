@@ -1,0 +1,32 @@
+{% extends 'atlas/gallery_base.html' %}
+{% load i18n static %}
+{% block og_type %}article{% endblock %}
+{% block article_meta %}<meta property="article:published_time" content="{{ published_time }}"><meta property="article:modified_time" content="{{ published_time }}">{% endblock %}
+{% block main_class %}page page--editorial{% endblock %}
+{% block content %}
+<article class="article">
+<div class="article__hero">
+<div class="article__intro">
+{% include 'atlas/breadcrumbs.html' with section='articles' current=breadcrumb only %}
+<span class="eyebrow">{{ eyebrow }}</span>
+<h1 class="t-h1">{{ heading }}</h1>
+<p class="t-lead">{% block deck %}{% endblock %}</p>
+</div>
+<div class="article__aside">
+<aside class="answer-box" aria-label="{{ answer_label }}"><span class="eyebrow">{{ answer_label }}</span><p>{% block answer %}{% endblock %}</p></aside>
+{% include 'atlas/map_card.html' %}
+</div>
+</div>
+<details class="toc-details"><summary>{% blocktranslate count counter=toc|length %}On this page · {{ counter }} section{% plural %}On this page · {{ counter }} sections{% endblocktranslate %}</summary>
+<nav aria-label="{% trans 'On this page' %}">{% include 'atlas/article_toc.html' %}</nav>
+</details>
+<div class="article__body">
+<nav class="toc" aria-label="{% trans 'On this page' %}"><span class="eyebrow" aria-hidden="true">{% trans "On this page" %}</span>{% include 'atlas/article_toc.html' %}</nav>
+<div class="article__text">
+{% block body %}{% endblock %}
+</div>
+</div>
+</article>
+{% include 'atlas/derry_explore.html' with variant='reading' %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'atlas/article.js' %}" defer></script>{% endblock %}

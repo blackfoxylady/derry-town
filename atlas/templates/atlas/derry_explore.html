@@ -1,4 +1,20 @@
-{% load i18n %}<nav class="explore" aria-labelledby="explore-title">
+{% load i18n static %}{% if variant == 'reading' %}<nav class="explore explore--reading" aria-labelledby="explore-title">
+<div class="explore__head">
+<div class="explore__titles"><span class="eyebrow">{% trans "About Derry" %}</span><h2 id="explore-title" class="t-h2">{% trans "Keep reading" %}</h2></div>
+<a href="{% url 'index' %}" class="link link--arrow explore__back">{% trans "Back to the map" %}</a>
+</div>
+<ul class="explore__grid">
+{% if current_hub != 'real' %}<li><a href="{% url 'derry_real' %}" class="explore__card"><span class="eyebrow">{% trans "Article" %}</span><span class="explore__title">{% translate "Is Derry, Maine a real town?" context "keep reading" %}</span><span class="explore__desc">{% trans "What is fictional, where King places the town, and why there is no ZIP code." %}</span><span class="explore__go">{% trans "Read →" %}</span></a></li>{% endif %}
+{% if current_hub != 'bangor' %}<li><a href="{% url 'derry_bangor' %}" class="explore__card"><span class="eyebrow">{% trans "Article" %}</span><span class="explore__title">{% trans "How Bangor inspired Derry" %}</span><span class="explore__desc">{% trans "The real landmarks behind the fictional town, and where the comparison stops." %}</span><span class="explore__go">{% trans "Read →" %}</span></a></li>{% endif %}
+{% if current_hub != 'books' %}<li><a href="{% url 'derry_books' %}" class="explore__card"><span class="eyebrow">{% trans "Article" %}</span><span class="explore__title">{% trans "Stephen King books set in Derry" %}</span><span class="explore__desc">{% trans "Seven books and stories, and a spoiler-light order to read them in." %}</span><span class="explore__go">{% trans "Read →" %}</span></a></li>{% endif %}
+{% if current_hub != 'printable' %}{% trans "Derry on four A2 sheets" as print_title %}<li class="explore__print"><div class="print-card">
+<a href="{% url 'printable_map' %}" class="print-card__sheet" aria-label="{{ print_title }}"><img src="{% if LANGUAGE_CODE == 'ru' %}{% static 'atlas/downloads/ru/preview.jpg' %}{% else %}{% static 'atlas/downloads/en/preview.jpg' %}{% endif %}" width="1200" height="848" alt="" loading="lazy"></a>
+<div class="print-card__body"><span class="eyebrow">{% trans "Printable map" %}</span><span class="print-card__title">{{ print_title }}</span><span class="explore__desc">{% trans "The whole town, the centre, the Barrens and the Losers’ clearing. A PDF for printing and an SVG for each sheet." %}</span>
+<span class="print-card__actions">{% if LANGUAGE_CODE == 'ru' %}<a class="btn btn--primary" href="{% static 'atlas/downloads/ru/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-ru.pdf">{% else %}<a class="btn btn--primary" href="{% static 'atlas/downloads/en/Derry_Print_Atlas.pdf' %}" download="derry-maine-printable-map-en.pdf">{% endif %}{% include 'atlas/icons/download.svg' %}{% trans "Download PDF" %}</a><a class="btn btn--quiet" href="{% url 'printable_map' %}">{% trans "All formats →" %}</a></span>
+</div></div></li>{% endif %}
+</ul>
+<a href="{% url 'index' %}" class="link link--arrow explore__back explore__back--end">{% trans "Back to the map" %}</a>
+</nav>{% else %}<nav class="explore" aria-labelledby="explore-title">
 <div class="explore__head">
 <div class="explore__titles"><span class="eyebrow">{% trans "About Derry" %}</span><h2 id="explore-title" class="t-h2">{% trans "Read more about the town" %}</h2></div>
 {% if back_url %}<a href="{{ back_url }}" class="link link--arrow">{% blocktranslate with name=back_name %}Back to the map, at {{ name }}{% endblocktranslate %}</a>{% endif %}
@@ -9,4 +25,4 @@
 {% if current_hub != 'books' %}<li><a href="{% url 'derry_books' %}" class="explore__card"><span class="explore__title">{% trans "Stephen King books set in Derry" %}</span><span class="explore__desc">{% trans "A spoiler-light reading path through the town." %}</span><span class="explore__go">{% trans "Read →" %}</span></a></li>{% endif %}
 {% if current_hub != 'printable' %}<li><a href="{% url 'printable_map' %}" class="explore__card explore__card--download"><span class="explore__title">{% trans "Printable map of Derry" %}</span><span class="explore__desc">{% trans "Four A2 sheets in PDF and SVG." %}</span><span class="explore__go">{% include 'atlas/icons/download.svg' %}{% trans "Download" %}</span></a></li>{% endif %}
 </ul>
-</nav>
+</nav>{% endif %}

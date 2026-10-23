@@ -92,17 +92,38 @@ def method(request, name, description):
     return _graph(request, _page(request, 'WebPage', name, description))
 
 
-def editorial(request, name, description, breadcrumb, published):
-    """Long-form, source-backed guide page with a visible Home breadcrumb."""
+def editorial(request, name, description, breadcrumb, published, in_articles=False):
+    """Long-form, source-backed guide page. Статьи лежат в разделе Articles
+    (Map / Articles / заголовок), страница печатной карты — сразу под картой."""
     article = _page(request, 'Article', name, description)
     article['headline'] = str(name)
     article['author'] = {'@type': 'Organization', 'name': 'Derry', 'url': _root(request)}
     article['publisher'] = {'@type': 'Organization', 'name': 'Derry', 'url': _root(request)}
     article['datePublished'] = published.isoformat()
     article['dateModified'] = published.isoformat()
-    return _graph(request, article,
+    crumbs = [(_breadcrumb_root_name(), reverse('index'))]
+    if in_articles:
+        crumbs.append((_('Articles'), reverse('articles')))
+    crumbs.append((breadcrumb, ''))
+    return _graph(request, article, _breadcrumbs(request, *crumbs))
+
+
+def articles(request, name, description, items):
+    """/articles/: CollectionPage со списком статей (ItemList) и крошками Map › Articles."""
+    url = request.build_absolute_uri(request.path)
+    collection = _page(request, 'CollectionPage', name, description)
+    collection['mainEntity'] = {'@id': url + '#articles'}
+    item_list = {
+        '@type': 'ItemList', '@id': url + '#articles', 'numberOfItems': len(items),
+        'itemListElement': [
+            {'@type': 'ListItem', 'position': position, 'name': item['heading'],
+             'url': request.build_absolute_uri(item['url'])}
+            for position, item in enumerate(items, 1)
+        ],
+    }
+    return _graph(request, collection, item_list,
                   _breadcrumbs(request, (_breadcrumb_root_name(), reverse('index')),
-                               (breadcrumb, '')))
+                               (_('Articles'), '')))
 
 
 def place(request, ctx):

@@ -13,8 +13,8 @@
 <a class="skip-link" href="#main">{% trans "Skip to content" %}</a>
 {% include 'atlas/cookie_notice.html' %}
 {% include 'atlas/site_header.html' %}
-<main class="page" id="main" tabindex="-1">{% block content %}{% endblock %}</main>
+<main class="{% block main_class %}page{% endblock %}" id="main" tabindex="-1">{% block content %}{% endblock %}</main>
 {% include 'atlas/site_footer.html' %}
 {% include 'atlas/menu_panel.html' %}
-<script src="{% static 'atlas/shell.js' %}" defer></script>
+<script src="{% static 'atlas/shell.js' %}" defer></script>{% block scripts %}{% endblock %}
 </body></html>

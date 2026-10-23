@@ -24,6 +24,7 @@ urlpatterns += i18n_patterns(
     path('photos/<int:photo_id>/', views.photo_page, name='photo'),
     path('places/', views.places, name='places'),
     path('places/<slug:slug>/', views.place_page, name='place'),
+    path('articles/', views.articles, name='articles'),
     path('is-derry-maine-real/', views.derry_real, name='derry_real'),
     path('how-bangor-inspired-derry-maine/', views.derry_bangor, name='derry_bangor'),
     path('books-set-in-derry-maine/', views.derry_books, name='derry_books'),

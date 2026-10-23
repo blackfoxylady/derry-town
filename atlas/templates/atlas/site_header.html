@@ -5,7 +5,7 @@
 <a href="{% url 'places' %}" class="nav__link"{% if page == 'places' %} aria-current="page"{% elif page == 'place' %} aria-current="true"{% endif %}>{% trans "Places" %}</a>
 <a href="{% url 'gallery' %}" class="nav__link"{% if page == 'gallery' %} aria-current="page"{% elif page == 'gallery_place' or page == 'gallery_character' or page == 'gallery_tag' or page == 'gallery_year' or page == 'photo' %} aria-current="true"{% endif %}>{% trans "Photos" %}</a>
 <div class="nav__item" data-disclosure>
-<button type="button" class="nav__link nav__disclosure{% if page == 'derry_real' or page == 'derry_bangor' or page == 'derry_books' or page == 'printable_map' %} is-section{% endif %}" aria-expanded="false" aria-controls="about-menu">{% trans "About Derry" %}{% include 'atlas/icons/chevron-down.svg' %}</button>
+<button type="button" class="nav__link nav__disclosure{% if page == 'articles' or page == 'derry_real' or page == 'derry_bangor' or page == 'derry_books' or page == 'printable_map' %} is-section{% endif %}" aria-expanded="false" aria-controls="about-menu">{% trans "About Derry" %}{% include 'atlas/icons/chevron-down.svg' %}</button>
 <div class="dropdown" id="about-menu" hidden>
 {% include 'atlas/about_links.html' with variant='dropdown' page=page %}
 </div>

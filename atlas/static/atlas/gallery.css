@@ -97,34 +97,10 @@ button.chip{font-family:inherit;cursor:pointer}
 .editorial h1{max-width:850px;font:700 42px/1.08 var(--font-display);margin:6px 0 16px;letter-spacing:-.3px}
 .editorial h2{max-width:760px;font:650 23px/1.25 var(--font-display);margin:36px 0 12px}
 .editorial h3{font:650 18px/1.3 var(--font-display);margin:7px 0 8px}
-.editorial>p,.editorial-deck,.editorial-note{max-width:760px;font-size:15px;line-height:1.72;margin:0 0 15px}
+.editorial>p,.editorial-deck{max-width:760px;font-size:15px;line-height:1.72;margin:0 0 15px}
 .editorial .editorial-deck{font:400 19px/1.58 var(--font-read);color:#394d47;margin-bottom:24px}
-.answer-box,.screen-note{max-width:760px;margin:24px 0 30px;padding:17px 19px;border:1px solid #bdc8b7;border-left:4px solid #426650;border-radius:6px;background:#faf8f1}
-.answer-box>b,.screen-note>b{display:block;margin-bottom:6px;font-size:11px;letter-spacing:1.05px;text-transform:uppercase}
-.answer-box p,.screen-note{font-size:14px;line-height:1.62}
-.answer-box p{margin:0}
-.screen-note{border-left-color:#a88746;color:#394d47}
-.comparison-scroll{max-width:900px;overflow-x:auto;margin:14px 0 30px;border:1px solid var(--line);border-radius:7px;background:#faf8f1}
-
-.comparison-table{width:100%;min-width:760px;border-collapse:collapse;font-size:13px;line-height:1.5}
-.comparison-table th,.comparison-table td{padding:13px 14px;border-bottom:1px solid #dde0d5;border-right:1px solid #e3e5dc;text-align:left;vertical-align:top}
-.comparison-table th:last-child,.comparison-table td:last-child{border-right:0}
-.comparison-table tr:last-child th,.comparison-table tr:last-child td{border-bottom:0}
-.comparison-table thead th{background:#edf0e7;color:#44584e;font-size:10px;letter-spacing:.8px;text-transform:uppercase}
-.comparison-table tbody th{width:115px;font-weight:700;color:#315e5a}
-.book-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:900px}
-.book-entry{border:1px solid var(--line);border-radius:7px;background:#faf8f1;padding:17px 18px}
-.book-entry:first-child:nth-last-child(3){grid-column:span 2}
-.book-year,.book-role{display:inline-block;color:var(--muted);font-size:10px;letter-spacing:.7px;text-transform:uppercase}
-.book-year{font-weight:750;color:#315e5a;margin-right:9px}
-.book-entry p{margin:0;color:#394d47;font-size:13px;line-height:1.62}
-.reading-order{max-width:720px;margin:0 0 17px;padding-left:24px}
-.reading-order li{padding:5px 0 5px 5px;font-size:14px;line-height:1.55}
-.editorial .editorial-note{color:var(--muted);font-size:13px}
-.editorial-sources{max-width:760px;margin-top:42px;padding-top:3px;border-top:1px solid var(--line)}
-.editorial-sources h2{font-size:18px;margin-top:22px}
-.editorial-sources ul{margin:0;padding-left:20px}
-.editorial-sources li{padding:4px 0;font-size:12px;line-height:1.5}
+.editorial .screen-note{display:block;max-width:760px;margin:24px 0 30px;padding:17px 19px;border:1px solid #bdc8b7;border-left:4px solid #a88746;border-radius:6px;background:#faf8f1;font-size:14px;line-height:1.62;color:#394d47}
+.editorial .screen-note>b{display:block;margin-bottom:6px;font-size:11px;letter-spacing:1.05px;text-transform:uppercase}
 .printable-preview{max-width:900px;margin:27px 0 24px}
 .printable-preview a{display:block;border:1px solid #bdc8b7;border-radius:8px;overflow:hidden;background:#e7e4d6;box-shadow:0 8px 28px rgba(38,61,56,.09)}
 .printable-preview img{display:block;width:100%;height:auto;aspect-ratio:594/420;object-fit:cover}
@@ -145,10 +121,9 @@ button.chip{font-family:inherit;cursor:pointer}
 .download-language{max-width:900px!important;margin:0 0 34px!important;color:var(--muted);font-size:12px!important}
 @media(max-width:700px){
  .editorial h1{font-size:33px}.editorial h2{font-size:21px;margin-top:31px}
- .editorial>p,.editorial-deck,.editorial-note{font-size:14px}
+ .editorial>p,.editorial-deck{font-size:14px}
  .editorial .editorial-deck{font-size:17px}
- .answer-box,.screen-note{margin:20px 0 25px;padding:15px}
- .book-list{grid-template-columns:1fr}.book-entry:first-child:nth-last-child(3){grid-column:auto}
+ .editorial .screen-note{margin:20px 0 25px;padding:15px}
  .download-grid{grid-template-columns:1fr}.download-card{padding:17px}
 }
 

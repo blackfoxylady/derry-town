@@ -57,6 +57,7 @@ class SeoTests(TestCase):
         self.assertEqual(response['Content-Type'], 'application/xml')
         body = response.content.decode()
         for path in ('/', '/ru/', '/places/', '/ru/places/', '/photos/', '/method/', '/ru/method/',
+                     '/articles/', '/ru/articles/',
                      '/is-derry-maine-real/', '/ru/is-derry-maine-real/',
                      '/how-bangor-inspired-derry-maine/',
                      '/ru/how-bangor-inspired-derry-maine/',
@@ -183,7 +184,7 @@ class SeoTests(TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, f'<title>{title}</title>', html=True)
             self.assertContains(response, description)
-            self.assertContains(response, f'<h1>{heading}</h1>', html=True)
+            self.assertContains(response, f'<h1 class="t-h1">{heading}</h1>', html=True)
             self.assertContains(response, '<h1', count=1)
             self.assertContains(response, '<meta property="og:type" content="article">')
             self.assertContains(response, '<meta property="article:published_time" content="2026-09-29">')
@@ -232,7 +233,7 @@ class SeoTests(TestCase):
                  '/how-bangor-inspired-derry-maine/': 'How Bangor inspired Derry',
                  '/books-set-in-derry-maine/': 'Stephen King books set in Derry',
                  '/printable-derry-map/': 'Printable map of Derry'}
-        for path in ('/places/', '/places/12-derry-public-library/', *cards):
+        for path in ('/places/', '/places/12-derry-public-library/', '/printable-derry-map/'):
             response = self.client.get(path)
             self.assertContains(response, '<nav class="explore"')
             explore = response.content.decode().split('<nav class="explore"')[1].split('</nav>')[0]

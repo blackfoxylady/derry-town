@@ -1,6 +1,7 @@
 {% load i18n %}<nav class="crumbs" aria-label="{% trans 'Breadcrumb' %}">
 <ol><li><a href="{% url 'index' %}">{% trans "Map" %}</a></li>
 {% if section == 'places' %}<li>{% if current %}<a href="{% url 'places' %}">{% trans "Places" %}</a>{% else %}<span aria-current="page">{% trans "Places" %}</span>{% endif %}</li>
-{% elif section == 'photos' %}<li>{% if current %}<a href="{% url 'gallery' %}">{% trans "Photographs" %}</a>{% else %}<span aria-current="page">{% trans "Photographs" %}</span>{% endif %}</li>{% endif %}
+{% elif section == 'photos' %}<li>{% if current %}<a href="{% url 'gallery' %}">{% trans "Photographs" %}</a>{% else %}<span aria-current="page">{% trans "Photographs" %}</span>{% endif %}</li>
+{% elif section == 'articles' %}<li>{% if current %}<a href="{% url 'articles' %}">{% trans "Articles" %}</a>{% else %}<span aria-current="page">{% trans "Articles" %}</span>{% endif %}</li>{% endif %}
 {% if current %}<li><span aria-current="page">{{ current }}</span></li>{% endif %}</ol>
 </nav>

@@ -785,3 +785,84 @@ msgstr "Историческое"
 msgctxt "kind short"
 msgid "Outlying"
 msgstr "Окраины"
+
+#: article_base.html articles.html breadcrumbs.html
+msgid "Articles"
+msgstr "Статьи"
+
+msgid "On this page"
+msgstr "На этой странице"
+
+#, python-format
+msgid "On this page · %(counter)s section"
+msgid_plural "On this page · %(counter)s sections"
+msgstr[0] "На этой странице · %(counter)s раздел"
+msgstr[1] "На этой странице · %(counter)s раздела"
+msgstr[2] "На этой странице · %(counter)s разделов"
+
+msgid "Open the map of Derry"
+msgstr "Открыть карту Дерри"
+
+#, python-format
+msgid "%(counter)s place, drawn from the novel"
+msgid_plural "%(counter)s places, drawn from the novel"
+msgstr[0] "%(counter)s место, нарисованное по тексту романа"
+msgstr[1] "%(counter)s места, нарисованных по тексту романа"
+msgstr[2] "%(counter)s мест, нарисованных по тексту романа"
+
+msgid "(opens an external site)"
+msgstr "(откроется внешний сайт)"
+
+msgid "Editorial note"
+msgstr "Примечание редакции"
+
+msgid "Keep reading"
+msgstr "Читать дальше"
+
+msgid "Back to the map"
+msgstr "Вернуться к карте"
+
+msgid "Article"
+msgstr "Статья"
+
+msgctxt "keep reading"
+msgid "Is Derry, Maine a real town?"
+msgstr "Существует ли город Дерри, штат Мэн?"
+
+msgid "What is fictional, where King places the town, and why there is no ZIP code."
+msgstr "Что здесь вымышлено, где Кинг помещает город и почему у него нет почтового индекса."
+
+msgid "The real landmarks behind the fictional town, and where the comparison stops."
+msgstr "Реальные места за вымышленным городом — и где сравнение заканчивается."
+
+msgid "Seven books and stories, and a spoiler-light order to read them in."
+msgstr "Семь книг и рассказов и порядок чтения без крупных спойлеров."
+
+msgid "Derry on four A2 sheets"
+msgstr "Дерри на четырёх листах A2"
+
+msgid ""
+"The whole town, the centre, the Barrens and the Losers’ clearing. A PDF for "
+"printing and an SVG for each sheet."
+msgstr "Весь город, центр, Пустошь и поляна Неудачников. PDF для печати и SVG каждого листа."
+
+msgid "Download PDF"
+msgstr "Скачать PDF"
+
+msgid "All formats →"
+msgstr "Все форматы →"
+
+msgid "Articles about Derry, Maine"
+msgstr "Статьи о Дерри, штат Мэн"
+
+msgid ""
+"Guides to the Derry of Stephen King’s <i>IT</i>: whether the town is real, "
+"where it came from, and which books take you back to it. Each one starts "
+"with a short answer."
+msgstr ""
+"Путеводители по Дерри из романа Стивена Кинга <i>«Оно»</i>: существует ли город, "
+"откуда он взялся и в какие книги можно к нему вернуться. Каждый начинается "
+"с короткого ответа."
+
+msgid "Read the article"
+msgstr "Читать статью"

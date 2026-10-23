@@ -37,13 +37,13 @@ class ShellTests(TestCase):
     def test_every_content_page_has_one_shell(self):
         for path in ('/places/', '/places/12-derry-public-library/', '/photos/', '/method/',
                      '/is-derry-maine-real/', '/how-bangor-inspired-derry-maine/',
-                     '/books-set-in-derry-maine/', '/printable-derry-map/'):
+                     '/books-set-in-derry-maine/', '/printable-derry-map/', '/articles/'):
             html = self.page(path)
             body = html.split('<body class="shell">', 1)[1]
             # Skip link first, then the cookie notice, then the header.
             self.assertTrue(body.lstrip().startswith('<a class="skip-link" href="#main">Skip to content</a>'), path)
             self.assertLess(body.index('id="cookieConsent"'), body.index('class="site-header"'), path)
-            self.assertIn('<main class="page" id="main"', body)
+            self.assertRegex(body, r'<main class="page( page--editorial)?" id="main"')
             self.assertEqual(html.count('class="site-header"'), 1, path)
             self.assertEqual(html.count('class="site-footer"'), 1, path)
             # The menu panel is server HTML and not a <dialog> element.
@@ -65,6 +65,12 @@ class ShellTests(TestCase):
         self.assertEqual(dropdown.count('aria-current="page"'), 1)
         self.assertIn('<a href="/how-bangor-inspired-derry-maine/" aria-current="page">', dropdown)
         self.assertNotIn('is-section', self.page('/places/'))
+        # /articles/ is not in the navigation, but belongs to the About Derry section.
+        listing = self.page('/articles/')
+        self.assertEqual(current(listing), {})
+        self.assertIn('nav__disclosure is-section"', listing)
+        self.assertNotIn('href="/articles/"', listing.split('<main', 1)[0])
+        self.assertNotIn('href="/articles/"', listing.split('class="site-footer"', 1)[1])
 
     def test_breadcrumb_root_is_the_map(self):
         crumbs = nav(self.page('/places/12-derry-public-library/'), 'crumbs')
