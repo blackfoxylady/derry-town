@@ -237,6 +237,33 @@ def edit(photo_id, **changes):
     return photo
 
 
+def set_avatar(slug, photo_id=None, x=None, y=None, zoom=None, clear=False):
+    """Аватар персонажа для фильтра галереи (см. Character). None = не менять."""
+    with transaction.atomic():
+        try:
+            character = Character.objects.select_for_update().get(pk=slug)
+        except Character.DoesNotExist:
+            raise ValueError(f'Character {slug!r} does not exist.') from None
+        if clear:
+            character.avatar = None
+        elif photo_id is not None:
+            photo = Photo.objects.filter(pk=photo_id).first()
+            if photo is None:
+                raise ValueError(f'Photo {photo_id} does not exist.')
+            character.avatar = photo
+        for field, value in (('avatar_x', x), ('avatar_y', y)):
+            if value is not None:
+                if not 0 <= value <= 1:
+                    raise ValueError(f'{field} must be between 0 and 1, got {value}.')
+                setattr(character, field, value)
+        if zoom is not None:
+            if zoom < 1:
+                raise ValueError(f'Zoom must be at least 1, got {zoom}.')
+            character.avatar_zoom = zoom
+        character.save()
+    return character
+
+
 def remove(photo_id):
     """Удаляет запись и её файлы. Файлы удаляются после успешной транзакции."""
     with transaction.atomic():

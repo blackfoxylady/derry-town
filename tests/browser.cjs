@@ -153,9 +153,9 @@ const path=require('node:path');
   assert.equal(await page.locator('html').getAttribute('lang'),'ru');
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
   assert.equal(await page.locator('.crumbs li').count(),2);
-  assert.match(await page.locator('.status').innerText(),/\d+ photographs?/);
-  if(await page.locator('.card').count()){
-   await page.locator('.card .pic').first().click();
+  assert.match(await page.locator('#galleryStatus').innerText(),/\d+ photographs?/);
+  if(await page.locator('.gallery-item').count()){
+   await page.locator('.gallery-item__link').first().click();
    await page.waitForURL(/\/photos\/\d+\/$/);
    assert.equal(await page.locator('.crumbs li').count(),3);
    assert(await page.locator('.facts').isVisible());
@@ -173,7 +173,7 @@ const path=require('node:path');
   const context=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:1});
   const page=await context.newPage();
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
-  const photoHref=await page.locator('.card .pic').count()?await page.locator('.card .pic').first().getAttribute('href'):null;
+  const photoHref=await page.locator('.gallery-item__link').count()?await page.locator('.gallery-item__link').first().getAttribute('href'):null;
   const pages=['/','/places/','/photos/','/method/','/places/12-derry-public-library/',
    '/is-derry-maine-real/','/how-bangor-inspired-derry-maine/','/books-set-in-derry-maine/'];
   if(photoHref)pages.push(photoHref);

@@ -122,7 +122,7 @@ class SeoTests(TestCase):
         verification = '<meta name="google-site-verification" content="PQSwf6jyMi2X-8WbazpZT47x4vm7KZqvt-KBrnmpiH0">'
         self.assertContains(self.client.get('/'), verification)
         self.assertContains(self.client.get('/photos/'), verification)
-        self.assertContains(self.client.get('/photos/'), '<h1 class="gallery-title">Photographs</h1>')
+        self.assertContains(self.client.get('/photos/'), '<h1 class="t-h1">Photographs</h1>')
         self.assertContains(self.client.get('/places/12-derry-public-library/'), '<h1', count=1)
 
     def test_pages_carry_open_graph_tags(self):
@@ -409,7 +409,7 @@ class JsonLdTests(TestCase):
         self.assertEqual(gallery['name'], 'Library photographs of Derry, Maine · Stephen King’s IT')
         crumbs = node(data, 'BreadcrumbList')['itemListElement']
         self.assertEqual([crumb['name'] for crumb in crumbs],
-                         ['Map', 'Photographs', 'Library photographs'])
+                         ['Map', 'Photographs', 'Library'])
         self.assertEqual(crumbs[1]['item'], 'http://testserver/photos/')
         self.assertNotIn('item', crumbs[2])
 

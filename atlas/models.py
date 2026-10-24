@@ -111,9 +111,19 @@ class MapState(models.Model):
 
 
 class Character(models.Model):
-    """Справочник персонажей для фотографий; пополняется командой photos."""
+    """Справочник персонажей для фотографий; пополняется командой photos.
+
+    Аватар — кружок 22 px в фильтре галереи: кадр из фото `avatar`, точка лица
+    (avatar_x, avatar_y — доли ширины и высоты снимка) встаёт в центр кружка,
+    avatar_zoom — ширина снимка в ширинах кружка. Задаётся `photos character`.
+    """
     slug = models.CharField(max_length=100, primary_key=True)
     name = models.CharField(max_length=150)
+    avatar = models.ForeignKey('Photo', null=True, blank=True, on_delete=models.SET_NULL,
+                               related_name='+')
+    avatar_x = models.FloatField(default=0.5)
+    avatar_y = models.FloatField(default=0.3)
+    avatar_zoom = models.FloatField(default=3.0)
 
 
 class Tag(models.Model):

@@ -1,21 +1,39 @@
 {% extends 'atlas/gallery_base.html' %}
 {% load i18n static %}
+{% block main_class %}page page--gallery{% endblock %}
 {% block content %}
+<div class="gallery-head">
 {% include 'atlas/breadcrumbs.html' with section='photos' current=gallery_breadcrumb only %}
-<h1 class="gallery-title">{{ gallery_heading }}</h1>
-{% if gallery_intro %}<p class="gallery-intro">{{ gallery_intro }}</p>{% endif %}
-<section class="filters" aria-label="{% trans 'Photograph filters' %}">
-{% for g in groups %}{% if g.options %}<div class="frow"><span class="fname">{{ g.title }}</span><span class="chips">{% for o in g.options %}{% if o.url %}<a class="chip{% if o.active %} on{% endif %}" href="{{ o.url }}"{% if o.nofollow %} rel="nofollow"{% endif %}{% if client_state %} data-dim="{{ o.dim }}" data-value="{{ o.value }}"{% endif %}>{{ o.label }}{% if o.count %}<span class="n">{{ o.count }}</span>{% endif %}</a>{% else %}<button type="button" class="chip" data-dim="{{ o.dim }}" data-value="{{ o.value }}">{{ o.label }}{% if o.count %}<span class="n">{{ o.count }}</span>{% endif %}</button>{% endif %}{% endfor %}</span></div>{% endif %}{% endfor %}
-<div class="frow status"><span class="count">{% blocktranslate count n=shown %}{{ n }} photograph{% plural %}{{ n }} photographs{% endblocktranslate %}</span>{% if filtered %}<a class="clear" href="{{ clear_url }}">{% trans "Clear filters" %} ×</a>{% endif %}</div>
-</section>
-{% if client_state %}{{ client_state|json_script:"gallery-filter" }}<script src="{% static 'atlas/gallery.js' %}" defer></script>{% endif %}
-{% if cards %}
-<ul class="grid">
-{% for c in cards %}<li class="card"{% if c.hidden %} hidden{% endif %}{% if client_state %} data-place="{{ c.photo.feature_key }}" data-characters="{{ c.characters }}" data-tags="{{ c.tags }}" data-year="{{ c.photo.year|default_if_none:'' }}"{% endif %}>
-<a class="pic" href="{% url 'photo' c.photo.id %}"><img src="{{ c.thumb }}" srcset="{{ c.srcset }}" sizes="(max-width:525px) calc(100vw - 30px), (max-width:799px) calc(50vw - 23px), (max-width:1057px) calc(33.333vw - 26.667px), 239px" alt="{{ c.alt }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy" decoding="async"></a>
-<p class="caption"><a href="{% url 'photo' c.photo.id %}">{{ c.caption|default:c.photo.original_name }}</a></p>
-<p class="meta">{% if c.photo.year %}<a href="{{ c.year_url }}">{{ c.photo.year }}</a>{% endif %}{% if c.photo.year and c.place_url %} · {% endif %}{% if c.place_url %}<a href="{{ c.place_url }}">{{ c.place_label }}</a>{% endif %}{% if c.place_gallery_url %} · <a class="place-photo-filter" href="{{ c.place_gallery_url }}">{% trans "Photographs from here" %}</a>{% endif %}</p>
-</li>{% endfor %}
-</ul>
-{% endif %}{% if not shown or client_state %}<p class="empty"{% if shown %} hidden{% endif %}>{% trans "No photographs match these filters." %} <a href="{{ clear_url }}">{% trans "Show all photographs" %}</a>.</p>{% endif %}
+<h1 class="t-h1">{{ gallery_heading }}</h1>
+{% if gallery_intro %}<p class="gallery-head__intro">{{ gallery_intro }}</p>{% endif %}
+{% if place_links %}<p class="gallery-head__links"><a class="link link--arrow" href="{{ place_links.page }}">{% trans "Place page" %}</a>{% if place_links.map %}<a class="link link--arrow" href="{{ place_links.map }}">{% trans "Show on the map" %}</a>{% endif %}</p>{% endif %}
+</div>
+
+<div class="gallery-layout">
+<aside class="gallery-filters" id="galleryFilters" aria-label="{% trans 'Filters' %}">
+{% for g in groups %}{% if g.options %}<fieldset class="gallery-filters__group" data-group="{{ g.name }}"><legend class="eyebrow">{{ g.title }}</legend>
+{% if g.name == 'tag' %}<div class="chip-group gallery-filters__chips">{% for o in g.options %}<a class="chip chip--sm{% if not o.count %} is-empty{% endif %}" href="{{ o.url }}" data-group="tag" data-value="{{ o.value }}"{% if o.checked %} aria-current="true"{% endif %}>{{ o.label }} <span class="chip__count">{{ o.count }}</span></a>{% endfor %}</div>
+{% else %}{% for o in g.options %}{% include 'atlas/gallery_option.html' %}{% endfor %}
+{% if g.more %}<details class="gallery-filters__more"{% if g.more_open %} open{% endif %}><summary class="link">{% blocktranslate count counter=g.total %}All {{ counter }} place{% plural %}All {{ counter }} places{% endblocktranslate %}</summary>
+{% for o in g.more %}{% include 'atlas/gallery_option.html' %}{% endfor %}</details>{% endif %}{% endif %}
+</fieldset>
+{% endif %}{% endfor %}
+</aside>
+
+<div class="gallery-results">
+<div class="gallery-results__head">
+<span class="gallery-results__status" id="galleryStatus" role="status">{{ status }}</span>
+{% if chips %}<span class="gallery-results__chips">{% for o in chips %}<a class="chip chip--set" href="{{ o.url }}" aria-label="{% blocktranslate with name=o.label %}Remove filter: {{ name }}{% endblocktranslate %}">{{ o.label }}{% include 'atlas/icons/close.svg' %}</a>{% endfor %}</span>
+<a class="gallery-results__clear" href="{% url 'gallery' %}">{% trans "Clear filters" %}</a>{% endif %}
+</div>
+{% if cards %}<ul class="gallery-grid" id="galleryGrid">
+{% for c in cards %}<li class="gallery-item"><a class="gallery-item__link" href="{% url 'photo' c.photo.id %}"><img class="gallery-item__img" src="{{ c.thumb }}" srcset="{{ c.srcset }}" sizes="(max-width: 47.99em) calc(50vw - 22px), (max-width: 63.99em) calc(50vw - 170px), 270px" alt="{{ c.alt }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy" decoding="async"><span class="gallery-item__caption" aria-hidden="true">{{ c.caption }}</span>{% if c.meta %}<span class="t-meta">{{ c.meta }}</span>{% endif %}</a></li>
+{% endfor %}</ul>
+{% else %}<div class="gallery-empty" id="galleryEmpty">
+<h2 class="gallery-empty__title">{% trans "No photographs found" %}</h2>
+<p class="gallery-empty__text">{% trans "Try removing a filter." %}</p>
+<p class="gallery-empty__actions"><a class="btn btn--secondary" href="{% url 'gallery' %}">{% trans "Clear filters" %}</a></p>
+</div>{% endif %}
+</div>
+</div>
 {% endblock %}

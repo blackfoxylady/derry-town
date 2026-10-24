@@ -60,6 +60,13 @@ class Command(BaseCommand):
         p.add_argument('id', type=int)
         sub.add_parser('list')
         sub.add_parser('check', help='Verify files, feature bindings and orphan media files.')
+        p = sub.add_parser('character', help='Show or set the face crop of a character (gallery filter).')
+        p.add_argument('slug')
+        avatar = p.add_mutually_exclusive_group()
+        avatar.add_argument('--avatar', type=int, help='Photo id to crop the face from.')
+        avatar.add_argument('--no-avatar', action='store_true', help='Drop the face crop.')
+        p.add_argument('--focal', help='Face centre as x,y fractions of the photo, e.g. 0.53,0.25.')
+        p.add_argument('--zoom', type=float, help='Photo width in circle widths (≥ 1), e.g. 3.2.')
 
     def handle(self, *args, **o):
         try:
@@ -114,6 +121,22 @@ class Command(BaseCommand):
             for photo in queryset:
                 self.stdout.write(describe(photo))
             self.stdout.write(f'{queryset.count()} photos.')
+        elif action == 'character':
+            x = y = None
+            if o['focal']:
+                try:
+                    x, y = (float(part) for part in o['focal'].split(','))
+                except ValueError:
+                    raise ValueError('--focal takes two numbers: x,y') from None
+            if o['avatar'] is not None or o['no_avatar'] or o['focal'] or o['zoom'] is not None:
+                character = photos.set_avatar(o['slug'], o['avatar'], x, y, o['zoom'], clear=o['no_avatar'])
+            else:
+                character = photos.Character.objects.filter(pk=o['slug']).first()
+                if character is None:
+                    raise ValueError(f'Character {o["slug"]!r} does not exist.')
+            avatar = f'photo {character.avatar_id}' if character.avatar_id else 'no photo'
+            self.stdout.write(f'{character.slug}\t{character.name}\tavatar: {avatar}, focal '
+                              f'{character.avatar_x:g},{character.avatar_y:g}, zoom {character.avatar_zoom:g}')
         elif action == 'check':
             problems = photos.check()
             for line in problems:

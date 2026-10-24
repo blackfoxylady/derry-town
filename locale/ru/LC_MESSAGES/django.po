@@ -1020,3 +1020,29 @@ msgstr "Фильтры, %(n)s"
 
 msgid "Remove filter: %(name)s"
 msgstr "Убрать фильтр: %(name)s"
+
+# П10: галерея
+
+msgid "Place page"
+msgstr "Страница места"
+
+msgid "Tag"
+msgstr "Теги"
+
+msgid "All %(counter)s place"
+msgid_plural "All %(counter)s places"
+msgstr[0] "Все %(counter)s место"
+msgstr[1] "Все %(counter)s места"
+msgstr[2] "Все %(counter)s мест"
+
+msgid "%(n)s of %(total)s photograph"
+msgid_plural "%(n)s of %(total)s photographs"
+msgstr[0] "%(n)s из %(total)s фотографии"
+msgstr[1] "%(n)s из %(total)s фотографий"
+msgstr[2] "%(n)s из %(total)s фотографий"
+
+msgid "No photographs found"
+msgstr "Фотографий не нашлось"
+
+msgid "Try removing a filter."
+msgstr "Попробуйте убрать один из фильтров."

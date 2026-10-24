@@ -43,7 +43,7 @@ class ShellTests(TestCase):
             # Skip link first, then the cookie notice, then the header.
             self.assertTrue(body.lstrip().startswith('<a class="skip-link" href="#main">Skip to content</a>'), path)
             self.assertLess(body.index('id="cookieConsent"'), body.index('class="site-header"'), path)
-            self.assertRegex(body, r'<main class="page( page--(editorial|place|index))?" id="main"')
+            self.assertRegex(body, r'<main class="page( page--(editorial|place|index|gallery))?" id="main"')
             self.assertEqual(html.count('class="site-header"'), 1, path)
             self.assertEqual(html.count('class="site-footer"'), 1, path)
             # The menu panel is server HTML and not a <dialog> element.
