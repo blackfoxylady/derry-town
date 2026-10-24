@@ -227,5 +227,5 @@ class PlacePageTests(TestCase):
                 photo = photos.add(root / 'a.png', caption='Ben at the library.', feature='12', year=1958)
                 response = self.client.get(f'/photos/{photo.id}/')
                 self.assertContains(response, '/places/12-derry-public-library/')
-                self.assertContains(response, 'Photographs from here')
+                self.assertContains(response, 'Place page')
                 self.assertNotContains(response, 'target="_blank"')

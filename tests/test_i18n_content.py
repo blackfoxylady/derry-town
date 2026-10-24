@@ -127,7 +127,7 @@ class RuContentTests(TestCase):
             year=1958, feature_key='12', width=1200, height=800)
 
         page = self.client.get(f'/ru/photos/{photo.id}/')
-        self.assertContains(page, f'<h1>{translated}</h1>')
+        self.assertContains(page, f'<h1 class="viewer__caption">{translated}</h1>')
         self.assertContains(page, f'alt="{translated}"')
         self.assertContains(page, 'aria-label="Хлебные крошки">\n<ol><li><a href="/ru/">Карта</a></li>')
         self.assertNotContains(page, mixed)
@@ -139,7 +139,7 @@ class RuContentTests(TestCase):
         self.assertEqual(api_photo['caption'], translated)
 
         english_page = self.client.get(f'/photos/{photo.id}/')
-        self.assertContains(english_page, f'<h1>{english}</h1>')
+        self.assertContains(english_page, f'<h1 class="viewer__caption">{english}</h1>')
         photo.refresh_from_db()
         self.assertEqual(photo.caption_ru, mixed)  # реестр не изменяет рабочую БД
 

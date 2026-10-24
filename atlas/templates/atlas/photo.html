@@ -1,20 +1,43 @@
 {% extends 'atlas/gallery_base.html' %}
-{% load i18n atlas_tags %}
+{% load i18n static atlas_tags %}
 {% block og_type %}article{% endblock %}
 {% block og_image %}<meta property="og:image" content="{% absolute_url urls.medium %}"><meta property="og:image:width" content="{{ og_image_width }}"><meta property="og:image:height" content="{{ og_image_height }}"><meta property="og:image:alt" content="{{ alt }}">{% endblock %}
 {% block article_meta %}<meta property="article:published_time" content="{{ published_time|date:'c' }}"><meta property="article:modified_time" content="{{ modified_time|date:'c' }}">{% endblock %}
+{% block extra_head %}<meta name="theme-color" content="#161A18">{% endblock %}
+{% block body_class %}viewer-page{% endblock %}
+{% block header %}<header class="viewer-bar">
+<a href="{% url 'index' %}" class="brand viewer-bar__brand" aria-label="{% trans 'Derry, a literary atlas: home' %}">{% include 'atlas/icons/brand-mark.svg' %}<span class="brand__name">DERRY</span></a>
+<div class="viewer-bar__crumbs">{% include 'atlas/breadcrumbs.html' with section='photos' current=breadcrumb only %}</div>
+<a class="viewer-bar__back" href="{% url 'gallery' %}" data-close>{% include 'atlas/icons/chevron-left.svg' %}{% trans "Photographs" %}</a>
+<span class="viewer-bar__count"><span aria-hidden="true" data-counter>{{ position }} / {{ count }}</span><span class="visually-hidden" data-counter-label>{% blocktranslate with n=position total=count %}Photograph {{ n }} of {{ total }}{% endblocktranslate %}</span></span>
+<a class="viewer-bar__close" href="{% url 'gallery' %}" data-close><span class="viewer-bar__close-text">{% trans "Close" %}</span>{% include 'atlas/icons/close.svg' %}</a>
+</header>{% endblock %}
+{% block main_class %}viewer{% endblock %}
 {% block content %}
-{% include 'atlas/breadcrumbs.html' with section='photos' current=heading only %}
-<article class="photo">
-<h1>{{ heading }}</h1>
-<figure><a href="{{ urls.original }}" title="{% trans 'Open the original file' %}"><img src="{{ urls.medium }}" srcset="{{ srcset }}" sizes="(max-width:864px) calc(100vw - 44px), 820px" alt="{{ alt }}" width="{{ photo.width }}" height="{{ photo.height }}"></a>
-{% if caption %}<figcaption>{{ caption }}</figcaption>{% endif %}</figure>
-<dl class="facts">
+<div class="viewer__stage" id="viewerStage">
+<a class="viewer__nav viewer__nav--prev" data-prev{% if prev %} href="{{ prev.url }}" aria-label="{% blocktranslate with caption=prev.caption %}Previous photograph: {{ caption }}{% endblocktranslate %}"{% else %} hidden{% endif %}>{% include 'atlas/icons/arrow-left.svg' %}</a>
+<figure class="viewer__figure"><a class="viewer__original" href="{{ urls.original }}" title="{% trans 'Original' %}"><img class="viewer__img" src="{{ urls.medium }}" srcset="{{ srcset }}" sizes="(max-width: 63.99em) 100vw, calc(100vw - 528px)" alt="{{ alt }}" width="{{ photo.width }}" height="{{ photo.height }}"></a></figure>
+<a class="viewer__nav viewer__nav--next" data-next{% if next %} href="{{ next.url }}" aria-label="{% blocktranslate with caption=next.caption %}Next photograph: {{ caption }}{% endblocktranslate %}"{% else %} hidden{% endif %}>{% include 'atlas/icons/arrow-right.svg' %}</a>
+<span class="viewer__dots" data-dots aria-hidden="true"></span>
+</div>
+<div class="viewer__panel">
+<h1 class="viewer__caption">{{ heading }}</h1>
+<dl class="viewer__facts">
+{% if place_label %}<dt>{% trans "Place" %}</dt><dd><a href="{% if place_page_url %}{{ place_page_url }}{% else %}{{ place_gallery_url }}{% endif %}">{{ place_label }}</a></dd>{% endif %}
 {% if photo.year %}<dt>{% trans "Year" %}</dt><dd><a href="{{ year_url }}">{{ photo.year }}</a></dd>{% endif %}
-{% if place_label %}<dt>{% trans "Place" %}</dt><dd>{% if place_page_url %}<a href="{{ place_page_url }}">{{ place_label }}</a>{% else %}<a href="{{ place_gallery_url }}">{{ place_label }}</a>{% endif %}{% if place_page_url %} · <a href="{{ place_gallery_url }}">{% trans "Photographs from here" %}</a>{% endif %}{% if map_url %} · <a href="{{ map_url }}">{% trans "Show on the map" %}</a>{% endif %}</dd>{% endif %}
 {% if characters %}<dt>{% trans "Characters" %}</dt><dd>{% for c in characters %}<a href="{{ c.url }}">{{ c.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</dd>{% endif %}
-{% if tags %}<dt>{% trans "Tags" %}</dt><dd class="chips">{% for t in tags %}<a class="chip" href="{{ t.url }}">{{ t.name }}</a>{% endfor %}</dd>{% endif %}
-<dt>{% trans "Original" %}</dt><dd><a href="{{ urls.original }}">{{ photo.width }} × {{ photo.height }} px · {{ photo.ext|upper }}</a></dd>
+{% if tags %}<dt>{% trans "Tags" %}</dt><dd class="viewer__tags">{% for t in tags %}<a class="viewer__tag" href="{{ t.url }}">{{ t.name }}</a>{% endfor %}</dd>{% endif %}
+<dt>{% trans "Original" %}</dt><dd><a class="viewer__quiet" href="{{ urls.original }}">{{ photo.width }} × {{ photo.height }} px · {{ photo.ext|upper }}</a></dd>
 </dl>
-</article>
+{% if map_url or place_page_url %}<p class="viewer__actions">{% if map_url %}<a class="btn viewer__map" href="{{ map_url }}">{% include 'atlas/icons/pin.svg' %}{% trans "Show on the map" %}</a>{% endif %}{% if place_page_url %}<a class="btn viewer__place" href="{{ place_page_url }}">{% trans "Place page" %} →</a>{% endif %}</p>{% endif %}
+{% if more %}<section class="viewer__more" aria-labelledby="viewerMore"><h2 class="viewer__more-title" id="viewerMore">{% trans "More from this place" %}</h2>
+<ul class="viewer__more-list">{% for m in more %}<li><a href="{% url 'photo' m.id %}"><img src="{{ m.thumb }}" alt="{{ m.alt }}" width="92" height="92" loading="lazy" decoding="async"></a></li>{% endfor %}</ul></section>{% endif %}
+<p class="viewer__hint">{% trans "← → browse photographs · Esc returns to the gallery" %}</p>
+</div>
 {% endblock %}
+{% block footer %}<footer class="viewer-foot">
+<span>{% trans "Photographs are AI-generated period images." %}</span>
+<button type="button" class="cookie-settings viewer-foot__cookie" data-cookie-settings>{% trans "Cookie settings" %}</button>
+{% include 'atlas/lang_switch.html' with inverse=True %}
+</footer>{% endblock %}
+{% block scripts %}{{ viewer_state|json_script:'viewerState' }}<script src="{% static 'atlas/viewer.js' %}" defer></script>{% endblock %}

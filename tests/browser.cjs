@@ -180,7 +180,8 @@ const path=require('node:path');
    await page.locator('.gallery-item__link').first().click();
    await page.waitForURL(/\/photos\/\d+\/$/);
    assert.equal(await page.locator('.crumbs li').count(),3);
-   assert(await page.locator('.facts').isVisible());
+   assert(await page.locator('.viewer__facts').isVisible());
+   assert.match(await page.locator('[data-counter]').innerText(),/^\d+ \/ \d+$/);
    const toMap=page.locator('a:has-text("Show on the map")');
    if(await toMap.count()){await toMap.first().click();await page.waitForFunction(()=>typeof window.DerryAtlas?.view.selected==='number',{timeout:120000})}
   }

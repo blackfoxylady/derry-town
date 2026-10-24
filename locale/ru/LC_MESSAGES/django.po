@@ -34,9 +34,6 @@ msgid "Map"
 msgstr "Карта"
 
 #: gallery.html
-msgid "Photograph filters"
-msgstr "Фильтры фотографий"
-
 msgid "%(n)s photograph"
 msgid_plural "%(n)s photographs"
 msgstr[0] "%(n)s фотография"
@@ -45,12 +42,6 @@ msgstr[2] "%(n)s фотографий"
 
 msgid "Clear filters"
 msgstr "Сбросить фильтры"
-
-msgid "No photographs match these filters."
-msgstr "Под эти фильтры не подходит ни одна фотография."
-
-msgid "Show all photographs"
-msgstr "Показать все фотографии"
 
 msgid "Photographs of %(name)s"
 msgstr "Фотографии: %(name)s"
@@ -101,9 +92,6 @@ msgstr ""
 "Посмотрите фотографии Дерри в %(year)s году в литературном атласе романа "
 "Стивена Кинга «Оно»."
 
-msgid "Open the original file"
-msgstr "Открыть оригинальный файл"
-
 msgid "Characters"
 msgstr "Персонажи"
 
@@ -121,9 +109,6 @@ msgstr "Места рядом на карте"
 
 msgid "View this area on the map"
 msgstr "Показать этот район на карте"
-
-msgid "Photographs from here"
-msgstr "Фотографии этого места"
 
 #: method.html
 msgid "Sources & method"
@@ -1066,3 +1051,23 @@ msgstr "Показать ещё %(n)s"
 
 msgid "%(n)s of %(total)s"
 msgstr "%(n)s из %(total)s"
+
+# П12: страница фото
+
+msgid "Previous photograph: %(caption)s"
+msgstr "Предыдущая фотография: %(caption)s"
+
+msgid "Next photograph: %(caption)s"
+msgstr "Следующая фотография: %(caption)s"
+
+msgid "More from this place"
+msgstr "Ещё фото этого места"
+
+msgid "← → browse photographs · Esc returns to the gallery"
+msgstr "← → листают фотографии · Esc — к галерее"
+
+msgid "Photographs are AI-generated period images."
+msgstr "Фотографии — изображения эпохи, созданные ИИ."
+
+msgid "Photograph %(n)s of %(total)s"
+msgstr "Фотография %(n)s из %(total)s"

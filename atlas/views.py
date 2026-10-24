@@ -1109,14 +1109,17 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
     return response
 
 
+PHOTO_MORE = 6  # «More from this place»
+
+
 @require_safe
 def photo_page(request, photo_id):
     photo = get_object_or_404(Photo.objects.prefetch_related('characters', 'tags'), pk=photo_id)
     feature = Feature.objects.filter(pk=photo.feature_key).first() if photo.feature_key else None
-    # Карта выделяет точки и нелокализованные записи; у дорог и прочих
-    # контуров маркера нет, поэтому ссылки на карту у таких фото нет.
-    on_map = feature is not None and feature.object_type in ('site', 'unplaced')
-    map_url = reverse('index') + '?place=' + feature.key if on_map else ''
+    # Страница места есть у точек и мест без координат; кнопка карты — только у точек
+    # (у дорог, контуров и U-мест маркера нет, блок 08 «No place on the map»).
+    has_page = feature is not None and feature.object_type in ('site', 'unplaced')
+    map_url = reverse('index') + '?place=' + feature.key if has_page and feature.object_type == 'site' else ''
     urls = _media_urls(photo)
     caption = _caption(photo)
     alt = _photo_alt(photo, feature)
@@ -1134,6 +1137,14 @@ def photo_page(request, photo_id):
             '%(subject)s A photograph of %(place)s in the Derry, Maine literary atlas based on '
             'Stephen King’s IT.') % {'subject': description_subject, 'place': place_label}
     og_width, og_height = _fitted_dimensions(photo.width, photo.height, MEDIUM_SIZE)
+    # Порядок галереи без фильтров: prev/next и «3 / 8» без JS. viewer.js заменяет их
+    # отбором из галереи (sessionStorage), если фото в нём есть.
+    sequence = [{'id': p.id, 'url': reverse('photo', args=[p.id]), 'caption': _caption(p) or _photo_alt(p)}
+                for p in Photo.objects.only('id', 'sha256', 'caption', 'caption_ru')]
+    index = next(i for i, item in enumerate(sequence) if item['id'] == photo.id)
+    more = [{'id': p.id, 'thumb': _media_urls(p)['thumb'], 'alt': _photo_alt(p, feature)}
+            for p in Photo.objects.filter(feature_key=photo.feature_key).exclude(pk=photo.id)[:PHOTO_MORE]
+            ] if photo.feature_key else []
     context = {
         'photo': photo, 'urls': urls, 'caption': caption, 'alt': alt,
         'heading': heading, 'page_title': page_title, 'meta_description': meta_description,
@@ -1142,7 +1153,7 @@ def photo_page(request, photo_id):
                                   (urls['original'], max(photo.width, photo.height))]),
         'og_image_width': og_width, 'og_image_height': og_height,
         'published_time': photo.created, 'modified_time': photo.modified,
-        'place_page_url': reverse('place', args=[place_slug(feature)]) if on_map else '',
+        'place_page_url': reverse('place', args=[place_slug(feature)]) if has_page else '',
         'place_label': feature_name(feature) if feature else photo.feature_key,
         'place_gallery_url': (_gallery_url(place=photo.feature_key, place_feature=feature)
                               if photo.feature_key else ''),
@@ -1151,7 +1162,18 @@ def photo_page(request, photo_id):
         'characters': [{'name': character_name(c), 'url': _gallery_url(character=c.slug)}
                        for c in photo.characters.order_by('name')],
         'tags': [{'slug': t.slug, 'name': tag_name(t),
-                  'url': _gallery_url(tags=[t.slug])} for t in photo.tags.order_by('slug')]}
+                  'url': _gallery_url(tags=[t.slug])} for t in photo.tags.order_by('slug')],
+        # Крошки «Map / Photographs / Место» (у фото без места — подпись), JSON-LD так же.
+        'breadcrumb': feature_name(feature) if feature else heading,
+        'position': index + 1, 'count': len(sequence),
+        'prev': sequence[index - 1] if index > 0 else None,
+        'next': sequence[index + 1] if index + 1 < len(sequence) else None,
+        'more': more,
+        'viewer_state': {'id': photo.id, 'sequence': sequence, 'base': reverse('gallery'),
+                         'strings': {'prev': str(_('Previous photograph: %(caption)s')),
+                                     'next': str(_('Next photograph: %(caption)s')),
+                                     'counter': str(_('Photograph %(n)s of %(total)s'))}},
+    }
     context['jsonld'] = schema.photo(request, context)
     response = render(request, 'atlas/photo.html', context)
     response['Cache-Control'] = 'no-cache'

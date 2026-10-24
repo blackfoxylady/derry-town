@@ -1156,3 +1156,96 @@ a.filter-opt:hover .filter-opt__label { text-decoration: underline; text-decorat
   .gallery-grid.is-laid-out { position: static; height: auto !important; columns: 3; }
   .gallery-grid.is-laid-out .gallery-item { position: static; width: auto !important; margin-bottom: var(--space-6); }
 }
+
+/* ==========================================================================
+   PHOTO VIEWER (block 08): /photos/<id>/ as a dark page. Top bar with crumbs,
+   counter and Close; the photo uncropped with ← →; facts panel; a short
+   bottom line instead of the footer (AI note, cookie settings, language, D27).
+   ========================================================================== */
+body.viewer-page { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; background: var(--viewer-bg); color: var(--viewer-text); }
+.viewer-page :focus-visible { outline: var(--focus-width) solid #FFFFFF; outline-offset: 2px; }
+.viewer-page .cookie :focus-visible { outline-color: var(--color-focus); }  /* light notice on the dark page */
+.viewer-page a { color: var(--viewer-text); }
+.viewer-bar { flex: none; display: flex; align-items: center; gap: var(--space-5); height: 56px; padding: 0 var(--space-6); border-bottom: var(--border-1) solid var(--viewer-line); }
+.viewer-page .viewer-bar__brand { gap: 10px; color: var(--viewer-text); }
+.viewer-bar__brand .brand__mark { width: 26px; height: 26px; }
+.viewer-bar__brand .brand__name { font-size: 1.25rem; }
+.viewer-bar .crumbs { margin: 0; font-size: var(--text-s); color: var(--viewer-text-2); }
+.viewer-page .viewer-bar .crumbs a { color: var(--viewer-text-2); text-decoration-color: var(--viewer-line); }
+.viewer-bar .crumbs [aria-current] { color: var(--viewer-text); }
+.viewer-bar .crumbs li + li::before { color: var(--viewer-text-3); }
+.viewer-bar__crumbs { min-width: 0; }
+.viewer-bar .crumbs ol { flex-wrap: nowrap; }
+.viewer-bar .crumbs li:last-child { min-width: 0; }
+.viewer-bar .crumbs [aria-current] { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
+.viewer-bar__back { display: none; }
+.viewer-bar__count { margin-left: auto; color: var(--viewer-text-2); font: var(--weight-medium) var(--text-s) / 1 var(--font-ui); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.viewer-page .viewer-bar__close, .viewer-page .viewer-bar__back { align-items: center; gap: 6px; min-height: var(--target); color: var(--viewer-text); font-size: var(--text-s); text-decoration: none; }
+.viewer-bar__close { display: inline-flex; }
+.viewer-bar svg { width: 18px; height: 18px; flex: none; }
+
+main.viewer { flex: 1; display: flex; min-height: 0; }
+.viewer__stage { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-6); }
+.viewer__figure { flex: 1; min-width: 0; margin: 0; display: flex; justify-content: center; }
+.viewer__original { display: block; max-width: 100%; }
+/* The whole frame: portrait photos fit the height, landscape ones the stage width */
+.viewer__img { display: block; max-width: 100%; width: auto; height: auto; max-height: calc(100vh - 56px - 48px - 46px); max-height: calc(100dvh - 56px - 48px - 46px); background: #000; }
+.viewer__nav { flex: none; display: grid; place-items: center; width: 52px; height: 52px; border: var(--border-1) solid #3A423C; border-radius: 50%; color: var(--viewer-text); }
+.viewer__nav:hover { border-color: var(--viewer-text-2); }
+.viewer__nav[hidden] { display: grid; visibility: hidden; }  /* keeps the photo centred */
+.viewer__nav svg { width: 22px; height: 22px; }
+.viewer__dots { display: none; }
+
+.viewer__panel { flex: none; width: 400px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px; padding: 28px; border-left: var(--border-1) solid var(--viewer-line); }
+.viewer__caption { margin: 0; font: var(--weight-regular) 1.375rem / 1.4 var(--font-read); color: var(--viewer-text); }
+.viewer__facts { display: grid; grid-template-columns: 96px minmax(0, 1fr); margin: 0; font-size: 0.90625rem; line-height: 1.45; }
+.viewer__facts dt, .viewer__facts dd { padding: 9px 0; border-bottom: var(--border-1) solid var(--viewer-line); }
+.viewer__facts dt { color: var(--viewer-text-3); }
+.viewer__facts dd { margin: 0; overflow-wrap: anywhere; }
+.viewer__tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.viewer-page .viewer__tag { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border: var(--border-1) solid #4A544D; border-radius: var(--radius-pill); font-size: var(--text-xs); text-decoration: none; }
+.viewer-page .viewer__tag:hover { border-color: var(--viewer-text-2); }
+.viewer-page .viewer__quiet { color: var(--viewer-text-2); }
+.viewer__actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; }
+.viewer-page .viewer__map { gap: 8px; background: var(--viewer-accent); border-color: var(--viewer-accent); color: var(--viewer-bg); }
+.viewer-page .viewer__map:hover { background: #F0D184; }
+.viewer__map svg { width: 18px; height: 18px; }
+.viewer-page .viewer__place { background: transparent; border-color: #5A655D; color: var(--viewer-text); }
+.viewer-page .viewer__place:hover { border-color: var(--viewer-text-2); }
+.viewer__more { display: flex; flex-direction: column; gap: var(--space-2); }
+.viewer__more-title { margin: 0; color: var(--viewer-text-3); font: var(--weight-semibold) var(--text-2xs) / 1.2 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; }
+.viewer__more-list { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.viewer__more-list a { display: block; }
+.viewer__more-list img { display: block; width: 92px; height: 92px; object-fit: cover; background: var(--viewer-line); }
+.viewer__hint { margin: auto 0 0; color: var(--viewer-text-3); font-size: var(--text-2xs); }
+
+.viewer-foot { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-5); padding: var(--space-2) var(--space-6); border-top: var(--border-1) solid var(--viewer-line); color: var(--viewer-text-3); font-size: var(--text-2xs); }
+.viewer-page .viewer-foot__cookie { min-height: 28px; padding: 0; border: 0; background: none; color: var(--viewer-text-2); font: inherit; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
+.viewer-foot .lang { margin-left: auto; }
+
+@media (max-width: 63.99em) {
+  .viewer-bar { height: 52px; gap: var(--space-2); padding: 0 var(--space-2) 0 var(--space-4); }
+  .viewer-bar__brand, .viewer-bar__crumbs { display: none; }
+  .viewer-page .viewer-bar__back { display: inline-flex; gap: 4px; font-size: var(--text-m); }
+  .viewer-bar__close { justify-content: center; width: var(--target); }
+  .viewer-bar__close-text { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .viewer-bar__close svg { width: 22px; height: 22px; }
+  main.viewer { display: block; }
+  .viewer__stage { position: relative; display: block; padding: 0; background: #000; }
+  /* No arrows on the phone (swipe), but the links stay for screen readers and keyboards */
+  .viewer__nav:not([hidden]) { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .viewer__nav:not([hidden]):focus-visible { top: 8px; width: 44px; height: 44px; margin: 0; clip: auto; overflow: visible; background: var(--viewer-bg); }
+  .viewer__nav--prev:focus-visible { left: 8px; }
+  .viewer__nav--next:focus-visible { right: 8px; }
+  .viewer__nav[hidden] { display: none; }
+  .viewer__img { width: 100%; max-height: 520px; object-fit: contain; }
+  .viewer__dots { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 6px; pointer-events: none; }
+  .viewer__dot { width: 6px; height: 6px; border-radius: 50%; background: rgb(237 233 222 / 0.4); }
+  .viewer__dot.is-current { background: var(--viewer-text); }
+  .viewer__panel { width: auto; gap: 14px; padding: var(--space-4) var(--gutter) var(--space-6); border-left: 0; }
+  .viewer__caption { font-size: 1.125rem; }
+  .viewer__facts { font-size: var(--text-s); }
+  .viewer__hint { display: none; }
+  .viewer-foot { padding: var(--space-3) var(--gutter); }
+}
+@media print { .viewer__nav, .viewer__hint, .viewer-foot__cookie { display: none !important; } }

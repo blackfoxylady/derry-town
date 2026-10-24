@@ -169,5 +169,5 @@ def photo(request, ctx):
     if keywords:
         image['keywords'] = ', '.join(keywords)
     crumbs = _breadcrumbs(request, (_breadcrumb_root_name(), reverse('index')),
-                          (_('Photographs'), reverse('gallery')), (name, ''))
+                          (_('Photographs'), reverse('gallery')), (ctx.get('breadcrumb') or name, ''))
     return _graph(request, image, crumbs)

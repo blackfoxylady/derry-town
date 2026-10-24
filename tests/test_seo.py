@@ -311,7 +311,7 @@ class SeoTests(TestCase):
                 self.assertContains(response, '<meta property="og:image:height" content="800">')
                 self.assertContains(response, '<meta property="article:published_time"')
                 self.assertContains(response, '<meta property="article:modified_time"')
-                self.assertContains(response, '<h1>Ben.</h1>')
+                self.assertContains(response, '<h1 class="viewer__caption">Ben.</h1>')
                 self.assertContains(response, 'srcset="/media/photos/medium/')
                 # Страница места берёт первое фото места.
                 response = self.client.get('/places/12-derry-public-library/')
@@ -463,7 +463,7 @@ class JsonLdTests(TestCase):
         self.assertEqual(image['keywords'], 'Ben, Library')
         crumbs = node(data, 'BreadcrumbList')['itemListElement']
         self.assertEqual(crumbs[1]['item'], 'http://testserver/photos/')
-        self.assertEqual(crumbs[2]['name'], 'Ben & Bill.')
+        self.assertEqual(crumbs[2]['name'], 'Derry Public Library')  # место, как в видимых крошках
         # Спецсимволы экранируются, как в json_script: сырых <, >, & в блоке нет.
         body = response.content.decode()
         marker = '<script type="application/ld+json">'

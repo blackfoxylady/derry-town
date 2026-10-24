@@ -314,21 +314,68 @@ class GalleryTests(TestCase):
         rel = photos.relative_paths(self.ben.sha256, self.ben.ext)
         self.assertContains(response, rel['medium'])
         self.assertContains(response, rel['original'])
-        self.assertContains(response, 'Ben at the library.')
+        self.assertContains(response, '<h1 class="viewer__caption">Ben at the library.</h1>')
         self.assertContains(response, '/photos/character/ben-hanscom/')
-        self.assertContains(response, '/photos/tag/library/')
-        self.assertContains(response, '/photos/place/12-derry-public-library/')
+        self.assertContains(response, '<a class="viewer__tag" href="/photos/tag/library/">Library</a>')
         self.assertContains(response, '/photos/year/1958/')
-        self.assertContains(response, '>Library<')
-        self.assertContains(response, '/?place=12')  # место-точка: есть переход на карту
-        self.assertContains(response, 'href="/places/12-derry-public-library/"')
+        # Место ведёт на страницу места; кнопки — карта (точка) и страница места.
+        self.assertContains(response, '<dd><a href="/places/12-derry-public-library/">Derry Public Library</a></dd>')
+        self.assertContains(response, '<a class="btn viewer__map" href="/?place=12">')
+        self.assertContains(response, '<a class="btn viewer__place" href="/places/12-derry-public-library/">Place page →</a>')
+        self.assertNotContains(response, 'Photographs from here')
+
+    def test_photo_page_is_a_dark_viewer_with_neighbours(self):
+        response = self.client.get(f'/photos/{self.building.id}/')
+        self.assertContains(response, '<body class="viewer-page">')
+        self.assertNotContains(response, 'class="site-header"')
+        self.assertNotContains(response, 'class="site-footer"')
+        self.assertNotContains(response, 'shell.js')
+        # Нижняя строка вместо подвала (D27): ИИ, настройки cookie, язык.
+        self.assertContains(response, 'Photographs are AI-generated period images.')
+        self.assertContains(response, 'data-cookie-settings')
+        self.assertContains(response, 'hreflang="ru" lang="ru">RU</a>')
+        # Крошки «Map / Photographs / Место», JSON-LD синхронно.
+        self.assertContains(response, '<li><span aria-current="page">Derry Public Library</span></li>')
+        self.assertIn('"name": "Derry Public Library"', response.content.decode())
+        # Соседи и счётчик — в порядке галереи без фильтров.
+        self.assertContains(response, 'data-counter>2 / 4<')
+        self.assertContains(response, 'data-counter-label>Photograph 2 of 4<')
+        self.assertContains(response, f'data-prev href="/photos/{self.ben.id}/" aria-label="Previous photograph: Ben at the library."')
+        self.assertContains(response, f'data-next href="/photos/{self.bill.id}/" aria-label="Next photograph: Bill races Silver."')
+        self.assertContains(response, 'href="/photos/" data-close')
+        # «More from this place»: другие фото того же места.
+        thumb = photos.relative_paths(self.ben.sha256, self.ben.ext)['thumb']
+        self.assertContains(response, f'<li><a href="/photos/{self.ben.id}/"><img src="/media/{thumb}" alt="Ben at the library."')
+        first = self.client.get(f'/photos/{self.ben.id}/')
+        self.assertContains(first, 'data-prev hidden>')
+        self.assertContains(self.client.get(f'/photos/{self.loose.id}/'), 'data-next hidden>')
+        self.assertNotContains(self.client.get(f'/photos/{self.loose.id}/'), 'viewer__more')
+        state = json.loads(re.search(r'<script id="viewerState" type="application/json">(.*?)</script>',
+                                     response.content.decode()).group(1))
+        self.assertEqual([p['id'] for p in state['sequence']],
+                         [self.ben.id, self.building.id, self.bill.id, self.loose.id])
+        self.assertEqual(state['base'], '/photos/')
+        russian = self.client.get(f'/ru/photos/{self.building.id}/')
+        self.assertContains(russian, 'Фотографии — изображения эпохи, созданные ИИ.')
+        self.assertContains(russian, 'aria-label="Предыдущая фотография: ')
+        self.assertContains(russian, 'Ещё фото этого места')
 
     def test_photo_page_map_link_only_for_sites(self):
         response = self.client.get(f'/photos/{self.bill.id}/')
-        self.assertContains(response, '/photos/place/road02-main-street/')
-        self.assertNotContains(response, 'Show on the map')  # у дороги нет маркера на карте
+        # У дороги нет страницы места и маркера: место ведёт в галерею, кнопок нет.
+        self.assertContains(response, '<dd><a href="/photos/place/road02-main-street/">Main Street</a></dd>')
+        self.assertNotContains(response, 'viewer__actions')
+        self.assertContains(response, '<li><span aria-current="page">Main Street</span></li>')
+        Feature.objects.create(key='U9', object_type='unplaced', confidence='U', name='Somewhere',
+                               metadata={})
+        photos.edit(self.loose.id, feature='U9')
+        response = self.client.get(f'/photos/{self.loose.id}/')
+        self.assertContains(response, 'viewer__place')  # у U-места есть страница
+        self.assertNotContains(response, 'viewer__map')  # но нет точки на карте
+        photos.edit(self.loose.id, feature='')
         response = self.client.get(f'/photos/{self.loose.id}/')
         self.assertNotContains(response, '<dt>Place</dt>')  # без привязки нет и блока места
+        self.assertContains(response, '<li><span aria-current="page">Derry in 1985.</span></li>')
 
     def test_missing_photo_and_write_methods(self):
         self.assertEqual(self.client.get('/photos/999/').status_code, 404)
