@@ -20,7 +20,7 @@ from .localized_names import (character_name, feature_name, feature_search_terms
 from .localized_photos import photo_caption
 from .models import (Character, Evidence, Feature, MapState, Photo, PlaceCover,
                      Revision, Setting, Source, Tag)
-from .photos import MEDIUM_SIZE, THUMB_SIZE, relative_paths
+from .photos import GRID_WIDTHS, MEDIUM_SIZE, THUMB_SIZE, relative_paths
 from .locators import EXAMPLES as LOCATOR_EXAMPLES
 from .rendering import current_payload, RENDER_VERSION
 from .terms import (CONFIDENCE_EXPLANATIONS, CONFIDENCE_LABELS, CONFIDENCE_META,
@@ -457,6 +457,17 @@ def _card_image(photo):
     return {'thumb': urls['thumb'], 'medium': urls['medium'], 'srcset': srcset}
 
 
+def _grid_image(photo):
+    """Колонка галереи: производные по ширине (480 и 960), без увеличения малых снимков."""
+    urls = _media_urls(photo)
+    widths = []
+    for width in GRID_WIDTHS:
+        fitted = min(width, photo.width)
+        if fitted not in [w for _, w in widths]:
+            widths.append((urls[f'w{width}'], fitted))
+    return {'src': widths[0][0], 'srcset': ', '.join(f'{url} {w}w' for url, w in widths)}
+
+
 def _fitted_srcset(width, height, sources):
     """srcset из пар (url, max_side производного) с реальными intrinsic-ширинами."""
     longest = max(width, height)
@@ -699,7 +710,8 @@ AUDIT_TILE_NOTES = {
 def _plural_forms(singular, plural, counter='%(n)s'):
     """Формы ngettext для JS: [одна, несколько, много] (RU) или [одна, много, много] (EN).
     Числа подставляет браузер: %(n)s, а счётчик формы — вместо `counter`."""
-    return [ngettext(singular, plural, n) % {'counter': counter, 'n': '%(n)s'} for n in (1, 2, 5)]
+    return [ngettext(singular, plural, n) % {'counter': counter, 'n': '%(n)s', 'total': '%(total)s'}
+            for n in (1, 2, 5)]
 
 
 def _places_js_strings():
@@ -851,6 +863,24 @@ def places(request):
     return response
 
 
+GALLERY_PAGE = 24  # «Show 24 more» (D25)
+
+
+def _gallery_js_strings():
+    """Строки gallery.js: статус, «Show more», кнопка шторки, чипы."""
+    return {
+        'photos': _plural_forms('%(n)s photograph', '%(n)s photographs', counter='%(n)s'),
+        'of_total': _plural_forms('%(n)s of %(total)s photograph', '%(n)s of %(total)s photographs',
+                                  counter='%(total)s'),
+        'show': _plural_forms('Show %(counter)s photograph', 'Show %(counter)s photographs'),
+        'more': str(_('Show %(n)s more')), 'shown': str(_('%(n)s of %(total)s')),
+        'filters': str(_('Filters')), 'filters_n': str(_('Filters, %(n)s')),
+        'remove': str(_('Remove filter: %(name)s')), 'heading': str(_('Photographs')),
+        'close_icon': render_to_string('atlas/icons/close.svg').strip(),
+        'page': GALLERY_PAGE,
+    }
+
+
 FACE_PX = 22
 
 
@@ -947,13 +977,15 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
         """Пункт панели. Счётчик фасетный: сколько снимков даст этот пункт при прочих
         группах. Ссылка — на лендинг пункта, у отмеченного — отбор без него."""
         checked = value in selection[group]
+        landing_url = _selection_url({group: [value]}, features)
         if checked:
             rest = {g: [v for v in values if (g, v) != (group, value)]
                     for g, values in selection.items()}
             url = _selection_url(rest, features)
         else:
-            url = _selection_url({group: [value]}, features)
+            url = landing_url
         return {'group': group, 'value': value, 'label': label, 'checked': checked, 'url': url,
+                'landing': landing_url,
                 'count': sum(1 for item in items if value in item[group] and matches(item, group)),
                 **extra}
 
@@ -981,17 +1013,25 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
     chips = [labels[(group, value)] for group in GALLERY_GROUPS for value in selection[group]
              ] if selected > 1 else []
 
-    cards = []
+    # В HTML — только подходящие фото (лендинг индексируется без чужих снимков);
+    # gallery.js получает все фото в JSON и фильтрует дальше в браузере.
+    cards, everything = [], []
     for item in items:
-        if not matches(item):
-            continue
         photo = item['photo']
         feature = features.get(photo.feature_key)
         alt = _photo_alt(photo, feature)
-        cards.append({
-            'photo': photo, **_card_image(photo), 'alt': alt, 'caption': _caption(photo) or alt,
+        card = {
+            'photo': photo, **_grid_image(photo), 'alt': alt, 'caption': _caption(photo) or alt,
             'meta': ' · '.join(filter(None, (str(photo.year or ''),
                                              feature_name(feature) if feature else ''))),
+        }
+        if matches(item):
+            cards.append(card)
+        everything.append({
+            'id': photo.id, 'url': reverse('photo', args=[photo.id]), 'src': card['src'],
+            'srcset': card['srcset'], 'w': photo.width, 'h': photo.height, 'alt': alt,
+            'caption': card['caption'], 'meta': card['meta'],
+            **{group: sorted(item[group]) for group in GALLERY_GROUPS},
         })
     total = len(items)
     if selected > 1:
@@ -1049,8 +1089,14 @@ def gallery(request, filter_type='', filter_slug='', filter_year=None):
     # Сочетания дублируют лендинги: не индексируются и ссылки не обходятся.
     robots_meta = 'noindex, nofollow' if selected > 1 else ''
     breadcrumb = landing['label'] if landing else ''
+    gallery_state = {
+        'photos': everything, 'selection': selection, 'base': reverse('gallery'),
+        'landings': {f'{o["group"]}:{o["value"]}': o['landing'] for o in labels.values()},
+        'strings': _gallery_js_strings(),
+    }
     response = render(request, 'atlas/gallery.html', {
         'robots_meta': robots_meta, 'groups': groups, 'chips': chips, 'cards': cards,
+        'gallery_state': gallery_state, 'total': total,
         'status': status, 'landing': landing, 'gallery_heading': gallery_heading,
         'gallery_breadcrumb': breadcrumb, 'gallery_intro': gallery_intro,
         'place_links': place_links, 'page_title': page_title,

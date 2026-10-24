@@ -63,6 +63,56 @@ class PhotoTests(TestCase):
         with Image.open(photos.paths_for(photo)['medium']) as m:
             self.assertEqual(m.size, (1600, 1067))
 
+    def test_grid_derivatives_are_fitted_by_width(self):
+        portrait = photos.add(make_image(self.source / 'tall.png', size=(1024, 1536)))
+        small = photos.add(make_image(self.source / 'small.png', size=(600, 400), color=(1, 2, 3)))
+        with Image.open(photos.paths_for(portrait)['w480']) as a,                 Image.open(photos.paths_for(portrait)['w960']) as b:
+            self.assertEqual((a.size, b.size), ((480, 720), (960, 1440)))
+        with Image.open(photos.paths_for(small)['w960']) as c:
+            self.assertEqual(c.size, (600, 400))  # не растягивается
+
+    def test_rebuild_creates_missing_derivatives_only(self):
+        photo = photos.add(make_image(self.source / 'a.png'))
+        files = photos.paths_for(photo)
+        files['w480'].unlink()
+        files['w960'].unlink()
+        thumb_time = files['thumb'].stat().st_mtime_ns
+        self.assertEqual(len(photos.check()), 2)
+        self.assertIn('photo %d: w480, w960' % photo.id, self.cmd('rebuild'))
+        self.assertTrue(files['w480'].is_file() and files['w960'].is_file())
+        self.assertEqual(files['thumb'].stat().st_mtime_ns, thumb_time)
+        self.assertEqual(photos.check(), [])
+        self.assertIn('Rebuilt derivatives of 0 photos.', self.cmd('rebuild'))
+        self.assertIn('thumb, medium', self.cmd('rebuild', '--force').replace('medium, thumb', 'thumb, medium'))
+
+    def test_rebuild_reports_a_broken_original_and_goes_on(self):
+        broken = photos.add(make_image(self.source / 'a.png'))
+        good = photos.add(make_image(self.source / 'b.png', color=(9, 9, 9)))
+        photos.paths_for(broken)['original'].write_bytes(b'not an image')
+        for photo in (broken, good):
+            photos.paths_for(photo)['w480'].unlink()
+        done, errors = photos.rebuild()
+        self.assertEqual(done, [(good.id, ['w480'])])
+        self.assertEqual(len(errors), 1)
+        self.assertTrue(errors[0].startswith(f'photo {broken.id}:'))
+        with self.assertRaisesMessage(CommandError, '1 photos could not be rebuilt'):
+            self.cmd('rebuild')
+
+    def test_palette_png_derivatives_are_rgb(self):
+        photo = photos.add(make_image(self.source / 'p.png', mode='P', color=3))
+        with Image.open(photos.paths_for(photo)['w480']) as image:
+            self.assertEqual(image.mode, 'RGB')
+
+    def test_character_avatar_command(self):
+        photo = photos.add(make_image(self.source / 'a.png'), characters=['ben-hanscom'])
+        out = self.cmd('character', 'ben-hanscom', '--avatar', str(photo.id), '--focal', '0.4,0.2', '--zoom', '5')
+        self.assertIn(f'avatar: photo {photo.id}, focal 0.4,0.2, zoom 5', out)
+        self.assertIn('avatar: no photo', self.cmd('character', 'ben-hanscom', '--no-avatar'))
+        with self.assertRaises(CommandError):
+            self.cmd('character', 'ben-hanscom', '--focal', 'x')
+        with self.assertRaises(CommandError):
+            self.cmd('character', 'nobody')
+
     def test_duplicate_content_is_rejected(self):
         src = make_image(self.source / 'one.png')
         photo = photos.add(src)

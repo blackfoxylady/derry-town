@@ -154,6 +154,28 @@ const path=require('node:path');
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
   assert.equal(await page.locator('.crumbs li').count(),2);
   assert.match(await page.locator('#galleryStatus').innerText(),/\d+ photographs?/);
+  // Gallery filters in the browser: up to two values reach the URL, a third only sessionStorage.
+  const charOpts='#galleryFilters button[data-group="character"]:not([aria-disabled])';
+  if(name==='desktop'&&await page.locator(charOpts).count()>=3){
+   await page.locator(charOpts).nth(0).click();
+   await page.waitForURL(/\/photos\/character\/[^/]+\/$/);
+   await page.locator(charOpts+'[aria-checked="false"]').nth(0).click();
+   await page.waitForURL(/\/photos\/\?character=[^&,]+,[^&,]+$/);
+   const twoUrl=page.url();
+   await page.locator(charOpts+'[aria-checked="false"]').nth(0).click();
+   assert.equal(page.url(),twoUrl);
+   assert.equal(await page.locator('#galleryChips .chip').count(),3);
+   assert.equal(JSON.parse(await page.evaluate(()=>sessionStorage.getItem('derry.gallery'))).sel.character.length,3);
+   await page.locator('.gallery-results__clear').click();
+   await page.waitForURL(/\/photos\/$/);
+   assert.equal(await page.locator('#galleryChips .chip').count(),0);
+  }
+  if(name==='mobile'){
+   await page.locator('#openGalleryFilters').click();
+   assert.equal(await page.locator('#galleryFilters').getAttribute('role'),'dialog');
+   await page.keyboard.press('Escape');
+   assert.equal(await page.locator('#galleryFilters').getAttribute('role'),null);
+  }
   if(await page.locator('.gallery-item').count()){
    await page.locator('.gallery-item__link').first().click();
    await page.waitForURL(/\/photos\/\d+\/$/);

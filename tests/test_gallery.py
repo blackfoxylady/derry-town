@@ -1,3 +1,4 @@
+import json
 import re
 import tempfile
 from pathlib import Path
@@ -57,14 +58,14 @@ class GalleryTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Cache-Control'], 'no-cache')
         self.assertEqual(len(self.captions(response)), 4)
-        self.assertContains(response, photos.relative_paths(self.ben.sha256, self.ben.ext)['thumb'])
+        self.assertContains(response, photos.relative_paths(self.ben.sha256, self.ben.ext)['w480'])
         # Карточка — одна ссылка на страницу фото; год и место — текстом.
         self.assertContains(response, f'<a class="gallery-item__link" href="/photos/{self.ben.id}/">')
         self.assertContains(response, '<span class="t-meta">1958 · Derry Public Library</span>')
         self.assertContains(response, '<span class="t-meta">1985</span>')
         self.assertNotContains(response, 'Photographs from here')
         self.assertContains(response, 'id="galleryStatus" role="status">4 photographs<')
-        self.assertNotContains(response, 'Clear filters')
+        self.assertContains(response, 'href="/photos/" data-clear hidden>Clear filters</a>')
         # Группы в порядке D23: Character, Place, Year (всегда), Tag.
         html = response.content.decode()
         order = [html.find(f'data-group="{g}"><legend') for g in ('character', 'place', 'year', 'tag')]
@@ -81,9 +82,13 @@ class GalleryTests(TestCase):
     def test_gallery_cards_offer_responsive_sources(self):
         response = self.client.get('/photos/')
         rel = photos.relative_paths(self.ben.sha256, self.ben.ext)
-        self.assertContains(response, f'{rel["thumb"]} 320w')
-        self.assertContains(response, f'{rel["medium"]} 1200w')
+        # Колонки галереи — производные по ширине 480 и 960 (снимок 1200 px шириной).
+        self.assertContains(response, f'srcset="/media/{rel["w480"]} 480w, /media/{rel["w960"]} 960w"')
         self.assertContains(response, 'sizes="(max-width: 47.99em) calc(50vw - 22px)')
+        # Узкий снимок: одна запись с его настоящей шириной.
+        narrow = photos.add(make_image(Path(self.dir.name) / 'n.png', size=(400, 300), color=(5, 6, 7)))
+        small = photos.relative_paths(narrow.sha256, narrow.ext)
+        self.assertContains(self.client.get('/photos/'), f'srcset="/media/{small["w480"]} 400w"')
 
         response = self.client.get('/places/12-derry-public-library/')
         self.assertContains(response, f'{rel["thumb"]} 320w')
@@ -164,6 +169,32 @@ class GalleryTests(TestCase):
         self.assertEqual(self.captions(self.client.get('/photos/', {'tag': 'silver,library'})),
                          ['Ben at the library.', 'The library building.', 'Bill races Silver.'])
 
+    def test_all_photos_reach_the_script(self):
+        response = self.client.get('/photos/tag/silver/')
+        self.assertEqual(self.captions(response), ['Bill races Silver.'])
+        self.assertContains(response, 'src="/static/atlas/gallery.js" defer')
+        state = json.loads(re.search(r'<script id="galleryState" type="application/json">(.*?)</script>',
+                                     response.content.decode()).group(1))
+        # В JSON — все фото в порядке галереи, с группами для фильтра в браузере.
+        self.assertEqual([p['id'] for p in state['photos']],
+                         [self.ben.id, self.building.id, self.bill.id, self.loose.id])
+        ben = state['photos'][0]
+        self.assertEqual((ben['place'], ben['character'], ben['tag'], ben['year']),
+                         (['12'], ['ben-hanscom'], ['interior', 'library'], ['1958']))
+        self.assertEqual(ben['url'], f'/photos/{self.ben.id}/')
+        self.assertEqual(state['selection'], {'character': [], 'place': [], 'year': [], 'tag': ['silver']})
+        self.assertEqual(state['landings']['place:road:02'], '/photos/place/road02-main-street/')
+        self.assertEqual(state['strings']['page'], 24)
+        self.assertEqual(state['strings']['of_total'][2], '%(n)s of %(total)s photographs')
+        russian = json.loads(re.search(r'<script id="galleryState" type="application/json">(.*?)</script>',
+                                       self.client.get('/ru/photos/').content.decode()).group(1))
+        self.assertEqual(russian['base'], '/ru/photos/')
+        self.assertEqual(russian['photos'][0]['url'], f'/ru/photos/{self.ben.id}/')
+        self.assertEqual(russian['strings']['show'],
+                         ['Показать %(n)s фотографию', 'Показать %(n)s фотографии',
+                          'Показать %(n)s фотографий'])
+        self.assertEqual(russian['strings']['more'], 'Показать ещё %(n)s')
+
     def test_values_within_a_group_are_any_of(self):
         response = self.client.get('/photos/', {'place': '12,road:02'})
         self.assertEqual(self.captions(response),
@@ -183,7 +214,7 @@ class GalleryTests(TestCase):
                                       'aria-label="Remove filter: Derry Public Library">')
         self.assertContains(response, '<a class="chip chip--set" href="/photos/place/12-derry-public-library/" '
                                       'aria-label="Remove filter: Interior">')
-        self.assertContains(response, '<a class="gallery-results__clear" href="/photos/">Clear filters</a>')
+        self.assertContains(response, '<a class="gallery-results__clear" href="/photos/" data-clear>Clear filters</a>')
         # Фасеты: Ben даёт 1 снимок, Bill — 0 (серый); другое место при ИЛИ — свои снимки.
         html = response.content.decode()
         self.assertRegex(html, r'(?s)data-value="ben-hanscom">.*?chip__count">1<')
@@ -193,7 +224,7 @@ class GalleryTests(TestCase):
         self.assertEqual(self.captions(response), [])
         self.assertContains(response, 'No photographs found')
         self.assertContains(response, 'Try removing a filter.')
-        self.assertContains(response, '<a class="btn btn--secondary" href="/photos/">Clear filters</a>')
+        self.assertContains(response, '<a class="btn btn--secondary" href="/photos/" data-clear>Clear filters</a>')
 
     def test_combinations_are_noindex_and_limited_to_two_values(self):
         combo = self.client.get('/photos/', {'place': '12', 'year': '1958'})

@@ -60,6 +60,8 @@ class Command(BaseCommand):
         p.add_argument('id', type=int)
         sub.add_parser('list')
         sub.add_parser('check', help='Verify files, feature bindings and orphan media files.')
+        p = sub.add_parser('rebuild', help='Create missing derivative sizes from the originals.')
+        p.add_argument('--force', action='store_true', help='Rewrite every derivative.')
         p = sub.add_parser('character', help='Show or set the face crop of a character (gallery filter).')
         p.add_argument('slug')
         avatar = p.add_mutually_exclusive_group()
@@ -137,6 +139,15 @@ class Command(BaseCommand):
             avatar = f'photo {character.avatar_id}' if character.avatar_id else 'no photo'
             self.stdout.write(f'{character.slug}\t{character.name}\tavatar: {avatar}, focal '
                               f'{character.avatar_x:g},{character.avatar_y:g}, zoom {character.avatar_zoom:g}')
+        elif action == 'rebuild':
+            done, errors = photos.rebuild(force=o['force'])
+            for photo_id, kinds in done:
+                self.stdout.write(f'photo {photo_id}: {", ".join(kinds)}')
+            self.stdout.write(f'Rebuilt derivatives of {len(done)} photos.')
+            for line in errors:
+                self.stderr.write(line)
+            if errors:
+                raise ValueError(f'{len(errors)} photos could not be rebuilt.')
         elif action == 'check':
             problems = photos.check()
             for line in problems:

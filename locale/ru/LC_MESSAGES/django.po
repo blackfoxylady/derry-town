@@ -1046,3 +1046,23 @@ msgstr "Фотографий не нашлось"
 
 msgid "Try removing a filter."
 msgstr "Попробуйте убрать один из фильтров."
+
+# П11: галерея, gallery.js
+
+msgid "Search captions"
+msgstr "Поиск по подписям"
+
+msgid "Search captions…"
+msgstr "Поиск по подписям…"
+
+msgid "Show %(counter)s photograph"
+msgid_plural "Show %(counter)s photographs"
+msgstr[0] "Показать %(counter)s фотографию"
+msgstr[1] "Показать %(counter)s фотографии"
+msgstr[2] "Показать %(counter)s фотографий"
+
+msgid "Show %(n)s more"
+msgstr "Показать ещё %(n)s"
+
+msgid "%(n)s of %(total)s"
+msgstr "%(n)s из %(total)s"

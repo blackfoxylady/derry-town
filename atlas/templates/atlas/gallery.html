@@ -2,7 +2,8 @@
 {% load i18n static %}
 {% block main_class %}page page--gallery{% endblock %}
 {% block content %}
-<div class="gallery-head">
+<script>document.documentElement.classList.add('js')</script>
+<div class="gallery-head" id="galleryHead">
 {% include 'atlas/breadcrumbs.html' with section='photos' current=gallery_breadcrumb only %}
 <h1 class="t-h1">{{ gallery_heading }}</h1>
 {% if gallery_intro %}<p class="gallery-head__intro">{{ gallery_intro }}</p>{% endif %}
@@ -11,29 +12,40 @@
 
 <div class="gallery-layout">
 <aside class="gallery-filters" id="galleryFilters" aria-label="{% trans 'Filters' %}">
+<div class="gallery-filters__head"><span class="gallery-filters__grabber" aria-hidden="true"></span><h2 class="gallery-filters__title" id="galleryFiltersTitle">{% trans "Filters" %}</h2><button type="button" class="btn btn--quiet btn--compact gallery-filters__clear" data-clear>{% trans "Clear filters" %}</button><button type="button" class="icon-btn gallery-filters__close" data-close-filters aria-label="{% trans 'Close' %}">{% include 'atlas/icons/close.svg' %}</button></div>
+<div class="gallery-filters__body">
+<div class="search gallery-filters__search js-only"><span class="search__icon">{% include 'atlas/icons/search.svg' %}</span><input class="input" id="gallerySearch" type="search" aria-label="{% trans 'Search captions' %}" placeholder="{% trans 'Search captions…' %}" autocomplete="off"></div>
 {% for g in groups %}{% if g.options %}<fieldset class="gallery-filters__group" data-group="{{ g.name }}"><legend class="eyebrow">{{ g.title }}</legend>
 {% if g.name == 'tag' %}<div class="chip-group gallery-filters__chips">{% for o in g.options %}<a class="chip chip--sm{% if not o.count %} is-empty{% endif %}" href="{{ o.url }}" data-group="tag" data-value="{{ o.value }}"{% if o.checked %} aria-current="true"{% endif %}>{{ o.label }} <span class="chip__count">{{ o.count }}</span></a>{% endfor %}</div>
-{% else %}{% for o in g.options %}{% include 'atlas/gallery_option.html' %}{% endfor %}
+{% else %}<div class="gallery-filters__options">{% for o in g.options %}{% include 'atlas/gallery_option.html' %}{% endfor %}</div>
 {% if g.more %}<details class="gallery-filters__more"{% if g.more_open %} open{% endif %}><summary class="link">{% blocktranslate count counter=g.total %}All {{ counter }} place{% plural %}All {{ counter }} places{% endblocktranslate %}</summary>
-{% for o in g.more %}{% include 'atlas/gallery_option.html' %}{% endfor %}</details>{% endif %}{% endif %}
+<div class="gallery-filters__options">{% for o in g.more %}{% include 'atlas/gallery_option.html' %}{% endfor %}</div></details>{% endif %}{% endif %}
 </fieldset>
 {% endif %}{% endfor %}
+</div>
+<div class="gallery-filters__foot"><button type="button" class="btn btn--primary btn--block" data-close-filters data-show-count>{% blocktranslate count counter=cards|length %}Show {{ counter }} photograph{% plural %}Show {{ counter }} photographs{% endblocktranslate %}</button></div>
 </aside>
 
 <div class="gallery-results">
+<div class="gallery-phonebar js-only">
+<div class="search"><span class="search__icon">{% include 'atlas/icons/search.svg' %}</span><input class="input" id="gallerySearchPhone" type="search" aria-label="{% trans 'Search captions' %}" placeholder="{% trans 'Search captions…' %}" autocomplete="off"></div>
+<button type="button" class="btn btn--quiet gallery-phonebar__filters" id="openGalleryFilters" aria-haspopup="dialog" aria-controls="galleryFilters">{% include 'atlas/icons/filter.svg' %}<span>{% trans "Filters" %}</span><span class="index-phonebar__n" data-filter-count hidden></span></button>
+</div>
 <div class="gallery-results__head">
 <span class="gallery-results__status" id="galleryStatus" role="status">{{ status }}</span>
-{% if chips %}<span class="gallery-results__chips">{% for o in chips %}<a class="chip chip--set" href="{{ o.url }}" aria-label="{% blocktranslate with name=o.label %}Remove filter: {{ name }}{% endblocktranslate %}">{{ o.label }}{% include 'atlas/icons/close.svg' %}</a>{% endfor %}</span>
-<a class="gallery-results__clear" href="{% url 'gallery' %}">{% trans "Clear filters" %}</a>{% endif %}
+<span class="gallery-results__chips" id="galleryChips">{% for o in chips %}<a class="chip chip--set" href="{{ o.url }}" aria-label="{% blocktranslate with name=o.label %}Remove filter: {{ name }}{% endblocktranslate %}">{{ o.label }}{% include 'atlas/icons/close.svg' %}</a>{% endfor %}</span>
+<a class="gallery-results__clear" href="{% url 'gallery' %}" data-clear{% if not chips %} hidden{% endif %}>{% trans "Clear filters" %}</a>
 </div>
-{% if cards %}<ul class="gallery-grid" id="galleryGrid">
-{% for c in cards %}<li class="gallery-item"><a class="gallery-item__link" href="{% url 'photo' c.photo.id %}"><img class="gallery-item__img" src="{{ c.thumb }}" srcset="{{ c.srcset }}" sizes="(max-width: 47.99em) calc(50vw - 22px), (max-width: 63.99em) calc(50vw - 170px), 270px" alt="{{ c.alt }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy" decoding="async"><span class="gallery-item__caption" aria-hidden="true">{{ c.caption }}</span>{% if c.meta %}<span class="t-meta">{{ c.meta }}</span>{% endif %}</a></li>
+<ul class="gallery-grid" id="galleryGrid"{% if not cards %} hidden{% endif %}>
+{% for c in cards %}<li class="gallery-item" data-id="{{ c.photo.id }}"><a class="gallery-item__link" href="{% url 'photo' c.photo.id %}"><img class="gallery-item__img" src="{{ c.src }}" srcset="{{ c.srcset }}" sizes="(max-width: 47.99em) calc(50vw - 22px), (max-width: 63.99em) calc(50vw - 170px), 270px" alt="{{ c.alt }}" width="{{ c.photo.width }}" height="{{ c.photo.height }}" loading="lazy" decoding="async"><span class="gallery-item__caption" aria-hidden="true">{{ c.caption }}</span>{% if c.meta %}<span class="t-meta">{{ c.meta }}</span>{% endif %}</a></li>
 {% endfor %}</ul>
-{% else %}<div class="gallery-empty" id="galleryEmpty">
+<div class="gallery-more js-only" id="galleryMore" hidden><span class="t-meta" data-shown></span><button type="button" class="btn btn--secondary gallery-more__btn" data-more></button></div>
+<div class="gallery-empty" id="galleryEmpty"{% if cards %} hidden{% endif %}>
 <h2 class="gallery-empty__title">{% trans "No photographs found" %}</h2>
 <p class="gallery-empty__text">{% trans "Try removing a filter." %}</p>
-<p class="gallery-empty__actions"><a class="btn btn--secondary" href="{% url 'gallery' %}">{% trans "Clear filters" %}</a></p>
-</div>{% endif %}
+<p class="gallery-empty__actions"><a class="btn btn--secondary" href="{% url 'gallery' %}" data-clear>{% trans "Clear filters" %}</a></p>
+</div>
 </div>
 </div>
 {% endblock %}
+{% block scripts %}{{ gallery_state|json_script:'galleryState' }}<script src="{% static 'atlas/gallery.js' %}" defer></script>{% endblock %}

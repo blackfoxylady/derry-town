@@ -5,8 +5,9 @@
 модуля; каталог media — производное хранилище, руками файлы не кладутся.
 
 Имена файлов — по SHA-256 содержимого, поэтому они неизменяемы и отдаются
-с бессрочным кешем. Оригинал сохраняется байт в байт; miniature (thumb) и
-средний размер (medium) генерируются как JPEG.
+с бессрочным кешем. Оригинал сохраняется байт в байт; производные — JPEG:
+miniature (thumb), средний размер (medium) и колонки галереи (w480, w960).
+`rebuild()` досоздаёт производные, которых нет (новые размеры после обновления).
 """
 import hashlib
 import os
@@ -25,6 +26,9 @@ ALLOWED_YEARS = (1906, 1929, 1930, 1958, 1984, 1985)
 # Максимальная сторона производных размеров, пиксели.
 THUMB_SIZE = 320
 MEDIUM_SIZE = 1600
+# Колонки галереи (блок 07): ширина, а не длинная сторона — портрет и пейзаж
+# в колонке одной ширины.
+GRID_WIDTHS = (480, 960)
 JPEG_QUALITY = 85
 MAX_FILE_BYTES = 50_000_000
 ALLOWED_FORMATS = {'PNG': 'png', 'JPEG': 'jpg', 'WEBP': 'webp'}
@@ -38,7 +42,8 @@ def photo_root():
 def relative_paths(sha256, ext):
     return {'original': f'photos/original/{sha256}.{ext}',
             'medium': f'photos/medium/{sha256}.jpg',
-            'thumb': f'photos/thumb/{sha256}.jpg'}
+            'thumb': f'photos/thumb/{sha256}.jpg',
+            **{f'w{width}': f'photos/{width}/{sha256}.jpg' for width in GRID_WIDTHS}}
 
 
 def paths_for(photo):
@@ -92,9 +97,15 @@ def _atomic_write(path, write):
     return path
 
 
-def _derivative(image, max_side, target):
+def _derivative(image, max_side, target, width=None):
+    """JPEG не больше max_side по длинной стороне (или width по ширине); не растягивает."""
     copy = image.copy()
-    copy.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
+    if copy.mode in ('P', '1', 'LA') or 'transparency' in copy.info:
+        copy = copy.convert('RGBA')  # палитра уменьшается гладко, прозрачность — на белое
+    if width:
+        copy.thumbnail((width, copy.height), Image.Resampling.LANCZOS)
+    else:
+        copy.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
     if copy.mode != 'RGB':
         # Прозрачность кладётся на белый фон, а не на чёрный по умолчанию.
         background = Image.new('RGB', copy.size, (255, 255, 255))
@@ -136,8 +147,20 @@ class _Prepared:
             if not path.exists():
                 created.append(path)
         _atomic_write(targets['original'], lambda f: f.write(self.data))
-        _derivative(self.image, MEDIUM_SIZE, targets['medium'])
-        _derivative(self.image, THUMB_SIZE, targets['thumb'])
+        _write_derivatives(self.image, targets)
+
+
+def _write_derivatives(image, targets, only=None):
+    """Производные размеры в targets (ключи relative_paths); only — подмножество ключей."""
+    for kind, path in targets.items():
+        if kind == 'original' or (only is not None and kind not in only):
+            continue
+        if kind == 'medium':
+            _derivative(image, MEDIUM_SIZE, path)
+        elif kind == 'thumb':
+            _derivative(image, THUMB_SIZE, path)
+        else:
+            _derivative(image, None, path, width=int(kind[1:]))
 
 
 def _cleanup(created):
@@ -274,6 +297,27 @@ def remove(photo_id):
         files = list(paths_for(photo).values())
         photo.delete()
     _cleanup(files)
+
+
+def rebuild(force=False):
+    """Досоздаёт отсутствующие производные из оригиналов (force — все заново).
+    Возвращает ([(photo_id, [виды])] записанного, [ошибки]): битое фото не мешает остальным."""
+    done, errors = [], []
+    for photo in Photo.objects.all():
+        targets = paths_for(photo)
+        kinds = [k for k, path in targets.items()
+                 if k != 'original' and (force or not path.is_file())]
+        if not kinds:
+            continue
+        try:
+            with Image.open(targets['original']) as image:
+                image.load()
+                _write_derivatives(ImageOps.exif_transpose(image), targets, only=kinds)
+        except (OSError, ValueError) as e:
+            errors.append(f'photo {photo.id}: {e}')
+            continue
+        done.append((photo.id, kinds))
+    return done, errors
 
 
 def check():
