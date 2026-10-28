@@ -16,18 +16,6 @@ a.quiet{text-decoration:none;color:inherit;display:inline-block}
 @media(max-width:950px){.pill{display:none}}
 /* Touch: the visible glyphs stay small, so extend the tap area to ~44px. */
 @media(max-width:780px){.close{position:relative}.close::after{content:"";position:absolute;inset:-12px}}
-/* Photo layer: polaroids pinned to the map. The tilt lives on an inner group as a CSS
-   variable so hover can straighten and enlarge it without fighting the SVG translate. */
-.polaroid{cursor:pointer}
-.polaroid:focus{outline:none}
-.polaroid-tilt{transform:rotate(var(--tilt,0deg));transform-box:fill-box;transform-origin:center;transition:transform .16s ease-out,opacity .12s,visibility .12s;filter:drop-shadow(0 1.5px 2.2px rgba(31,48,41,.38))}
-.polaroid:hover .polaroid-tilt,.polaroid:focus-visible .polaroid-tilt{transform:rotate(0deg) scale(1.9)}
-/* Mid zoom: a marker-sized medallion stands in; hovering pops the full polaroid out of it. */
-.polaroid-tilt.pop{visibility:hidden;opacity:0;transform:rotate(var(--tilt,0deg)) scale(.3)}
-.polaroid:hover .polaroid-tilt.pop,.polaroid:focus-visible .polaroid-tilt.pop{visibility:visible;opacity:1;transform:rotate(0deg) scale(1.9)}
-.medallion{transition:opacity .12s;filter:drop-shadow(0 1px 1.6px rgba(31,48,41,.35))}
-.polaroid:hover .medallion,.polaroid:focus-visible .medallion{opacity:0}
-.polaroid-year{font:italic 7px Georgia,"Times New Roman",serif;fill:#6b5d49;pointer-events:none}
 @media print{#photoLayer{display:none}}
 /* Place card: a short strip of polaroid thumbnails above the sources. */
 .card-photos{display:flex;flex-wrap:wrap;gap:10px;margin:13px 0 2px}
@@ -121,6 +109,25 @@ header .lang{font:inherit;font-size:12px}header .lang>*{display:inline-block;min
 .dm .mk.is-dim .mk__num{fill:var(--cat)}
 .dm .mk.is-dim .mk__halo{display:none}
 .dm .ph-dot{fill:var(--map-photo-dot);stroke:#fff;stroke-width:1;pointer-events:none}
+/* Photo layer (block 13): medallions (mid) and polaroids (near). The shadow is an offset card,
+   not a filter. 'is-up' is hover or keyboard focus: the medallion pops a straight 1.9× print,
+   a near print straightens and grows 1.6×. No transitions: the pop is instant. */
+.dm .ph{cursor:pointer}.dm .ph:focus{outline:none}
+.dm .ph-copy{pointer-events:none}
+.dm .ph-medal__ring{fill:#fff;stroke:var(--color-ink);stroke-width:1.2}
+.dm .ph-focus{fill:none;stroke:none}
+.dm .ph-copy>.ph-focus,.dm .ph-copy>.ph-print>.ph-print__body>.ph-focus{stroke:var(--color-focus);stroke-width:var(--focus-width)}
+.dm .ph-count{font:700 10px var(--font-display);fill:var(--color-ink);paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round}
+.dm .ph-print__card{fill:var(--map-print);stroke:var(--map-print-edge);stroke-width:.7}
+.dm .ph-print__shadow{fill:var(--map-print-shadow)}
+.dm .ph-print__cap{font:italic 8px var(--font-read);fill:var(--map-print-caption);pointer-events:none}
+.dm .ph-print__body{transform:rotate(var(--tilt,0deg))}
+.dm .ph-leader{fill:none;stroke:var(--map-print-leader);stroke-width:.8}
+.dm .ph-anchor{fill:var(--map-print-leader)}
+.dm .ph-pop{display:none}
+.dm .ph-medal.is-up .ph-pop{display:inline}
+.dm .ph-near.is-up .ph-print__body{transform:scale(1.6)}
+.dm .ph.is-up .ph-print__shadow{fill:rgb(31 48 41 / .32);transform:translate(1px,3px)}
 /* Overlay: grid letters at the screen edges, conceptual spot heights. */
 .dm .gref{font:600 12px/1 var(--font-display);fill:var(--color-ink-2);text-anchor:middle;paint-order:stroke;stroke:var(--map-margin);stroke-width:3px;stroke-linejoin:round;pointer-events:none}
 .dm .peak{font:italic 400 12px/1 var(--font-read);fill:var(--map-label-area);paint-order:stroke;stroke:var(--map-label-halo);stroke-width:3px;stroke-linejoin:round;pointer-events:none}

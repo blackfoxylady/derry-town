@@ -90,21 +90,32 @@ const path=require('node:path');
   await page.locator('#showBuildings').check();
   assert(await page.locator('.lbl--place').count()>0);await page.locator('#showNames').uncheck();assert.equal(await page.locator('.lbl--place').count(),0);
   await page.locator('#showNames').check();
-  await page.locator('#showPhotos').uncheck();assert.equal(await page.locator('#photoLayer .polaroid').count(),0);
+  await page.locator('#showPhotos').uncheck();assert.equal(await page.locator('#photoLayer .ph,.ph-dot').count(),0);
   await page.locator('#showPhotos').check();
   await page.locator('.map-legend summary').click();
-  // Photo layer: polaroids at the town view. Desktop only (the mobile town view is
-  // below the polaroid zoom threshold); a fresh install may hold zero photos.
+  // Photo layer (block 13): sepia dots far out, medallions at mid zoom (hover pops the print),
+  // polaroids close in. Desktop only (hover); a fresh install may hold zero photos.
   if(name==='desktop'&&await page.evaluate(()=>DerryAtlas.photoFeatureCount)){
-   await page.locator('#reset').click();
-   assert(await page.locator('#photoLayer .polaroid').count()>0);
-   const pol=page.locator('#photoLayer .polaroid[data-key="12"]');
+   await page.evaluate(()=>DerryAtlas.fit('city'));
+   assert(await page.locator('#markers .ph-dot').count()>0);
+   assert.equal(await page.locator('#photoLayer .ph').count(),0);
+   await page.evaluate(()=>DerryAtlas.setView(-1510,-540,.3));
+   const med=page.locator('#photoLayer .ph-medal[data-key="12"]');
+   if(await med.count()){
+    assert.match(await med.getAttribute('aria-label'),/^Photographs · Derry Public Library/);
+    assert(!await med.locator('.ph-pop').isVisible());
+    await med.hover();assert(await med.locator('.ph-pop').isVisible());
+   }
+   await page.evaluate(()=>DerryAtlas.setView(-1510,-540,.9));
+   assert(await page.locator('#photoLayer .ph-near').count()>0);
+   const pol=page.locator('#photoLayer .ph-near[data-key="12"]');
    if(await pol.count()){
     await pol.click();
     assert.match(await page.locator('#detail').innerText(),/Library/);
     assert(await page.locator('#detail .card-photo').count()>0);
     assert(await page.locator('#detail .card-photos-more a').count()===1);
    }
+   await page.evaluate(()=>DerryAtlas.fit('city'));
   }
   await page.locator('#measure').click();
   const box=await page.locator('#map').boundingBox();
