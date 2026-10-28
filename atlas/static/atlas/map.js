@@ -27,7 +27,7 @@ const PAYLOAD=await response.json();
 const PHOTOS=photoResponse.ok?(await photoResponse.json()).features:{};
 const D=PAYLOAD.data,NS='http://www.w3.org/2000/svg',q=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const world=q('#world'),map=q('#map'),markers=q('#markers'),labels=q('#landLabels'),photoLayer=q('#photoLayer');
-const state={cx:0,cy:0,k:.1,w:1000,h:700,selected:null,view:'city',active:new Set(Object.keys(PAYLOAD.colors)),search:'',names:true,relief:true,buildings:true,photos:true,measuring:false,measure:[]};
+const state={cx:0,cy:0,k:.1,w:1000,h:700,selected:null,view:'city',active:new Set(Object.keys(PAYLOAD.colors)),search:'',sort:'number',names:true,relief:true,buildings:true,photos:true,measuring:false,measure:[]};
 // The photo layer follows the map LOD (block 13): far — sepia dots by the markers, mid —
 // medallions at the marker's shoulder (hover or keyboard focus pops the polaroid out), near —
 // polaroids on a leader. Card 50 × 62 with a 42 px photo.
@@ -56,7 +56,11 @@ function geo(x,y){return [state.cx+(x-state.w/2)/state.k,state.cy-(y-state.h/2)/
 // Views fit with a 24 px margin (D40), above the phone sheet when there is one.
 function fit(id){const v=PAYLOAD.views.find(v=>v.id===id),pad=ui.sheetCover();state.view=id;const [a,b,c,d]=v.bounds;state.k=Math.min((state.w-48)/(c-a),(state.h-48-pad)/(d-b));state.cx=(a+c)/2;state.cy=(b+d)/2-pad/2/state.k;render();}
 function catOk(s){return s.kind==='Unlocated'||state.active.has(s.kind)}
-function searchOk(s){return !state.search||[s.id,s.name,s.short,s.note,s.period,...(s.search_aliases||[])].join(' ').toLowerCase().replace(/–/g,'-').includes(state.search.replace(/–/g,'-'))}
+// Search (block 10): number, EN and RU names, aliases, note and period; state.search is the
+// normalised query once it is long enough (map-ui.js), '' otherwise.
+const norm=t=>String(t).toLowerCase().replace(/[–—]/g,'-').replace(/ё/g,'е');
+// One or two digits look up a map number ("5" is place 5, not every year with a 5 in it).
+function searchOk(s){return !state.search||(/^\d{1,2}$/.test(state.search)?String(s.id)===state.search:norm([s.id,s.name,s.short,s.note,s.period,...(s.search_aliases||[])].join(' ')).includes(state.search))}
 function hits(s){return catOk(s)&&searchOk(s)}
 function format(m){return m>=1000?(m/1000).toLocaleString(LANG,{maximumFractionDigits:2})+' '+_('km'):Math.round(m).toLocaleString(LANG)+' '+_('m')}
 function intersects(a,b,pad=2){return !(a[2]+pad<b[0]||a[0]-pad>b[2]||a[3]+pad<b[1]||a[1]-pad>b[3])}
@@ -85,7 +89,7 @@ function render(){
  }
  // Markers at their true position, all the same size: far zoom draws dots (the selected
  // place and search matches stay full markers); a search dims the places it misses.
- const match=state.search?new Set(D.sites.filter(searchOk).map(s=>s.id)):null;
+ let match=state.search?new Set(D.sites.filter(searchOk).map(s=>s.id)):null;if(match&&!match.size)match=null;
  const isMatch=s=>match&&match.has(s.id),rank=s=>s.id===state.selected?3:isMatch(s)?2:match?0:1;
  const shown=D.sites.filter(s=>catOk(s)||s.id===state.selected).sort((a,b)=>rank(a)-rank(b)||a.id-b.id),placed=[];
  const hitLayer=el('g',{class:'mk-hits'},markers);
@@ -192,6 +196,7 @@ function openPhotoFeature(key){const f=PHOTOS[key];if(!f)return;if(f.object_type
 const CONF_META={A:_('named in the novel'),B:_('inferred'),C:_('proposed'),U:_('no location')};
 // Short category names, as in meta lines ("Civic" / "Город"): marker labels for screen readers.
 const KIND_SHORT={Homes:p_('kind short','Homes'),Civic:p_('kind short','Civic'),Encounters:p_('kind short','Encounters'),Historical:p_('kind short','Historical'),Barrens:p_('kind short','Barrens'),Outlying:p_('kind short','Outlying')};
+function resetFilters(){state.active=new Set(Object.keys(PAYLOAD.colors));document.querySelectorAll('#filters input').forEach(x=>x.checked=true)}
 // Choosing a place centres it unless it already sits in the middle 60% of the visible map (on
 // the phone, the part above the card sheet); from the list, the pager or a link it also zooms
 // in to street level. An unlocated place leaves the map.
@@ -204,16 +209,25 @@ function select(id,opts={}){const s=all.find(s=>s.id===id);if(!s)return;if(typeo
 // Closing (× or Esc) drops the ring and leaves the map where it is; focus returns to the opener.
 function closeDetail(){if(state.selected==null)return;const id=state.selected;state.selected=null;render();
  const back=ui.close();(back||q(`#markers .mk[data-id="${id}"]`)||map).focus()}
+// "Zoom to N places": fit the results with 48 px around them (above the phone sheet), over
+// 300 ms, instantly under reduced motion. One place gets street zoom.
+function zoomToPlaces(places){const pts=places.filter(s=>typeof s.id==='number');if(!pts.length)return;
+ const xs=pts.map(s=>s.x),ys=pts.map(s=>s.y),pad=ui.sheetCover(),[a,b,c,d]=[Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)];
+ const k=pts.length===1?Math.max(state.k,.9):Math.min(1.2,(state.w-96)/Math.max(c-a,1),(state.h-96-pad)/Math.max(d-b,1));
+ const to={k:Math.max(MIN_K,Math.min(MAX_K,k)),cx:(a+c)/2},from={k:state.k,cx:state.cx,cy:state.cy};to.cy=(b+d)/2-pad/2/to.k;state.view='';
+ if(matchMedia('(prefers-reduced-motion: reduce)').matches){Object.assign(state,to);render();return}
+ const t0=performance.now();(function step(t){const p=Math.min(1,(t-t0)/300),e=p<.5?2*p*p:1-(-2*p+2)**2/2;
+  state.k=from.k*(to.k/from.k)**e;state.cx=from.cx+(to.cx-from.cx)*e;state.cy=from.cy+(to.cy-from.cy)*e;render();if(p<1)requestAnimationFrame(step)})(t0)}
 function zoom(f,x=state.w/2,y=state.h/2){const [gx,gy]=geo(x,y);state.k=Math.min(MAX_K,Math.max(MIN_K,state.k*f));state.cx=gx-(x-state.w/2)/state.k;state.cy=gy+(y-state.h/2)/state.k;state.view='';render()}
 function showToast(msg){q('#toast').textContent=msg;q('#toast').hidden=!msg}
 function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();if(!state.measure.length)return;state.measure.forEach(p=>{const[x,y]=screen(...p);el('circle',{cx:x,cy:y,r:4,fill:'#a34b35',stroke:'#fff','stroke-width':1.3},layer)});if(state.measure.length===2){const a=screen(...state.measure[0]),b=screen(...state.measure[1]);el('path',{d:`M${a}L${b}`,fill:'none',stroke:'#a34b35','stroke-width':2,'stroke-dasharray':'5 3'},layer);showToast(format(Math.hypot(state.measure[0][0]-state.measure[1][0],state.measure[0][1]-state.measure[1][1]))+' · '+_('straight line in this reconstruction'));}}
 function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').classList.toggle('on',state.measuring);q('#measure').setAttribute('aria-pressed',state.measuring);map.classList.toggle('measuring',state.measuring);showToast(state.measuring?_('Select two points to measure. Drag to pan. Escape clears.'):'');render()}
 scene();
-const ui=window.DerryMapUI({state,all,photos:PHOTOS,placeUrl,photoUrl,galleryUrl:URLS.gallery,hits,kindShort:KIND_SHORT,confMeta:CONF_META,_,n_,select,close:closeDetail,render});
+const ui=window.DerryMapUI({state,all,photos:PHOTOS,placeUrl,photoUrl,galleryUrl:URLS.gallery,hits,catOk,searchOk,norm,kindShort:KIND_SHORT,confMeta:CONF_META,_,n_,select,close:closeDetail,render,zoomToPlaces,resetFilters});
 // Category keys are canonical data; only the visible labels translate.
 const KIND_LABELS={Homes:_('Homes'),Civic:_('Civic'),Encounters:_('Encounters'),Historical:_('Historical'),Barrens:_('Barrens'),Outlying:_('Outlying')};
 q('#filters').innerHTML=Object.keys(PAYLOAD.colors).map(c=>`<label><input type="checkbox" checked data-kind="${c}">${esc(KIND_LABELS[c]||c)}</label>`).join('');
-q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);ui.list();render()});
+q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);ui.apply()});
 q('#showPhotos').onchange=e=>{state.photos=e.target.checked;render()};q('#showNames').onchange=e=>{state.names=e.target.checked;render()};q('#showRelief').onchange=e=>{state.relief=e.target.checked;world.querySelectorAll('.relief').forEach(n=>n.style.display=state.relief?'':'none');render()};q('#showBuildings').onchange=e=>{world.querySelectorAll('.buildings').forEach(n=>n.style.display=e.target.checked?'':'none')};
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#reset').onclick=()=>fit('city');q('#measure').onclick=()=>toggleMeasure();
 const pointers=new Map();let last=null,start=null,moved=false,lastPinch=0,hadPinch=false;
@@ -227,9 +241,11 @@ map.addEventListener('keydown',e=>{if(e.key==='+'||e.key==='='){e.preventDefault
 // Only from the map page itself (panel or stage): Esc down in the directory leaves the card alone.
 document.addEventListener('keydown',e=>{if(e.key!=='Escape'||e.defaultPrevented||!(e.target===document.body||e.target.closest?.('.app')))return;if(ui.closeTip())return;if(state.measuring)toggleMeasure(false);else closeDetail()});
 // Deep link from the photo gallery: /?place=12 or /?place=U3 opens the place card.
-function deepLink(){const p=new URLSearchParams(location.search).get('place');if(p)select(/^\d+$/.test(p)?Number(p):p.toUpperCase(),{zoom:true,focus:false})}
+// Read before the first apply() rewrites the address.
+const START_PLACE=new URLSearchParams(location.search).get('place');
+function deepLink(){const p=START_PLACE;if(p)select(/^\d+$/.test(p)?Number(p):p.toUpperCase(),{zoom:true,focus:false})}
 new ResizeObserver(entries=>{const r=entries[0].contentRect;state.w=r.width;state.h=r.height;if(!state.ready){state.ready=true;fit('city');deepLink()}else render()}).observe(q('.stage'));
-ui.list();
+ui.apply();
 // Exposed read-only diagnostics make the offline artifact easy to validate.
 window.DerryAtlas={get revision(){return PAYLOAD.revision},get siteCount(){return D.sites.length},get unlocatedCount(){return D.unplaced.length},get photoFeatureCount(){return Object.keys(PHOTOS).length},get view(){return {...state,active:[...state.active]}},select,close:closeDetail,fit,format,
  // Exact view (payload metres, y up), for side-by-side checks against the reference renderer.

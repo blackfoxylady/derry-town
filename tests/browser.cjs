@@ -80,6 +80,12 @@ const path=require('node:path');
    assert.equal(await page.locator('#index').getAttribute('data-sheet'),'peek');
   }
   await page.locator('#search').fill('library');
+  // Block 10: results after a 150 ms pause, the match marked, "Zoom to N places", the pill; the map stays put.
+  await page.waitForFunction(()=>DerryAtlas.view.search==='library');
+  assert.equal(await page.locator('#count').innerText(),'3 places match');
+  assert.equal(await page.locator('#list mark').count(),3);
+  assert.match(page.url(),/\?q=library$/);
+  if(name==='desktop')assert.match(await page.locator('#mapPill').innerText(),/Showing 3 results for “library”/);
   if(name==='mobile')assert.equal(await page.locator('#index').getAttribute('data-sheet'),'half');
   assert((await page.locator('#list .place-row').count())>=1);
   await page.locator('#list .place-row[data-place="12"]').click();
@@ -94,12 +100,12 @@ const path=require('node:path');
    const mk=await page.locator('#markers .mk[data-id="12"]').boundingBox(),sheetTop=(await page.locator('#index').boundingBox()).y;
    assert(mk&&mk.y+mk.height<sheetTop);
   }
-  assert.match(page.url(),/\?place=12$/);
+  assert.match(page.url(),/\?q=library&place=12$/);
   assert.match(await page.locator('.lang a[hreflang="ru"]').first().getAttribute('href'),/place=12/);
   assert.match(await page.locator('#detail .card-sec summary').innerText(),/In the novel\s*3 chapters/i);
   await page.screenshot({path:path.join(out,name+'-library.png'),fullPage:true});
   // Pager: every place in map-number order; Esc closes and returns focus to the row.
-  assert.equal(await page.locator('#detail .place-card__pager .t-meta').innerText(),'12 / 92');
+  assert.equal(await page.locator('#detail .place-card__pager .t-meta').innerText(),'1 / 3');
   await page.locator('#detail [data-step="1"]').click();
   assert.equal(await page.evaluate(()=>DerryAtlas.view.selected),13);
   await page.locator('#detail [data-step="-1"]').click();
@@ -108,17 +114,35 @@ const path=require('node:path');
   assert.equal(await page.evaluate(()=>document.activeElement.dataset.place),'12');
   if(name==='mobile')assert.equal(await page.locator('#index').getAttribute('data-sheet'),'half');
   assert.doesNotMatch(page.url(),/place=/);
-  await page.locator('#clearSearch').click();
+  // Esc in the field clears the query and leaves the map where it is.
+  const before=await page.evaluate(()=>{const v=DerryAtlas.view;return [v.cx,v.cy,v.k].join()});
+  await page.locator('#search').press('Escape');
+  assert.equal(await page.locator('#search').inputValue(),'');
+  assert.equal(await page.evaluate(()=>{const v=DerryAtlas.view;return [v.cx,v.cy,v.k].join()}),before);
+  assert.equal(await page.locator('#list .place-row').count(),92);
+  // Sort: Name A–Z through the listbox; the order lands in the address.
+  if(name==='desktop'){
+   await page.locator('#sortBtn').click();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+   assert.match(page.url(),/sort=name/);
+   assert.equal(await page.locator('#list .place-row__title').first().innerText(),'127 Lower Main Street');
+   await page.locator('#sortBtn').click();await page.keyboard.press('ArrowUp');await page.keyboard.press('Enter');
+   assert.doesNotMatch(page.url(),/sort=/);
+  }
   await page.locator('#search').fill('Juniper Hill');
+  await page.waitForFunction(()=>DerryAtlas.view.search==='juniper hill');
   await page.locator('#list .place-row').click();
   assert.match(await page.locator('#detail').innerText(),/No location/i);
   assert.equal(await page.locator('#detail .num--u').innerText(),'U4');
   if(name==='desktop')assert.match(await page.locator('#mapNotice').innerText(),/has no point on the map/);
+  assert.equal(await page.locator('#detail .place-card__pager .t-meta').innerText(),'1 / 1');
+  await page.locator('#detail button[data-close][aria-label]').click();
+  await page.locator('#clearSearch').click();
+  // Without a search the pager walks all 92 places: 84 → U1.
+  await page.evaluate(()=>DerryAtlas.select(84));
   await page.locator('#detail [data-step="1"]').click();
-  assert.equal(await page.evaluate(()=>DerryAtlas.view.selected),'U6');
+  assert.equal(await page.evaluate(()=>DerryAtlas.view.selected),'U1');
   await page.locator('#detail button[data-close][aria-label]').click();
   assert.equal(await page.locator('#mapNotice').innerText(),'');
-  await page.locator('#clearSearch').click();
   for(const view of ['central','barrens','camp']){
    await page.locator(`[data-view="${view}"]`).click();
    assert.equal(await page.evaluate(()=>DerryAtlas.view.view),view);

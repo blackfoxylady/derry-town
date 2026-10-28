@@ -1101,3 +1101,7 @@ msgstr "Список"
 
 msgid "Show map"
 msgstr "Показать карту"
+
+#: atlas/templates/atlas/index.html (block 10: sort)
+msgid "Sort places by"
+msgstr "Сортировать места"

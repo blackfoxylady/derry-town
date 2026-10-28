@@ -174,3 +174,64 @@ msgstr "Точки на карте нет: роман не говорит, гд�
 
 msgid "Close"
 msgstr "Закрыть"
+
+#: atlas/static/atlas/map-ui.js (block 10: search and sort)
+msgid "%s place matches"
+msgid_plural "%s places match"
+msgstr[0] "Найдено %s место"
+msgstr[1] "Найдено %s места"
+msgstr[2] "Найдено %s мест"
+
+msgid "Zoom to the place"
+msgstr "Приблизить к месту"
+
+msgid "Zoom to %s place"
+msgid_plural "Zoom to %s places"
+msgstr[0] "Приблизить к %s месту"
+msgstr[1] "Приблизить к %s местам"
+msgstr[2] "Приблизить к %s местам"
+
+msgid "%s more hidden by filters"
+msgid_plural "%s more hidden by filters"
+msgstr[0] "Ещё %s скрыто фильтрами"
+msgstr[1] "Ещё %s скрыто фильтрами"
+msgstr[2] "Ещё %s скрыто фильтрами"
+
+msgid "Show them"
+msgstr "Показать"
+
+msgid "Nothing in Derry matches “%s”"
+msgstr "В Дерри нет ничего по запросу «%s»"
+
+msgid "Check the spelling or try a shorter word."
+msgstr "Проверьте написание или попробуйте слово короче."
+
+msgid "Clear search"
+msgstr "Сбросить поиск"
+
+msgid "%(n)s result for “%(q)s”"
+msgid_plural "%(n)s results for “%(q)s”"
+msgstr[0] "Найдено %(n)s по запросу «%(q)s»"
+msgstr[1] "Найдено %(n)s по запросу «%(q)s»"
+msgstr[2] "Найдено %(n)s по запросу «%(q)s»"
+
+msgid "Showing %(n)s result for “%(q)s”"
+msgid_plural "Showing %(n)s results for “%(q)s”"
+msgstr[0] "Найдено %(n)s по запросу «%(q)s»"
+msgstr[1] "Найдено %(n)s по запросу «%(q)s»"
+msgstr[2] "Найдено %(n)s по запросу «%(q)s»"
+
+msgid "No results for “%s”"
+msgstr "Ничего не найдено по запросу «%s»"
+
+msgid "Clear search: show all places"
+msgstr "Сбросить поиск: показать все места"
+
+msgid "Sort places: by map number"
+msgstr "Сортировка: по номеру на карте"
+
+msgid "Sort places: by name"
+msgstr "Сортировка: по названию"
+
+msgid "Sort places: by confidence"
+msgstr "Сортировка: по достоверности"
