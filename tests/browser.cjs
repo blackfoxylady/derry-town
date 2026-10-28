@@ -84,6 +84,7 @@ const path=require('node:path');
   await page.waitForFunction(()=>DerryAtlas.view.search==='library');
   assert.equal(await page.locator('#count').innerText(),'3 places match');
   assert.equal(await page.locator('#list mark').count(),3);
+  if(name==='desktop')assert.deepEqual(await page.locator('#mapKey .key__count').allInnerTexts(),['2','1','0','0']);
   assert.match(page.url(),/\?q=library$/);
   if(name==='desktop')assert.match(await page.locator('#mapPill').innerText(),/Showing 3 results for “library”/);
   if(name==='mobile')assert.equal(await page.locator('#index').getAttribute('data-sheet'),'half');
@@ -127,6 +128,27 @@ const path=require('node:path');
    assert.equal(await page.locator('#list .place-row__title').first().innerText(),'127 Lower Main Street');
    await page.locator('#sortBtn').click();await page.keyboard.press('ArrowUp');await page.keyboard.press('Enter');
    assert.doesNotMatch(page.url(),/sort=/);
+  }
+  // Filters: the key hides C on the map and in the list; Category and With photos; all in the address.
+  if(name==='desktop'){
+   const rows=await page.locator('#list .place-row').count();
+   await page.locator('#mapKey [data-hide="C"]').click();
+   assert.equal(await page.locator('#markers .mk--c').count(),0);
+   assert(await page.locator('#list .place-row').count()<rows);
+   assert.match(page.url(),/hide=C/);
+   await page.locator('#mapKey [data-hide="C"]').click();
+   await page.locator('#catBtn').click();
+   await page.locator('#catOpts [data-kind="Homes"]').click();
+   assert.match(await page.locator('#catBtn').innerText(),/5 of 6/);
+   assert.match(page.url(),/kind=civic,barrens,encounters,historical,outlying/);
+   await page.keyboard.press('Escape');
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'catBtn');
+   await page.locator('#catBtn').click();await page.locator('[data-cat-all]').click();await page.keyboard.press('Escape');
+   await page.locator('#mapKey [data-list="unlocated"]').click();
+   assert.equal(await page.locator('#list .place-row').count(),8);
+   await page.locator('#listAll').click();
+   assert.equal(await page.locator('#list .place-row').count(),92);
+   assert.doesNotMatch(page.url(),/kind=|hide=|list=/);
   }
   await page.locator('#search').fill('Juniper Hill');
   await page.waitForFunction(()=>DerryAtlas.view.search==='juniper hill');

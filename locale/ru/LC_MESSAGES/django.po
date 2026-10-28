@@ -1105,3 +1105,23 @@ msgstr "Показать карту"
 #: atlas/templates/atlas/index.html (block 10: sort)
 msgid "Sort places by"
 msgstr "Сортировать места"
+
+#: atlas/templates/atlas/index.html (block 10: filters and key)
+msgid "Show on the map and in the list"
+msgstr "Показывать на карте и в списке"
+
+msgid "Select all"
+msgstr "Выбрать все"
+
+msgid "Clear"
+msgstr "Сбросить"
+
+msgctxt "map chip"
+msgid "With photos"
+msgstr "С фото"
+
+msgid "Map key: how sure is each pin. Press a kind to hide or show those pins."
+msgstr "Легенда: насколько точна каждая точка. Нажмите, чтобы скрыть или показать."
+
+msgid "All places"
+msgstr "Все места"

@@ -57,9 +57,10 @@ window.DerryMapUI = function (ctx) {
  function list() {
   const result = shown(), n = result.length, count = q('#count'), zoomTo = q('#zoomTo');
   // Search results hidden by the filters are counted, with a way back to them.
-  const hidden = state.search ? all.filter(s => ctx.searchOk(s) && !ctx.catOk(s)).length : 0;
+  const hidden = state.search ? all.filter(s => ctx.searchOk(s) && !ctx.filterOk(s)).length : 0;
   count.classList.toggle('is-results', !!state.search);
   q('#sort').hidden = !!state.search;
+  q('#listAll').hidden = state.list !== 'unlocated';
   if (state.search) {
    count.textContent = sub(n_('%s place matches', '%s places match', n), {n});
    const mapped = result.filter(s => typeof s.id === 'number').length;
@@ -71,18 +72,22 @@ window.DerryMapUI = function (ctx) {
   }
   peekText.textContent = state.search ? sub(n_('%s place', '%s places', n), {n}) : peekDefault;
   const note = hidden ? `<li class="list-note">${esc(sub(n_('%s more hidden by filters', '%s more hidden by filters', hidden), {n: hidden}))} · <button type="button" class="link" data-show-hidden>${esc(_('Show them'))}</button></li>` : '';
+  // All three kinds switched off in the key: nothing to list, one way back.
+  if (state.hide.size === 3) { listEl.innerHTML = `<li class="list-empty"><p>${esc(_('All marks are hidden.'))}</p><button type="button" class="btn btn--secondary btn--compact" data-show-all>${esc(_('Show all'))}</button></li>`; return; }
   listEl.innerHTML = n ? result.map(row).join('') + note
    : state.search ? note || `<li class="list-empty"><h3>${esc(sub(_('Nothing in Derry matches “%s”'), {n: search.value.trim()}))}</h3><p>${esc(_('Check the spelling or try a shorter word.'))}</p><button type="button" class="btn btn--secondary btn--compact" data-clear-search>${esc(_('Clear search'))}</button></li>`
    : '<li class="empty">' + esc(_('No matching places. Try a shorter name or enable more categories.')) + '</li>';
  }
  // One pass after any change: the list, the map, the pill over it and the address.
- function apply() { list(); ctx.render(); pill(); syncURL(); }
+ function apply() { list(); controls(); ctx.render(); pill(); syncURL(); }
  listEl.addEventListener('click', e => {
   const b = e.target.closest('.place-row');
   if (b) ctx.select(/^U/.test(b.dataset.place) ? b.dataset.place : Number(b.dataset.place), {zoom: true, opener: {row: b.dataset.place}});
   else if (e.target.closest('[data-show-hidden]')) { ctx.resetFilters(); apply(); }
   else if (e.target.closest('[data-clear-search]')) { clearSearch(); search.focus(); }
+  else if (e.target.closest('[data-show-all]')) { state.hide.clear(); apply(); }
  });
+ q('#listAll').addEventListener('click', () => { state.list = 'all'; listEl.scrollTop = 0; apply(); search.focus(); });
  // ↑/↓ move through the rows; ↑ from the first goes back to the search field.
  listEl.addEventListener('keydown', e => {
   if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
@@ -168,9 +173,102 @@ window.DerryMapUI = function (ctx) {
  });
  document.addEventListener('click', e => { if (!sortMenu.hidden && !q('#sort').contains(e.target)) setSortMenu(false); });
 
- // The address carries the view: ?q=library&sort=name&place=12 (defaults left out).
+ // ---- Filters: Category, With photos and the key ----------------------------------------
+ // Each control counts what the rest of the selection leaves (search included), itself aside.
+ const catBtn = q('#catBtn'), catMenu = q('#catMenu'), catOpts = q('#catOpts'), scrim = q('#menuScrim');
+ const photosBtn = q('#photosBtn'), key = q('#mapKey'), keyTip = q('#keyTip');
+ catOpts.innerHTML = ctx.kinds.map(k => `<button type="button" class="menu__opt cat--${k.toLowerCase()}" role="menuitemcheckbox" aria-checked="true" data-kind="${k}" tabindex="-1"><span class="menu__box">${icon('check')}</span><span class="menu__swatch" aria-hidden="true"></span>${esc(ctx.kindLabels[k] || k)}<span class="menu__count"></span></button>`).join('');
+ const catItems = [...catOpts.querySelectorAll('[data-kind]')];
+ // On the phone the Category sheet keeps a draft until "Show N places".
+ let draft = null;
+ const chosen = () => draft || state.active;
+ const count = test => all.filter(s => ctx.searchOk(s) && test(s)).length;
+ function controls() {
+  catItems.forEach(b => {
+   b.setAttribute('aria-checked', String(chosen().has(b.dataset.kind)));
+   b.querySelector('.menu__count').textContent = count(s => s.kind === b.dataset.kind && ctx.filterOk(s, 'kind'));
+  });
+  const n = state.active.size, total = ctx.kinds.length, cc = q('#catCount');
+  catBtn.classList.toggle('chip--set', n < total);
+  cc.hidden = n === total; cc.textContent = sub(_('%(n)s of %(total)s'), {n, total});
+  if (draft) {
+   const keep = state.active; state.active = draft; const m = all.filter(hits).length; state.active = keep;
+   const go = catMenu.querySelector('[data-cat-apply]');
+   go.textContent = sub(n_('Show %s place', 'Show %s places', m), {n: m}); go.disabled = !m;
+  }
+  photosBtn.setAttribute('aria-pressed', String(state.withPhotos));
+  q('#photosCount').textContent = count(s => photos[String(s.id)] && ctx.filterOk(s, 'photos'));
+  key.querySelectorAll('[data-hide]').forEach(b => {
+   const L = b.dataset.hide, off = state.hide.has(L), n = count(s => s.confidence === L && ctx.filterOk(s, 'hide'));
+   b.setAttribute('aria-pressed', String(!off)); b.querySelector('.key__count').textContent = n;
+   b.disabled = !n && !off;
+  });
+  const u = key.querySelector('[data-list]'), nu = count(s => s.confidence === 'U' && ctx.filterOk(s));
+  u.querySelector('.key__count').textContent = nu; u.disabled = !nu;
+  u.setAttribute('aria-label', sub(n_('No location: show the %s place without a point in the list', 'No location: show the %s places without a point in the list', nu), {n: nu}));
+ }
+ // Category: a checklist under the chip (↑/↓, Space, Esc, Tab leaves); a bottom sheet on the phone.
+ function setCat(open, refocus) {
+  const asSheet = open && phone.matches;
+  catMenu.hidden = !open; catBtn.setAttribute('aria-expanded', String(open));
+  catMenu.classList.toggle('is-sheet', asSheet); scrim.hidden = !asSheet;
+  draft = asSheet ? new Set(state.active) : null;
+  controls();
+  if (open) catItems[0].focus(); else if (refocus) catBtn.focus();
+ }
+ const changed = () => { if (draft) controls(); else apply(); };
+ catBtn.addEventListener('click', () => setCat(catMenu.hidden));
+ catOpts.addEventListener('click', e => {
+  const b = e.target.closest('[data-kind]'); if (!b) return;
+  const set = chosen(); if (set.has(b.dataset.kind)) set.delete(b.dataset.kind); else set.add(b.dataset.kind);
+  changed();
+ });
+ catMenu.querySelector('[data-cat-all]').addEventListener('click', () => { ctx.kinds.forEach(k => chosen().add(k)); changed(); });
+ catMenu.querySelector('[data-cat-none]').addEventListener('click', () => { chosen().clear(); changed(); });
+ catMenu.querySelector('[data-cat-apply]').addEventListener('click', () => { state.active = draft; setCat(false, true); apply(); });
+ catMenu.querySelector('[data-cat-close]').addEventListener('click', () => setCat(false, true));
+ scrim.addEventListener('click', () => setCat(false, true));
+ catMenu.addEventListener('keydown', e => {
+  const i = catItems.indexOf(document.activeElement);
+  if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && i >= 0) { e.preventDefault(); catItems[(i + (e.key === 'ArrowDown' ? 1 : catItems.length - 1)) % catItems.length].focus(); }
+  else if (e.key === 'Escape') { e.preventDefault(); setCat(false, true); }
+  else if (e.key === 'Tab' && !draft) setCat(false);
+ });
+ document.addEventListener('click', e => { if (!catMenu.hidden && !draft && !q('.cat').contains(e.target)) setCat(false); });
+ photosBtn.addEventListener('click', () => { state.withPhotos = !state.withPhotos; apply(); });
+ // The key: A, B, C toggle those pins on the map and in the list; "No location →" lists the
+ // places without a point (the map does not change).
+ key.addEventListener('click', e => {
+  const b = e.target.closest('.key__item'); if (!b || b.disabled) return;
+  if (b.dataset.list) { state.list = 'unlocated'; listEl.scrollTop = 0; apply(); return; }
+  const L = b.dataset.hide; if (state.hide.has(L)) state.hide.delete(L); else state.hide.add(L);
+  apply(); tipText(b);
+ });
+ // Tooltip after 0.4 s on hover or focus; the text is there at once for screen readers.
+ let tipTimer = 0;
+ function tipText(b) {
+  const L = b.dataset.hide, lv = T.levels[L];
+  keyTip.innerHTML = `<b>${esc(lv.label)} · ${L}</b> — ${esc(lv.explanation)} ${esc(state.hide.has(L) ? _('Press to show these pins.') : _('Press to hide these pins.'))}`;
+ }
+ function showTip(b) {
+  tipText(b); clearTimeout(tipTimer);
+  tipTimer = setTimeout(() => { keyTip.style.left = b.offsetLeft + 'px'; keyTip.hidden = false; }, 400);
+ }
+ function hideTip() { clearTimeout(tipTimer); keyTip.hidden = true; }
+ key.querySelectorAll('[data-hide]').forEach(b => {
+  b.addEventListener('pointerenter', () => showTip(b)); b.addEventListener('focus', () => showTip(b));
+  b.addEventListener('pointerleave', hideTip); b.addEventListener('blur', hideTip);
+ });
+ document.addEventListener('keydown', e => { if (e.key === 'Escape' && !keyTip.hidden) { e.preventDefault(); hideTip(); } });
+
+ // The address carries the view: ?q=library&kind=civic,homes&photos=1&hide=C&sort=name&place=12
+ // &list=unlocated (defaults left out).
  const P = new URLSearchParams(location.search);
  if (SORTS[P.get('sort')]) state.sort = P.get('sort');
+ if (P.has('kind')) { const want = P.get('kind').toLowerCase().split(','); state.active = new Set(ctx.kinds.filter(k => want.includes(k.toLowerCase()))); }
+ if (P.get('photos') === '1') state.withPhotos = true;
+ if (P.get('hide')) state.hide = new Set(P.get('hide').toUpperCase().split(',').filter(L => ['A', 'B', 'C'].includes(L)));
+ if (P.get('list') === 'unlocated') state.list = 'unlocated';
  if (P.get('q')) { search.value = P.get('q'); fieldState(); readQuery(); }
  showSort();
 
@@ -271,8 +369,11 @@ window.DerryMapUI = function (ctx) {
  function syncURL() {
   const put = u => {
    const p = u.searchParams, set = (k, v) => { if (v) p.set(k, v); else p.delete(k); };
-   set('q', state.search ? search.value.trim() : ''); set('sort', state.sort !== 'number' ? state.sort : ''); set('place', state.selected ?? '');
-   return u.pathname + u.search + u.hash;
+   const kinds = state.active.size === ctx.kinds.length ? '' : ctx.kinds.filter(k => state.active.has(k)).map(k => k.toLowerCase()).join(',') || 'none';
+   set('q', state.search ? search.value.trim() : ''); set('kind', kinds); set('photos', state.withPhotos ? '1' : '');
+   set('hide', [...state.hide].sort().join(',')); set('sort', state.sort !== 'number' ? state.sort : '');
+   set('place', state.selected ?? ''); set('list', state.list === 'unlocated' ? 'unlocated' : '');
+   return u.pathname + u.search.replace(/%2C/g, ',') + u.hash;
   };
   history.replaceState(history.state, '', put(new URL(location.href)));
   document.querySelectorAll('.lang a').forEach(a => { a.href = put(new URL(a.href, location.href)); });
@@ -329,7 +430,7 @@ window.DerryMapUI = function (ctx) {
  // Screen pixels the card covers at the bottom of the map (phone only): the place is centred above it.
  const cover = () => phone.matches ? Math.round(innerHeight * 0.66) : 0;
  const sheetCover = () => phone.matches ? Math.round(sheet.getBoundingClientRect().height) : 0;
- if (state.search) setSheet('half');
+ if (state.list === 'unlocated') setSheet('full'); else if (state.search) setSheet('half');
  requestAnimationFrame(syncHeight);
 
  return {apply, list, open, close, hot, closeTip, markCurrent, cover, sheetCover};

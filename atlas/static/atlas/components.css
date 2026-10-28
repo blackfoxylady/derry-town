@@ -698,6 +698,30 @@ kbd { display: inline-flex; align-items: center; justify-content: center; min-wi
 }
 @media print { .toc, .toc-details, .map-card, .explore { display: none !important; } }
 
+
+/* ---- 02 Map: map key (confidence key + filter), from the foundation ----------------------
+   One white pill along the bottom of the map. A, B, C are toggles (aria-pressed): off = faded
+   and struck through, disabled = none of that kind in the current selection. */
+.key { display: inline-flex; align-items: stretch; gap: 2px; padding: 4px; background: #FFFFFF; border: var(--border-1) solid var(--color-line-strong); border-radius: var(--radius-pill); box-shadow: var(--shadow-float); }
+.key__item { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px 0 7px; border: 0; border-radius: var(--radius-pill); background: none; color: var(--color-ink); font: var(--weight-medium) var(--text-s) / 1.2 var(--font-ui); white-space: nowrap; cursor: pointer; }
+.key__item::after { content: ""; position: absolute; inset: -2px 0; }
+.key__item:hover { background: var(--color-surface-sunk); }
+.key__glyph { display: inline-flex; width: 26px; height: 26px; flex: none; }
+.key__glyph svg { width: 26px; height: 26px; }
+.key__count { font: var(--weight-regular) var(--text-xs) / 1 var(--font-display); font-variant-numeric: tabular-nums; color: var(--color-ink-2); }
+.key__item[aria-pressed="false"] { color: var(--color-ink-2); }
+.key__item[aria-pressed="false"] .key__glyph, .key__item[aria-pressed="false"] .key__label { opacity: 0.4; }
+.key__item[aria-pressed="false"] .key__label { text-decoration: line-through; text-decoration-thickness: 1px; }
+.key__item:disabled { cursor: default; opacity: 0.38; }
+.key__item:disabled:hover { background: none; }
+.key__sep { width: 1px; margin: 10px 0; background: var(--color-line); }
+.key__go { display: inline-flex; width: 14px; height: 14px; flex: none; margin-left: -2px; color: var(--color-ink-2); }
+.key__go svg { width: 14px; height: 14px; }
+.key__item--link:hover .key__go { color: var(--color-ink); }
+.key--grid { display: inline-grid; grid-template-columns: 1fr 1fr; border-radius: var(--radius-3); }
+.key--grid .key__item { border-radius: var(--radius-2); padding-right: 8px; font-size: 13px; }
+.key--grid .key__sep { display: none; }
+
 /* ==========================================================================
    PLACE PAGE (block 05): a reading column and a sticky fact panel.
    .place-meta, .card-sec, .refs, .card-photo, .segmented and the toggletip are

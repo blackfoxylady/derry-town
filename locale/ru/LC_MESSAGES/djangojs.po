@@ -235,3 +235,31 @@ msgstr "Сортировка: по названию"
 
 msgid "Sort places: by confidence"
 msgstr "Сортировка: по достоверности"
+
+#: atlas/static/atlas/map-ui.js (block 10: filters and key)
+msgid "%(n)s of %(total)s"
+msgstr "%(n)s из %(total)s"
+
+msgid "Show %s place"
+msgid_plural "Show %s places"
+msgstr[0] "Показать %s место"
+msgstr[1] "Показать %s места"
+msgstr[2] "Показать %s мест"
+
+msgid "No location: show the %s place without a point in the list"
+msgid_plural "No location: show the %s places without a point in the list"
+msgstr[0] "Без координат: показать в списке %s место без точки"
+msgstr[1] "Без координат: показать в списке %s места без точки"
+msgstr[2] "Без координат: показать в списке %s мест без точки"
+
+msgid "Press to hide these pins."
+msgstr "Нажмите, чтобы скрыть эти точки."
+
+msgid "Press to show these pins."
+msgstr "Нажмите, чтобы показать эти точки."
+
+msgid "All marks are hidden."
+msgstr "Все отметки скрыты."
+
+msgid "Show all"
+msgstr "Показать все"

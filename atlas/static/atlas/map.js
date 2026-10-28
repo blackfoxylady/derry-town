@@ -27,7 +27,7 @@ const PAYLOAD=await response.json();
 const PHOTOS=photoResponse.ok?(await photoResponse.json()).features:{};
 const D=PAYLOAD.data,NS='http://www.w3.org/2000/svg',q=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const world=q('#world'),map=q('#map'),markers=q('#markers'),labels=q('#landLabels'),photoLayer=q('#photoLayer');
-const state={cx:0,cy:0,k:.1,w:1000,h:700,selected:null,view:'city',active:new Set(Object.keys(PAYLOAD.colors)),search:'',sort:'number',names:true,relief:true,buildings:true,photos:true,measuring:false,measure:[]};
+const state={cx:0,cy:0,k:.1,w:1000,h:700,selected:null,view:'city',active:new Set(Object.keys(PAYLOAD.colors)),search:'',sort:'number',withPhotos:false,hide:new Set(),list:'all',names:true,relief:true,buildings:true,photos:true,measuring:false,measure:[]};
 // The photo layer follows the map LOD (block 13): far — sepia dots by the markers, mid —
 // medallions at the marker's shoulder (hover or keyboard focus pops the polaroid out), near —
 // polaroids on a leader. Card 50 × 62 with a 42 px photo.
@@ -55,13 +55,16 @@ function screen(x,y){return [(x-state.cx)*state.k+state.w/2,(state.cy-y)*state.k
 function geo(x,y){return [state.cx+(x-state.w/2)/state.k,state.cy-(y-state.h/2)/state.k]}
 // Views fit with a 24 px margin (D40), above the phone sheet when there is one.
 function fit(id){const v=PAYLOAD.views.find(v=>v.id===id),pad=ui.sheetCover();state.view=id;const [a,b,c,d]=v.bounds;state.k=Math.min((state.w-48)/(c-a),(state.h-48-pad)/(d-b));state.cx=(a+c)/2;state.cy=(b+d)/2-pad/2/state.k;render();}
-function catOk(s){return s.kind==='Unlocated'||state.active.has(s.kind)}
+// Filters (block 10): Category, With photos and the A/B/C key remove places from the map and the
+// list; skip leaves one of them out, for the counts next to that control.
+function filterOk(s,skip){return (skip==='kind'||s.kind==='Unlocated'||state.active.has(s.kind))&&(skip==='photos'||!state.withPhotos||!!PHOTOS[String(s.id)])&&(skip==='hide'||!state.hide.has(s.confidence))}
 // Search (block 10): number, EN and RU names, aliases, note and period; state.search is the
 // normalised query once it is long enough (map-ui.js), '' otherwise.
 const norm=t=>String(t).toLowerCase().replace(/[–—]/g,'-').replace(/ё/g,'е');
 // One or two digits look up a map number ("5" is place 5, not every year with a 5 in it).
 function searchOk(s){return !state.search||(/^\d{1,2}$/.test(state.search)?String(s.id)===state.search:norm([s.id,s.name,s.short,s.note,s.period,...(s.search_aliases||[])].join(' ')).includes(state.search))}
-function hits(s){return catOk(s)&&searchOk(s)}
+// The list: filters and search, and only the unlocated places after "No location →" (the map keeps them all).
+function hits(s){return filterOk(s)&&searchOk(s)&&(state.list!=='unlocated'||s.confidence==='U')}
 function format(m){return m>=1000?(m/1000).toLocaleString(LANG,{maximumFractionDigits:2})+' '+_('km'):Math.round(m).toLocaleString(LANG)+' '+_('m')}
 function intersects(a,b,pad=2){return !(a[2]+pad<b[0]||a[0]-pad>b[2]||a[3]+pad<b[1]||a[1]-pad>b[3])}
 // Letter-spaced source labels ("T H E  B A R R E N S") → plain words; the spacing comes from CSS.
@@ -91,7 +94,7 @@ function render(){
  // place and search matches stay full markers); a search dims the places it misses.
  let match=state.search?new Set(D.sites.filter(searchOk).map(s=>s.id)):null;if(match&&!match.size)match=null;
  const isMatch=s=>match&&match.has(s.id),rank=s=>s.id===state.selected?3:isMatch(s)?2:match?0:1;
- const shown=D.sites.filter(s=>catOk(s)||s.id===state.selected).sort((a,b)=>rank(a)-rank(b)||a.id-b.id),placed=[];
+ const shown=D.sites.filter(s=>filterOk(s)||s.id===state.selected).sort((a,b)=>rank(a)-rank(b)||a.id-b.id),placed=[];
  const hitLayer=el('g',{class:'mk-hits'},markers);
  for(const s of shown){const [x,y]=screen(s.x,s.y);if(!inView(x,y,30))continue;
   const sel=s.id===state.selected,dim=match&&!match.has(s.id)&&!sel,full=z!=='far'||sel||isMatch(s);
@@ -119,7 +122,7 @@ function render(){
   el('path',{d:`M${sx} ${sy-4.2}L${sx+3.8} ${sy+2.4}H${sx-3.8}Z`,class:'peak-mark'},labels);
   const pt=el('text',{x:sx+6,y:sy+3.5,class:'peak'},labels);pt.textContent='≈'+hh;}
  // Photos of places hidden by a category filter or missed by a search are left out.
- const off=new Set(D.sites.filter(s=>!catOk(s)||(match&&!match.has(s.id))).map(s=>String(s.id)));
+ const off=new Set(D.sites.filter(s=>!filterOk(s)||(match&&!match.has(s.id))).map(s=>String(s.id)));
  photoLayer.replaceChildren();if(state.photos)drawPhotos(occupied,off,z);
  // Place labels, greedy: selected first, then A → B → C, by number; right of the marker,
  // else left; a label that fits neither is skipped (the selected one never is).
@@ -196,7 +199,7 @@ function openPhotoFeature(key){const f=PHOTOS[key];if(!f)return;if(f.object_type
 const CONF_META={A:_('named in the novel'),B:_('inferred'),C:_('proposed'),U:_('no location')};
 // Short category names, as in meta lines ("Civic" / "Город"): marker labels for screen readers.
 const KIND_SHORT={Homes:p_('kind short','Homes'),Civic:p_('kind short','Civic'),Encounters:p_('kind short','Encounters'),Historical:p_('kind short','Historical'),Barrens:p_('kind short','Barrens'),Outlying:p_('kind short','Outlying')};
-function resetFilters(){state.active=new Set(Object.keys(PAYLOAD.colors));document.querySelectorAll('#filters input').forEach(x=>x.checked=true)}
+function resetFilters(){state.active=new Set(Object.keys(PAYLOAD.colors));state.withPhotos=false;state.hide=new Set()}
 // Choosing a place centres it unless it already sits in the middle 60% of the visible map (on
 // the phone, the part above the card sheet); from the list, the pager or a link it also zooms
 // in to street level. An unlocated place leaves the map.
@@ -222,12 +225,12 @@ function zoom(f,x=state.w/2,y=state.h/2){const [gx,gy]=geo(x,y);state.k=Math.min
 function showToast(msg){q('#toast').textContent=msg;q('#toast').hidden=!msg}
 function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();if(!state.measure.length)return;state.measure.forEach(p=>{const[x,y]=screen(...p);el('circle',{cx:x,cy:y,r:4,fill:'#a34b35',stroke:'#fff','stroke-width':1.3},layer)});if(state.measure.length===2){const a=screen(...state.measure[0]),b=screen(...state.measure[1]);el('path',{d:`M${a}L${b}`,fill:'none',stroke:'#a34b35','stroke-width':2,'stroke-dasharray':'5 3'},layer);showToast(format(Math.hypot(state.measure[0][0]-state.measure[1][0],state.measure[0][1]-state.measure[1][1]))+' · '+_('straight line in this reconstruction'));}}
 function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').classList.toggle('on',state.measuring);q('#measure').setAttribute('aria-pressed',state.measuring);map.classList.toggle('measuring',state.measuring);showToast(state.measuring?_('Select two points to measure. Drag to pan. Escape clears.'):'');render()}
-scene();
-const ui=window.DerryMapUI({state,all,photos:PHOTOS,placeUrl,photoUrl,galleryUrl:URLS.gallery,hits,catOk,searchOk,norm,kindShort:KIND_SHORT,confMeta:CONF_META,_,n_,select,close:closeDetail,render,zoomToPlaces,resetFilters});
 // Category keys are canonical data; only the visible labels translate.
+// Editorial order, as in the directory below the map.
+const KIND_ORDER=['Homes','Civic','Barrens','Encounters','Historical','Outlying'];
 const KIND_LABELS={Homes:_('Homes'),Civic:_('Civic'),Encounters:_('Encounters'),Historical:_('Historical'),Barrens:_('Barrens'),Outlying:_('Outlying')};
-q('#filters').innerHTML=Object.keys(PAYLOAD.colors).map(c=>`<label><input type="checkbox" checked data-kind="${c}">${esc(KIND_LABELS[c]||c)}</label>`).join('');
-q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);ui.apply()});
+scene();
+const ui=window.DerryMapUI({state,all,photos:PHOTOS,placeUrl,photoUrl,galleryUrl:URLS.gallery,hits,filterOk,searchOk,norm,kindShort:KIND_SHORT,kindLabels:KIND_LABELS,kinds:[...KIND_ORDER.filter(k=>k in PAYLOAD.colors),...Object.keys(PAYLOAD.colors).filter(k=>!KIND_ORDER.includes(k))],confMeta:CONF_META,_,n_,select,close:closeDetail,render,zoomToPlaces,resetFilters});
 q('#showPhotos').onchange=e=>{state.photos=e.target.checked;render()};q('#showNames').onchange=e=>{state.names=e.target.checked;render()};q('#showRelief').onchange=e=>{state.relief=e.target.checked;world.querySelectorAll('.relief').forEach(n=>n.style.display=state.relief?'':'none');render()};q('#showBuildings').onchange=e=>{world.querySelectorAll('.buildings').forEach(n=>n.style.display=e.target.checked?'':'none')};
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#reset').onclick=()=>fit('city');q('#measure').onclick=()=>toggleMeasure();
 const pointers=new Map();let last=null,start=null,moved=false,lastPinch=0,hadPinch=false;

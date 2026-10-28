@@ -1279,9 +1279,9 @@ def place_page(request, slug):
         'covers': covers, 'cards': shown, 'photo_total': photo_total,
         'more_desktop': photo_total - len(shown) if photo_total > PLACE_PHOTOS_DESKTOP else 0,
         'more_phone': photo_total - phone_limit if photo_total > PLACE_PHOTOS_PHONE else 0,
-        # Кнопка U ведёт на список мест без точки. До фильтра карты (П20) — указатель.
+        # Кнопка U ведёт на карту со списком мест без точки (ключ «No location →»).
         'unlocated_count': Feature.objects.filter(object_type='unplaced').count(),
-        'unlocated_url': reverse('places') + '?sure=u',
+        'unlocated_url': reverse('index') + '?list=unlocated',
         # Превью для соцсетей: заглавное фото, иначе первое фото места;
         # совсем без фото шаблон подставит общую карту.
         'og_photo': cover_og['large'] if cover_og else _media_urls(photos[0])['medium'] if photos else '',

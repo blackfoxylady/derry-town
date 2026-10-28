@@ -155,7 +155,7 @@ class PlacePageTests(TestCase):
         self.assertContains(response, 'Why this place has no pin')
         self.assertContains(response, 'Why there is no pin ↓')
         self.assertContains(response, 'No point on the map')  # в городе, не «вне карты»
-        self.assertContains(response, 'href="/places/?sure=u">See the 1 place without a point</a>')
+        self.assertContains(response, 'href="/?list=unlocated">See the 1 place without a point</a>')
         self.assertNotContains(response, 'Show on the map')
         self.assertNotContains(response, 'Back to the map, at')
 
