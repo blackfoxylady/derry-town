@@ -10,6 +10,7 @@ const placeUrl=s=>{const n=s.slug||slugify(s.name);return URLS.place.replace('/x
 // i18n: the jsi18n catalog defines gettext/ngettext; the offline artifact falls back to English.
 const _=typeof gettext==='function'?gettext:s=>s;
 const n_=typeof ngettext==='function'?ngettext:(s,p,n)=>n===1?s:p;
+const p_=typeof pgettext==='function'?pgettext:(c,s)=>s;
 const LANG=document.documentElement.lang||'en';
 // The directory is fully expanded in server HTML. On phones only, progressively
 // collapse it to native accordions while leaving every link in the document.
@@ -27,10 +28,12 @@ const PHOTOS=photoResponse.ok?(await photoResponse.json()).features:{};
 const D=PAYLOAD.data,NS='http://www.w3.org/2000/svg',q=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const world=q('#world'),map=q('#map'),markers=q('#markers'),labels=q('#landLabels'),photoLayer=q('#photoLayer');
 const state={cx:0,cy:0,k:.1,w:1000,h:700,selected:null,view:'city',active:new Set(Object.keys(PAYLOAD.colors)),search:'',names:true,relief:true,buildings:true,photos:true,measuring:false,measure:[]};
-// The photo layer steps with zoom: below PHOTO_MIN_K it folds into marker badges, up to
+// The photo layer steps with zoom: below PHOTO_MIN_K it folds into sepia dots on the markers, up to
 // POLAROID_FULL_K it shows marker-sized medallions (hover pops the polaroid), and close in —
 // where few places share the screen — full polaroids.
 const PHOTO_MIN_K=.055,POLAROID_FULL_K=.3;
+// The zoom cap: 20 m ≈ 45 px. The minimum fits the whole sheet on a 390 px phone.
+const MIN_K=.012,MAX_K=2.2;
 // Litho world data (post extension) and hill spot heights, built once in scene().
 let LITHO_D=null,LITHO_PEAKS=null;
 const all=[...D.sites,...D.unplaced.map(s=>({...s,kind:'Unlocated',confidence:'U',short:s.name}))];
@@ -51,68 +54,93 @@ function scene(){
 function screen(x,y){return [(x-state.cx)*state.k+state.w/2,(state.cy-y)*state.k+state.h/2]}
 function geo(x,y){return [state.cx+(x-state.w/2)/state.k,state.cy-(y-state.h/2)/state.k]}
 function fit(id){const v=PAYLOAD.views.find(v=>v.id===id);state.view=id;const [a,b,c,d]=v.bounds;state.cx=(a+c)/2;state.cy=(b+d)/2;state.k=Math.min((state.w-60)/(c-a),(state.h-100)/(d-b));render();}
-function hits(s){return (s.kind==='Unlocated'||state.active.has(s.kind))&&(!state.search||[s.id,s.name,s.short,s.note,s.period,...(s.search_aliases||[])].join(' ').toLowerCase().replace(/–/g,'-').includes(state.search.replace(/–/g,'-')));}
+function catOk(s){return s.kind==='Unlocated'||state.active.has(s.kind)}
+function searchOk(s){return !state.search||[s.id,s.name,s.short,s.note,s.period,...(s.search_aliases||[])].join(' ').toLowerCase().replace(/–/g,'-').includes(state.search.replace(/–/g,'-'))}
+function hits(s){return catOk(s)&&searchOk(s)}
 function format(m){return m>=1000?(m/1000).toLocaleString(LANG,{maximumFractionDigits:2})+' '+_('km'):Math.round(m).toLocaleString(LANG)+' '+_('m')}
 function intersects(a,b,pad=2){return !(a[2]+pad<b[0]||a[0]-pad>b[2]||a[3]+pad<b[1]||a[1]-pad>b[3])}
+// Letter-spaced source labels ("T H E  B A R R E N S") → plain words; the spacing comes from CSS.
+const spaced=t=>/^\S( {1,2}\S)+$/.test(t)&&t.split(/ {2,}/).every(w=>w.split(' ').every(c=>c.length===1))?t.split(/ {2,}/).map(w=>w.replace(/ /g,'')).join(' '):t;
 function render(){
- const {w,h,k,cx,cy}=state;map.setAttribute('viewBox',`0 0 ${w} ${h}`);world.setAttribute('transform',`translate(${w/2-cx*k},${h/2+cy*k}) scale(${k})`);
- // Litho foundation: --u is one screen pixel in world units, so styles can pin
- // stroke widths to the screen via calc(var(--u)*N); data-z drives LOD classes.
- const LOD=window.DerryLitho.LOD;map.style.setProperty('--u',(1/k)+'px');map.dataset.z=k<LOD.far?'far':k<LOD.mid?'mid':'near';
- map.dataset.bld=k<LOD.plan?'tint':'plan';window.DerryLitho.updatePatterns(k);
- markers.replaceChildren();labels.replaceChildren();const occupied=[],names=[];
- const points=D.sites.filter(hits).filter(s=>state.search||s.id===state.selected||k>.14||s.rank===1||s.kind==='Outlying').sort((a,b)=>(a.id===state.selected?-1:b.id===state.selected?1:a.rank-b.rank||a.id-b.id));
- for(const s of points){const [x,y]=screen(s.x,s.y);if(x<-30||y<-30||x>w+30||y>h+30)continue;let mx=x,my=y,ok=false;
-  for(const r of [0,19,33,48]){for(let i=0;i<(r?12:1);i++){const dx=Math.cos(i*Math.PI/6)*r,dy=Math.sin(i*Math.PI/6)*r,bb=[x+dx-9,y+dy-9,x+dx+9,y+dy+9];if(!occupied.some(b=>intersects(bb,b,1))){mx=x+dx;my=y+dy;occupied.push(bb);ok=true;break}}if(ok)break}
-  const color=PAYLOAD.colors[s.kind],g=el('g',{class:'mark',tabindex:'0',role:'button','aria-label':s.id+'. '+s.name,'data-id':s.id},markers);
-  if(Math.abs(mx-x)+Math.abs(my-y)>2){el('path',{d:`M${x},${y}L${mx},${my}`,stroke:color,'stroke-width':.75,fill:'none','pointer-events':'none'},g);el('circle',{cx:x,cy:y,r:1.7,fill:color},g)}
-  if(s.id===state.selected)el('circle',{cx:mx,cy:my,r:14,fill:'#fbf7e0',stroke:'#a88746','stroke-width':2.5},g);
-  // A pale halo under each symbol lifts it off busy ground such as the Barrens green.
-  if(s.confidence==='C')el('path',{d:`M${mx},${my-12.4}L${mx+12.4},${my}L${mx},${my+12.4}L${mx-12.4},${my}Z`,fill:'#fffef7'},g);
-  else el('circle',{cx:mx,cy:my,r:10.5,fill:'#fffef7'},g);
-  if(s.confidence==='C')el('path',{d:`M${mx},${my-11}L${mx+11},${my}L${mx},${my+11}L${mx-11},${my}Z`,fill:'#f8f5e8',stroke:color,'stroke-width':1.3},g);
-  else el('circle',{cx:mx,cy:my,r:9,fill:s.confidence==='A'?color:'#f8f5e8',stroke:color,'stroke-width':1.3},g);
-  const txt=el('text',{x:mx,y:my+3.2,'text-anchor':'middle',fill:s.confidence==='A'?'#fff':color},g);txt.textContent=String(s.id).padStart(2,'0');const title=el('title',{},g);title.textContent=s.name;
-  // Litho: a place-type badge appears from mid zoom, top right of the marker.
-  if(LITHO_D&&k>=.16){const bx=mx+9,by=my-9;window.DerryLitho.badge(g,bx,by,color,window.DerryLitho.iconOf(s.name+' '+(s.short||''),s.kind));occupied.push([bx-8,by-8,bx+8,by+8]);}
-  // Sepia dot: photographs exist here, but the view is too far out for polaroids.
-  if(state.photos&&PHOTOS[String(s.id)]&&k<=PHOTO_MIN_K)el('circle',{cx:mx+8.2,cy:my-8.2,r:3.4,fill:'#7a6752',stroke:'#fffef7','stroke-width':1.1,'pointer-events':'none'},g);
-  g.addEventListener('click',e=>{e.stopPropagation();if(!state.measuring)select(s.id,false)});g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(s.id,false)}});
-  if(state.names&&(s.id===state.selected||k>.42||s.rank===1||(k>.2&&s.rank===2)))names.push({s,mx,my});
+ const {w,h,k,cx,cy}=state,L=window.DerryLitho;map.setAttribute('viewBox',`0 0 ${w} ${h}`);world.setAttribute('transform',`translate(${w/2-cx*k},${h/2+cy*k}) scale(${k})`);
+ // --u is one screen pixel in world units, so styles pin stroke widths to the screen
+ // via calc(var(--u)*N); data-z and data-bld drive the LOD classes.
+ const z=k<L.LOD.far?'far':k<L.LOD.mid?'mid':'near';map.style.setProperty('--u',(1/k)+'px');map.dataset.z=z;
+ map.dataset.bld=k<L.LOD.plan?'tint':'plan';L.updatePatterns(k);
+ q('#zoomIn').disabled=k>=MAX_K-1e-9;
+ markers.replaceChildren();labels.replaceChildren();const occupied=[];
+ const inView=(x,y,m)=>x>-m&&y>-m&&x<w+m&&y<h+m;
+ // Area, water and land labels first: region and water names block place labels.
+ for(const l of PAYLOAD.labels){
+  if(l.kind==='road'&&z==='far')continue;if(l.kind==='land'&&z!=='near')continue;
+  if(l.kind==='water'&&(l.size<=10?z!=='near':l.size===11&&z==='far'))continue;   // brooks and arms near, canal names from mid
+  const wx=l.x+(l.web_offset?.[0]||0),wy=l.y+(l.web_offset?.[1]||0),[x,y]=screen(wx,wy);if(!inView(x,y,80))continue;
+  // Streets run along the road line; sharp bends fall back to a straight label.
+  if(l.kind==='road'&&L.roadLabel(labels,{x:wx,y:-wy,angle:l.angle,text:l.text},{cx,cy:-cy,k,w,h},LITHO_D.roads))continue;
+  const t=el('text',{x:0,y:0,transform:`translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${-l.angle})`,'text-anchor':'middle',class:'lbl lbl--'+l.kind},labels);
+  t.textContent=l.kind==='region'?spaced(l.text):l.kind==='road'?l.text.toUpperCase():l.text;
+  const half=t.textContent.length*(l.kind==='region'?11:6)/2;
+  if(l.kind==='region'||l.kind==='water')occupied.push([x-half,y-10,x+half,y+6]);
  }
- // Conceptual spot heights (▲≈NN) from mid zoom, under the markers; part of the relief layer.
- if(state.relief&&LITHO_PEAKS&&k>=.16)for(const[px,py,hh]of LITHO_PEAKS){const[sx,sy]=screen(px,-py);
-  if(sx<-20||sy<-20||sx>w+20||sy>h+20)continue;
+ // Markers at their true position, all the same size: far zoom draws dots (the selected
+ // place and search matches stay full markers); a search dims the places it misses.
+ const match=state.search?new Set(D.sites.filter(searchOk).map(s=>s.id)):null;
+ const isMatch=s=>match&&match.has(s.id),rank=s=>s.id===state.selected?3:isMatch(s)?2:match?0:1;
+ const shown=D.sites.filter(catOk).sort((a,b)=>rank(a)-rank(b)||a.id-b.id),placed=[];
+ const hitLayer=el('g',{class:'mk-hits'},markers);
+ for(const s of shown){const [x,y]=screen(s.x,s.y);if(!inView(x,y,30))continue;
+  const sel=s.id===state.selected,dim=match&&!match.has(s.id)&&!sel,full=z!=='far'||sel||isMatch(s);
+  const c=s.confidence.toLowerCase(),t=`translate(${x.toFixed(1)} ${y.toFixed(1)})`;
+  // An invisible 44 px tap target under every marker (dots and discs are smaller).
+  el('circle',{class:'mk-hit',r:22,transform:t,'data-id':s.id},hitLayer);
+  const g=el('g',{class:`mk mk--${s.kind.toLowerCase()} mk--${c}${sel?' is-selected':''}${dim?' is-dim':''}${isMatch(s)?' is-match':''}`,transform:t,
+   tabindex:dim?'-1':'0',role:'button','data-id':s.id,'aria-label':`${s.id} ${s.name}, ${KIND_SHORT[s.kind]||s.kind}, ${CONF_META[s.confidence]}`},markers);
+  if(!full){el('circle',{class:'mk__dot',r:5},g);occupied.push([x-6,y-6,x+6,y+6])}
+  else{el('circle',{class:'mk__focus',r:19},g);el('circle',{class:'mk__ring',r:18},g);
+   if(c!=='a')el('circle',{class:'mk__halo',r:15},g);
+   el('circle',{class:'mk__disc',r:sel?13:12},g);
+   el('text',{class:'mk__num',y:.5},g).textContent=String(s.id).padStart(2,'0');
+   occupied.push([x-16,y-16,x+16,y+16]);if(!dim)placed.push(s)}
+  el('title',{},g).textContent=s.name;
+  // Sepia dot: photographs exist here, but the view is too far out for polaroids.
+  if(state.photos&&!dim&&PHOTOS[String(s.id)]&&k<=PHOTO_MIN_K)el('circle',{class:'ph-dot',cx:full?9:6,cy:full?-9:-6,r:2.6},g);
+  g.addEventListener('click',e=>{e.stopPropagation();if(!state.measuring)select(s.id,false)});g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(s.id,false);markers.querySelector(`.mk[data-id="${s.id}"]`)?.focus()}});
+ }
+ // Conceptual spot heights (▲≈NN) from mid zoom; part of the relief layer.
+ if(state.relief&&z!=='far')for(const[px,py,hh]of LITHO_PEAKS){const[sx,sy]=screen(px,-py);
+  if(!inView(sx,sy,20))continue;
   const bb=[sx-5,sy-7,sx+34,sy+6];if(occupied.some(b=>intersects(bb,b)))continue;occupied.push(bb);
   el('path',{d:`M${sx} ${sy-4.2}L${sx+3.8} ${sy+2.4}H${sx-3.8}Z`,class:'peak-mark'},labels);
   const pt=el('text',{x:sx+6,y:sy+3.5,class:'peak'},labels);pt.textContent='≈'+hh;}
- photoLayer.replaceChildren();if(state.photos&&k>PHOTO_MIN_K)drawPhotos(occupied);
- for(const {s,mx,my}of names){const tw=s.short.length*6.5;let placed=false;for(const dy of [4,-13]){for(const left of [false,true]){const tx=mx+(left?-14:14),ty=my+dy,bb=[left?tx-tw:tx,ty-11,left?tx:tx+tw,ty+3];if(bb[0]<7||bb[2]>w-7||bb[1]<7||bb[3]>h-7||occupied.some(b=>intersects(bb,b)))continue;const t=el('text',{x:tx,y:ty,'text-anchor':left?'end':'start',class:'map-name'},markers);t.textContent=s.short;occupied.push(bb);placed=true;break}if(placed)break}}
- for(const l of [...PAYLOAD.labels].sort((a,b)=>({region:0,road:1,water:2,land:3}[a.kind]-{region:0,road:1,water:2,land:3}[b.kind]))){if(l.kind==='road'&&k<.15)continue;if(l.views.includes('camp')&&l.kind!=='road'&&k<.40)continue;if(l.kind==='region'&&k>.65)continue;
-  const wx=l.x+(l.web_offset?.[0]||0),wy=l.y+(l.web_offset?.[1]||0);const[x,y]=screen(wx,wy);if(x<10||y<10||x>w-10||y>h-10)continue;
-  // Litho streets run along the road line; sharp bends fall back to a straight label.
-  if(LITHO_D&&l.kind==='road'&&window.DerryLitho.roadLabel(labels,{x:wx,y:-wy,angle:l.angle,text:l.text},{cx:cx,cy:-cy,k,w,h},LITHO_D.roads))continue;
-  const road=l.kind==='road',sz=l.kind==='region'?16:road&&LITHO_D?8.5:11,txt=road&&LITHO_D?l.text.toUpperCase():l.text,tw=txt.length*(sz*.57)+(road&&LITHO_D?txt.length*1.6:0),a=l.angle*Math.PI/180,ww=Math.abs(tw*Math.cos(a))+Math.abs(sz*Math.sin(a)),hh=Math.abs(tw*Math.sin(a))+Math.abs(sz*Math.cos(a));const bb=[x-ww/2-3,y-hh/2-3,x+ww/2+3,y+hh/2+3];if(occupied.some(b=>intersects(bb,b,3)))continue;occupied.push(bb);
-  const st=LITHO_D?(l.kind==='region'?'font:600 16px Georgia,serif;letter-spacing:3px':l.kind==='water'?'font-style:italic;fill:#3f6f7c':road?'font-size:8.5px;letter-spacing:1.6px;fill:#6b5c42':'font-style:italic;font-size:10.5px;fill:#5d6b52')
-             :(l.kind==='region'?'font:600 16px Georgia,serif':l.kind==='water'?'font-style:italic;fill:#507e89':'');
-  const t=el('text',{x,y,transform:`rotate(${-l.angle} ${x} ${y})`,'text-anchor':'middle',class:'map-road',style:st},labels);t.textContent=txt;}
- window.DerryLitho.gridRefs(labels,{cx,cy:-cy,k,w,h});
+ // Photos of places hidden by a category filter or missed by a search are left out.
+ const off=new Set(D.sites.filter(s=>!catOk(s)||(match&&!match.has(s.id))).map(s=>String(s.id)));
+ photoLayer.replaceChildren();if(state.photos&&k>PHOTO_MIN_K)drawPhotos(occupied,off);
+ // Place labels, greedy: selected first, then A → B → C, by number; right of the marker,
+ // else left; a label that fits neither is skipped (the selected one never is).
+ if(state.names&&(z!=='far'||state.selected!=null||match)){const R={A:0,B:1,C:2};
+  for(const s of placed.sort((a,b)=>(b.id===state.selected)-(a.id===state.selected)||R[a.confidence]-R[b.confidence]||a.id-b.id)){
+   if(z==='mid'&&s.confidence==='C'&&s.id!==state.selected&&!match)continue;
+   const[x,y]=screen(s.x,s.y),tw=s.short.length*6.6+4,right=[x+18,y-9,x+18+tw,y+7],left=[x-18-tw,y-9,x-18,y+7];
+   const box=!occupied.some(b=>intersects(right,b,0))?right:!occupied.some(b=>intersects(left,b,0))?left:null;
+   if(!box&&s.id!==state.selected)continue;const b=box||right;occupied.push(b);
+   const t=el('text',{x:(b===left?b[2]:b[0]).toFixed(1),y:(y+4.5).toFixed(1),'text-anchor':b===left?'end':'start',class:'lbl lbl--place'+(s.id===state.selected?' is-selected':'')},labels);t.textContent=s.short}}
+ L.gridRefs(labels,{cx,cy:-cy,k,w,h});
  const target=130/k,base=10**Math.floor(Math.log10(target)),n=[1,2,5,10].filter(x=>x*base<=target).pop()||1,val=n*base;q('#scaleLine').style.width=(val*k)+'px';q('#scaleText').textContent=format(val);
  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
  drawMeasure();
 }
 // The photo layer: polaroids pinned to the map, tilt fixed per place so nothing jitters.
 // Mid zoom draws marker-sized medallions instead and keeps the polaroid as a hover pop-up.
-function drawPhotos(occupied){
+function drawPhotos(occupied,off){
  if(!q('#photoClip')){const defs=el('defs',{},map);const cp=el('clipPath',{id:'photoClip'},defs);el('circle',{r:11},cp)}
  const full=state.k>=POLAROID_FULL_K,FR=46,FH=57,IMG=40,R=12;
- // Medallions search rings of positions (top first) like markers do; a ring of 24 clears
- // the place's own marker, whose occupied box reaches 9+pad from the anchor.
- const offs=full?[[0,-46],[36,-36],[-36,-36],[44,0],[-44,0],[0,48],[36,38],[-36,38]]:[];
- if(!full)for(const r of [24,34,46])for(let i=0;i<12;i++){const a=-Math.PI/2+i*Math.PI/6;offs.push([Math.cos(a)*r,Math.sin(a)*r])}
+ // Medallions search rings of positions (top first); a ring of 32 clears the place's own
+ // marker, whose occupied box reaches 16 px from the anchor.
+ const offs=full?[[0,-50],[42,-42],[-42,-42],[50,0],[-50,0],[0,52],[42,44],[-42,44]]:[];
+ if(!full)for(const r of [32,44,56])for(let i=0;i<12;i++){const a=-Math.PI/2+i*Math.PI/6;offs.push([Math.cos(a)*r,Math.sin(a)*r])}
  const bw=full?FR/2+2:R+2,bh=full?FH/2+2:R+2;
  for(const [key,f] of Object.entries(PHOTOS)){
-  if(!f.anchor)continue;const [ax,ay]=screen(f.anchor[0],f.anchor[1]);
+  if(!f.anchor||off.has(key))continue;const [ax,ay]=screen(f.anchor[0],f.anchor[1]);
   if(ax<-60||ay<-60||ax>state.w+60||ay>state.h+60)continue;
   let px=null,py=null;
   for(const [dx,dy] of offs){const nx=ax+dx,ny=ay+dy,bb=[nx-bw,ny-bh,nx+bw,ny+bh];
@@ -142,6 +170,8 @@ function openPhotoFeature(key){const f=PHOTOS[key];if(!f)return;if(f.object_type
 // Confidence terms (shared with the place pages): full label with the letter, lowercase for meta lines.
 const CONF={A:'A · '+_('Named in the novel'),B:'B · '+_('Inferred'),C:'C · '+_('Proposed'),U:'U · '+_('No location')};
 const CONF_META={A:_('named in the novel'),B:_('inferred'),C:_('proposed'),U:_('no location')};
+// Short category names, as in meta lines ("Civic" / "Город"): marker labels for screen readers.
+const KIND_SHORT={Homes:p_('kind short','Homes'),Civic:p_('kind short','Civic'),Encounters:p_('kind short','Encounters'),Historical:p_('kind short','Historical'),Barrens:p_('kind short','Barrens'),Outlying:p_('kind short','Outlying')};
 function list(){const result=all.filter(hits),mapped=D.sites.filter(hits).length;q('#count').textContent=result.length+' '+n_('place','places',result.length)+' · '+mapped+' '+_('mapped');q('#list').innerHTML=result.length?result.map(s=>`<li><button data-place="${s.id}" class="${state.selected===s.id?'selected':''}"><span class="num" style="color:${PAYLOAD.colors[s.kind]||'#697166'}">${String(s.id).padStart(2,'0')}</span><span><span class="item-title">${esc(s.name)}</span><span class="item-sub">${esc(s.period)} · ${esc(CONF_META[s.confidence]||'')}</span></span></button></li>`).join(''):'<li class="empty">'+esc(_('No matching places. Try a shorter name or enable more categories.'))+'</li>';q('#list').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>select(/^U/.test(b.dataset.place)?b.dataset.place:Number(b.dataset.place),true)));}
 function select(id,focus){const s=all.find(s=>s.id===id);if(!s)return;state.selected=id;q('#intro').hidden=true;const panel=q('#detail');panel.hidden=false;const conf=CONF;
  const refs=s.refs||[];
@@ -153,7 +183,7 @@ function select(id,focus){const s=all.find(s=>s.id===id);if(!s)return;state.sele
  list();render();if(matchMedia('(max-width:780px)').matches&&!q('#workspace').classList.contains('open')){q('#workspace').classList.add('open');q('#placesToggle').setAttribute('aria-expanded','true');state.panelAutoOpened=true;}
 }
 function closeDetail(){state.selected=null;q('#detail').hidden=true;q('#intro').hidden=false;if(state.panelAutoOpened){state.panelAutoOpened=false;q('#workspace').classList.remove('open');q('#placesToggle').setAttribute('aria-expanded','false');}list();render()}
-function zoom(f,x=state.w/2,y=state.h/2){const [gx,gy]=geo(x,y);state.k=Math.min(4,Math.max(.012,state.k*f));state.cx=gx-(x-state.w/2)/state.k;state.cy=gy+(y-state.h/2)/state.k;state.view='';render()}
+function zoom(f,x=state.w/2,y=state.h/2){const [gx,gy]=geo(x,y);state.k=Math.min(MAX_K,Math.max(MIN_K,state.k*f));state.cx=gx-(x-state.w/2)/state.k;state.cy=gy+(y-state.h/2)/state.k;state.view='';render()}
 function showToast(msg){q('#toast').textContent=msg;q('#toast').hidden=!msg}
 function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();if(!state.measure.length)return;state.measure.forEach(p=>{const[x,y]=screen(...p);el('circle',{cx:x,cy:y,r:4,fill:'#a34b35',stroke:'#fff','stroke-width':1.3},layer)});if(state.measure.length===2){const a=screen(...state.measure[0]),b=screen(...state.measure[1]);el('path',{d:`M${a}L${b}`,fill:'none',stroke:'#a34b35','stroke-width':2,'stroke-dasharray':'5 3'},layer);showToast(format(Math.hypot(state.measure[0][0]-state.measure[1][0],state.measure[0][1]-state.measure[1][1]))+' · '+_('straight line in this reconstruction'));}}
 function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').classList.toggle('on',state.measuring);q('#measure').setAttribute('aria-pressed',state.measuring);map.classList.toggle('measuring',state.measuring);showToast(state.measuring?_('Select two points to measure. Drag to pan. Escape clears.'):'');render()}
@@ -161,9 +191,7 @@ scene();
 // Category keys are canonical data; only the visible labels translate.
 const KIND_LABELS={Homes:_('Homes'),Civic:_('Civic'),Encounters:_('Encounters'),Historical:_('Historical'),Barrens:_('Barrens'),Outlying:_('Outlying')};
 q('#filters').innerHTML=Object.keys(PAYLOAD.colors).map(c=>`<label><input type="checkbox" checked data-kind="${c}">${esc(KIND_LABELS[c]||c)}</label>`).join('');
-// The legend explains the litho place-type badges; the order mirrors how often they occur.
-if(window.DerryLitho&&q('#iconKey')){const IK=[['house',_('Home')],['cross',_('Church')],['flag',_('School')],['book',_('Library')],['plus',_('Hospital')],['tomb',_('Cemetery')],['rail',_('Station / depot')],['bridge',_('Bridge')],['wave',_('Dam')],['tent',_('Camp / clubhouse')],['tree',_('Park / woods')],['cup',_('Café / bar')],['star',_('Theater / hotel')],['obelisk',_('Memorial')],['shop',_('Shop / service')],['civic',_('Civic building')],['factory',_('Industry')],['pipe',_('Drain / pipe')],['clock',_('Historical event')],['alert',_('Encounter')]];
- q('#iconKey').innerHTML=IK.map(([ic,lab])=>`<span><svg viewBox="-8 -8 16 16" width="15" height="15" aria-hidden="true"><circle r="7" fill="#fbf9f1" stroke="#7a8577" stroke-width="1"/><path d="${window.DerryLitho.IC[ic]}" fill="none" stroke="#315e5a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>${esc(lab)}</span>`).join('')}q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);list();render()});
+q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);list();render()});
 q('#search').oninput=e=>{state.search=e.target.value.trim().toLowerCase();q('#clearSearch').hidden=!e.target.value;list();render()};q('#clearSearch').onclick=()=>{q('#search').value='';state.search='';q('#clearSearch').hidden=true;list();render();q('#search').focus()};
 q('#showPhotos').onchange=e=>{state.photos=e.target.checked;render()};q('#showNames').onchange=e=>{state.names=e.target.checked;render()};q('#showRelief').onchange=e=>{state.relief=e.target.checked;world.querySelectorAll('.relief').forEach(n=>n.style.display=state.relief?'':'none');render()};q('#showBuildings').onchange=e=>{world.querySelectorAll('.buildings').forEach(n=>n.style.display=e.target.checked?'':'none')};
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#reset').onclick=()=>fit('city');q('#measure').onclick=()=>toggleMeasure();
@@ -173,9 +201,9 @@ const pointers=new Map();let last=null,start=null,moved=false,lastPinch=0,hadPin
 function local(e){const r=map.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
 map.addEventListener('pointerdown',e=>{if(e.button!==0)return;const p=local(e);pointers.set(e.pointerId,p);map.setPointerCapture(e.pointerId);start=p;last=p;moved=false;if(pointers.size>1){hadPinch=true;const v=[...pointers.values()];lastPinch=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1])}map.classList.add('dragging')});
 map.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const p=local(e);pointers.set(e.pointerId,p);if(pointers.size===2){const v=[...pointers.values()],d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);if(lastPinch>0&&d>0)zoom(d/lastPinch,(v[0][0]+v[1][0])/2,(v[0][1]+v[1][1])/2);lastPinch=d;moved=true;return}if(last){const dx=p[0]-last[0],dy=p[1]-last[1];if(start&&Math.hypot(p[0]-start[0],p[1]-start[1])>4)moved=true;if(moved){state.cx-=dx/state.k;state.cy+=dy/state.k;state.view='';render()}}last=p});
-map.addEventListener('pointerup',e=>{const p=local(e),wasMoved=moved||hadPinch;pointers.delete(e.pointerId);if(!pointers.size){map.classList.remove('dragging');last=null;lastPinch=0;hadPinch=false}else last=[...pointers.values()][0];if(state.measuring&&!wasMoved){if(state.measure.length===2)state.measure=[];state.measure.push(geo(...p));drawMeasure()}if(!state.measuring&&!wasMoved){const hit=document.elementFromPoint(e.clientX,e.clientY);const pol=hit?.closest('.polaroid');if(pol)openPhotoFeature(pol.dataset.key);else{const target=hit?.closest('.mark');if(target)select(Number(target.dataset.id),false)}}});
+map.addEventListener('pointerup',e=>{const p=local(e),wasMoved=moved||hadPinch;pointers.delete(e.pointerId);if(!pointers.size){map.classList.remove('dragging');last=null;lastPinch=0;hadPinch=false}else last=[...pointers.values()][0];if(state.measuring&&!wasMoved){if(state.measure.length===2)state.measure=[];state.measure.push(geo(...p));drawMeasure()}if(!state.measuring&&!wasMoved){const hit=document.elementFromPoint(e.clientX,e.clientY);const pol=hit?.closest('.polaroid');if(pol)openPhotoFeature(pol.dataset.key);else{const target=hit?.closest('.mk,.mk-hit');if(target)select(Number(target.dataset.id),false)}}});
 map.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);last=null;map.classList.remove('dragging')});
-map.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.003),...local(e))},{passive:false});map.addEventListener('dblclick',e=>{if(!state.measuring&&!e.target.closest('.mark,.polaroid'))zoom(1.8,...local(e))});
+map.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.003),...local(e))},{passive:false});map.addEventListener('dblclick',e=>{if(!state.measuring&&!e.target.closest('.mk,.mk-hit,.polaroid'))zoom(1.8,...local(e))});
 map.addEventListener('keydown',e=>{if(e.key==='+'||e.key==='='){e.preventDefault();zoom(1.4)}else if(e.key==='-'){e.preventDefault();zoom(1/1.4)}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.cx+=({'ArrowLeft':-80,'ArrowRight':80}[e.key]||0)/state.k;state.cy+=({'ArrowUp':80,'ArrowDown':-80}[e.key]||0)/state.k;state.view='';render()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(state.measuring)toggleMeasure(false);else closeDetail()}});
 // Deep link from the photo gallery: /?place=12 or /?place=U3 opens the place card.

@@ -203,9 +203,6 @@ msgstr ""
 "положения. Приближайте карту, чтобы находить небольшие места. Поиск "
 "включает и места, которые нельзя локализовать."
 
-msgid "Filled circle: named in the novel.<br>Open circle: inferred.<br>Diamond: proposed."
-msgstr "Закрашенный круг: названо в романе.<br>Пустой круг: выведено.<br>Ромб: предположено."
-
 msgid "Interactive map"
 msgstr "Интерактивная карта"
 
@@ -270,9 +267,6 @@ msgid ""
 msgstr ""
 "Горизонтали не являются измеренными высотами. Все координаты и границы "
 "реконструированы."
-
-msgid "Badges by the markers (zoom in) show the type of place:"
-msgstr "Значки у маркеров (при приближении) показывают тип места:"
 
 #: server-rendered place directory
 msgid "Homes"

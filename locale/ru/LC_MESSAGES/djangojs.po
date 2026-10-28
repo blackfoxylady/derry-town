@@ -79,65 +79,30 @@ msgstr "Окраины"
 msgid "Barrens"
 msgstr "Пустошь"
 
-msgid "Home"
-msgstr "Дом"
+#: atlas/static/atlas/map.js (redesign pass 15): marker labels for screen readers
+msgctxt "kind short"
+msgid "Homes"
+msgstr "Дома"
 
-msgid "Church"
-msgstr "Церковь"
+msgctxt "kind short"
+msgid "Civic"
+msgstr "Город"
 
-msgid "School"
-msgstr "Школа"
+msgctxt "kind short"
+msgid "Barrens"
+msgstr "Пустошь"
 
-msgid "Library"
-msgstr "Библиотека"
+msgctxt "kind short"
+msgid "Encounters"
+msgstr "Встречи"
 
-msgid "Hospital"
-msgstr "Больница"
+msgctxt "kind short"
+msgid "Historical"
+msgstr "Историческое"
 
-msgid "Cemetery"
-msgstr "Кладбище"
-
-msgid "Station / depot"
-msgstr "Станция / депо"
-
-msgid "Bridge"
-msgstr "Мост"
-
-msgid "Dam"
-msgstr "Плотина"
-
-msgid "Camp / clubhouse"
-msgstr "Лагерь / штаб"
-
-msgid "Park / woods"
-msgstr "Парк / лес"
-
-msgid "Café / bar"
-msgstr "Кафе / бар"
-
-msgid "Theater / hotel"
-msgstr "Театр / отель"
-
-msgid "Memorial"
-msgstr "Памятник"
-
-msgid "Shop / service"
-msgstr "Магазин / сервис"
-
-msgid "Civic building"
-msgstr "Городское здание"
-
-msgid "Industry"
-msgstr "Производство"
-
-msgid "Drain / pipe"
-msgstr "Труба / дренаж"
-
-msgid "Historical event"
-msgstr "Историческое событие"
-
-msgid "Encounter"
-msgstr "Встреча"
+msgctxt "kind short"
+msgid "Outlying"
+msgstr "Окраины"
 
 #: atlas/static/atlas/map.js (redesign pass 3)
 msgid "Named in the novel"

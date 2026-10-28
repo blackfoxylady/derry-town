@@ -277,24 +277,7 @@ function drawDots(g,D){
  for(const c of D.dots)el('circle',{cx:c.x,cy:c.y,r:c.r,class:'m-dot lod-mid'+(c.lyr==='buildings'?' buildings':''),style:u(1)},g);
 }
 
-// --- Marker type badges (handoff block 7): 19 glyphs, assigned by name regex,
-// falling back to the category. Swap the regexes for a DB field if one appears.
-const IC={house:'M-4.2 0.2L0 -4L4.2 0.2M-3 -0.8V4H3V-0.8',cross:'M0 -4.6V4.6M-3.2 -1.6H3.2',flag:'M-3 4.6V-4.6M-3 -4.3H3.8L2.2 -2L3.8 0.3H-3',book:'M0 -2.8V4M0 -2.8Q-2 -4.3 -4.5 -3.4V3Q-2 2.2 0 4Q2 2.2 4.5 3V-3.4Q2 -4.3 0 -2.8',plus:'M0 -4.2V4.2M-4.2 0H4.2',
- tree:'M0 4.6V1.6M0 -4.6L3.8 1.6H-3.8Z',bridge:'M-5 -1H5M-4 -1V3.5M4 -1V3.5M-4 3.5Q0 -0.5 4 3.5',rail:'M-3.6 -4H3.6V1.6H-3.6ZM-3.6 -1.2H3.6M-2.6 4.6L-1.6 1.6M2.6 4.6L1.6 1.6',tomb:'M-3 4V-0.8A3 3 0 0 1 3 -0.8V4ZM-4.6 4.2H4.6M0 -2V2M-1.4 -0.6H1.4',
- shop:'M-4 -1H4L3.2 4.2H-3.2ZM-2 -1V-2.4A2 2 0 0 1 2 -2.4V-1',civic:'M-4.6 -1.8L0 -4.6L4.6 -1.8ZM-3.4 -0.8V3M0 -0.8V3M3.4 -0.8V3M-4.6 4.2H4.6',factory:'M-4.6 4.2V-0.8L-1.6 1.2V-0.8L1.4 1.2V-4.6H3.6V4.2Z',
- star:'M0 -4.6L1.3 -1.5H4.5L1.9 0.5L2.9 4L0 1.9L-2.9 4L-1.9 0.5L-4.5 -1.5H-1.3Z',cup:'M-4 -2.2H2.8V0.8A3.4 3.4 0 0 1 -4 0.8ZM2.8 -1.2H4.4V0.8H2.8M-4.4 4.4H3.2',alert:'M0 -4.2V1M0 3.4V3.8',clock:'M-4 0A4 4 0 1 0 4 0A4 4 0 1 0 -4 0M0 -2.4V0L1.8 1.4',
- pipe:'M-4 0A4 4 0 1 0 4 0A4 4 0 1 0 -4 0M-1.4 0A1.4 1.4 0 1 0 1.4 0A1.4 1.4 0 1 0 -1.4 0',wave:'M-4.6 -1.2Q-2.3 -3.4 0 -1.2T4.6 -1.2M-4.6 2.6Q-2.3 .4 0 2.6T4.6 2.6',tent:'M-4.6 4.2L0 -4.2L4.6 4.2ZM0 -4.2V4.2',obelisk:'M-1.6 4L-1 -2.8L0 -4.6L1 -2.8L1.6 4ZM-3.2 4.4H3.2'};
-const ICR=[['pipe',/cylinder|pumphouse|drain|culvert|standpipe|refrigerator/i],['bridge',/bridge/i],['cross',/church|seminary|baptist/i],['flag',/school/i],['book',/library/i],['plus',/hospital/i],['tomb',/cemetery/i],['rail',/train|station|bus terminal|depot/i],
- ['wave',/dam\b/i],['tent',/camp|smoke-hole|clubhouse/i],['tree',/park|woods|fairgrounds/i],['cup',/nan's|jade|falcon|silver dollar|traveller|black spot/i],['star',/theater|bijou|inn\b|hotel/i],['obelisk',/memorial|settlement/i],
- ['shop',/market|drug|freese|machen|secondhand|washateria|alley|mall|city center/i],['civic',/town house|courthouse|community|army/i],['factory',/ironworks|tool|dump|coal/i],['house',/home|house|farm|heights|cape|broadway|kersh|silver|macklin/i]];
-const ICK={Homes:'house',Encounters:'alert',Historical:'clock',Civic:'civic',Outlying:'house',Barrens:'tent'};
-function iconOf(name,kind){for(const[k,re]of ICR)if(re.test(name))return k;return ICK[kind]||'alert'}
-function badge(g,x,y,color,icon){
- el('circle',{cx:x,cy:y,r:7.5,fill:'#fbf9f1',stroke:color,'stroke-width':1.1,'pointer-events':'none'},g);
- el('path',{d:IC[icon],transform:`translate(${x} ${y}) scale(1.1)`,fill:'none',stroke:color,'stroke-width':1.2,'stroke-linecap':'round','stroke-linejoin':'round','pointer-events':'none'},g);
-}
-
-// --- Street names along the road line (handoff block 6). Returns false when the
+// --- Street names along the road line (<textPath>). Returns false when the
 // road bends too much or is shorter than the text; the caller then falls back.
 let RID=0;
 function roadLabel(g,lab,view,roads){
@@ -307,7 +290,8 @@ function roadLabel(g,lab,view,roads){
  const p=best.r.p,cum=[0];for(let i=1;i<p.length;i++)cum.push(cum[i-1]+Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]));
  const a=p[best.i-1],b=p[best.i],sl=cum[best.i]-cum[best.i-1]||1;
  let t=((wx-a[0])*(b[0]-a[0])+(wy-a[1])*(b[1]-a[1]))/(sl*sl);t=Math.max(0,Math.min(1,t));
- const s0=cum[best.i-1]+t*sl,txt=lab.text.toUpperCase(),fs=9,wpx=txt.length*(fs*.68+1.6)+12,h=wpx/2/view.k,T0=cum[cum.length-1];
+ // Plex Sans Condensed 500, 12px caps with 0.14em tracking: about 0.62em per letter.
+ const s0=cum[best.i-1]+t*sl,txt=lab.text.toUpperCase(),fs=12,wpx=txt.length*(fs*.62+fs*.14)+12,h=wpx/2/view.k,T0=cum[cum.length-1];
  let s1=Math.max(0,s0-h),s2=Math.min(T0,s0+h);
  if(s2-s1<2*h*.95){if(s1===0)s2=Math.min(T0,2*h);else s1=Math.max(0,T0-2*h)}
  if(s2-s1<2*h*.95)return false;
@@ -320,12 +304,12 @@ function roadLabel(g,lab,view,roads){
  const id='lithoRP'+(++RID);
  const df=g.querySelector('defs')||el('defs',{},g);
  el('path',{id,d:pd(sp)},df);
- const n=el('text',{class:'halo','stroke-width':3,'font-size':fs,'letter-spacing':1.6,fill:'#6b5c42',dy:3.2,'pointer-events':'none'},g);
+ const n=el('text',{class:'lbl lbl--road',dy:4.2},g);
  const tp=el('textPath',{href:'#'+id,startOffset:'50%','text-anchor':'middle'},n);tp.textContent=txt;
  return true;
 }
 
-window.DerryLitho={el,pd,u,mx,dash,FR,LOD,makePatterns,updatePatterns,paper,clip,grid,frame,gridRefs,IC,iconOf,badge,roadLabel,
+window.DerryLitho={el,pd,u,mx,dash,FR,LOD,makePatterns,updatePatterns,paper,clip,grid,frame,gridRefs,roadLabel,
  adapt,prep,makeSlots,drawAreas,drawValley,drawWater,drawCovered,drawRoads,drawBridges,drawRail,
  drawRelief,drawBuiltUp,drawForest,drawVeg,drawSymbols,drawBuildings,drawDots,drawMisc,peaks};
 })();

@@ -150,8 +150,8 @@ def renderer_geometry(payload):
     g['views'] = [{'id': v['id'], 't': v.get('title'),
                    'b': [v['bounds'][0], -v['bounds'][3], v['bounds'][2], -v['bounds'][1]]}
                   for v in payload.get('views', [])]
-    g['colors'] = payload.get('colors', {})
-    g['palette'] = payload.get('palette', {})
+    # No colours: the renderer takes them from the site tokens (--cat-*, --map-*), so a
+    # palette change in the data leaves every frame as it is.
     g['flow'] = [[x, -y, a] for x, y, a in (payload.get('print') or {}).get('flow_arrows', [])]
     return g
 

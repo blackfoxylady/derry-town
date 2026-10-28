@@ -46,7 +46,12 @@ const path=require('node:path');
   assert.equal(await page.locator('#world .m-frame').count(),1);
   assert.equal(await page.locator('#world use, #world text').count(),0);
   assert.equal(await page.evaluate(()=>document.querySelector('#map').dataset.bld),'tint');
-  assert(await page.locator('.mark').count()>15);
+  // Markers: same-size A/B/C shapes at their true position, far zoom as dots; no type
+  // badges, leader lines or filters; U places are not drawn.
+  assert(await page.locator('#markers .mk').count()>15);
+  assert.equal(await page.locator('#markers .mk[data-id^="U"]').count(),0);
+  assert.equal(await page.locator('#markers path, #map [filter]').count(),0);
+  assert.equal(await page.locator('#markers .mk--a').first().getAttribute('aria-label').then(t=>/^\d+ .+, .+, .+$/.test(t)),true);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   assert(await page.locator('.brand h1').evaluate(n=>n.getBoundingClientRect().top>=0));
   await page.screenshot({path:path.join(out,name+'-town.png'),fullPage:true});
@@ -69,6 +74,11 @@ const path=require('node:path');
   await page.screenshot({path:path.join(out,name+'-clearing.png'),fullPage:true});
   const k=await page.evaluate(()=>DerryAtlas.view.k);
   await page.locator('#zoomIn').click();assert((await page.evaluate(()=>DerryAtlas.view.k))>k);
+  // The zoom cap is k 2.2: + is disabled there.
+  for(let i=0;i<12;i++)await page.evaluate(()=>document.querySelector('#zoomIn').disabled||document.querySelector('#zoomIn').click());
+  assert.equal(await page.evaluate(()=>Math.round(DerryAtlas.view.k*100)),220);
+  assert.equal(await page.locator('#zoomIn').isDisabled(),true);
+  await page.locator(`[data-view="camp"]`).click();
   await page.locator('#map').focus();await page.keyboard.press('ArrowRight');
   await page.locator('.map-legend summary').click();
   await page.locator('#showRelief').uncheck();
@@ -78,7 +88,7 @@ const path=require('node:path');
   await page.locator('#showBuildings').uncheck();
   assert.equal(await page.locator('#world .buildings').first().evaluate(n=>getComputedStyle(n).display),'none');
   await page.locator('#showBuildings').check();
-  await page.locator('#showNames').uncheck();assert.equal(await page.locator('.map-name').count(),0);
+  assert(await page.locator('.lbl--place').count()>0);await page.locator('#showNames').uncheck();assert.equal(await page.locator('.lbl--place').count(),0);
   await page.locator('#showNames').check();
   await page.locator('#showPhotos').uncheck();assert.equal(await page.locator('#photoLayer .polaroid').count(),0);
   await page.locator('#showPhotos').check();
