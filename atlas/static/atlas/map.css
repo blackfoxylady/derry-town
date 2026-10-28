@@ -66,6 +66,25 @@ header .lang{font:inherit;font-size:12px}header .lang>*{display:inline-block;min
 .dm .m-builtup{fill:none;stroke:var(--map-builtup);stroke-linecap:round;stroke-linejoin:round}
 .dm .m-bld{fill:var(--map-building);stroke:var(--map-building-edge);stroke-linejoin:round}
 .dm .m-bld-key{fill:var(--map-building-landmark);stroke:var(--map-building-landmark);stroke-linejoin:round}
+.dm .m-water-edge{fill:none;stroke:var(--map-water-edge);stroke-linecap:round;stroke-linejoin:round}
+.dm .m-water{fill:none;stroke:var(--map-water);stroke-linecap:round;stroke-linejoin:round}
+.dm .is-canal{stroke-linecap:butt}
+.dm .m-ripple{fill:none;stroke:#fff;opacity:.55}
+.dm .m-lock{fill:none;stroke:var(--map-bridge);stroke-linecap:butt}
+.dm .m-road-cas{fill:none;stroke:var(--map-road-casing);stroke-linecap:round;stroke-linejoin:round}
+.dm .m-road{fill:none;stroke:var(--map-road);stroke-linecap:round;stroke-linejoin:round}
+.dm .m-road--main,.dm .m-road--highway,.dm .m-road--primary{stroke:var(--map-road-major)}
+.dm .m-road--track,.dm .m-road--trackdash,.dm .m-road--lane{stroke:var(--map-path)}
+.dm .m-road-fade{fill:none;stroke:var(--map-road-casing);opacity:.75;stroke-linecap:butt}
+.dm .m-path{fill:none;stroke:var(--map-path)}
+.dm .m-covered{fill:none;stroke:var(--map-water-edge);opacity:.8}
+.dm .m-bridge{fill:none;stroke:var(--map-bridge);stroke-linecap:butt}
+.dm .m-parapet{fill:none;stroke:var(--map-bridge);stroke-linecap:round;stroke-linejoin:round}
+.dm .m-rail,.dm .m-tie{fill:none;stroke:var(--map-rail)}
+.dm .m-rail-stop{fill:none;stroke:var(--map-rail);stroke-linecap:butt}
+.dm .m-symbol{fill:none;stroke:var(--map-veg);stroke-linecap:round}
+.dm .m-misc{fill:none;stroke:var(--map-path);stroke-linecap:round;stroke-linejoin:round}
+.dm .m-dot{fill:var(--map-dot);stroke:var(--map-dot-edge)}
 .dm .m-grid{fill:none;stroke:var(--map-grid)}
 .dm .m-frame{fill:none;stroke:var(--map-frame)}
 /* Overlay: grid letters at the screen edges, conceptual spot heights. */

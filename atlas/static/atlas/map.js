@@ -40,12 +40,12 @@ function scene(){
  // layers in fixed slots, the frame on top. Colours come from map.css.
  const L=window.DerryLitho,defs=el('defs',{},map);
  map.classList.add('dm');L.makePatterns(defs);L.paper(world);
- const slots=L.makeSlots(L.clip(world,defs)),D=L.prepWater(L.adapt(PAYLOAD));LITHO_D=D;LITHO_PEAKS=L.peaks(D);
+ const slots=L.makeSlots(L.clip(world,defs)),D=L.prep(L.adapt(PAYLOAD));LITHO_D=D;LITHO_PEAKS=L.peaks(D);
  // The Layers toggles target these classes: 'relief' and 'buildings'.
  slots.relief.classList.add('relief');slots.builtup.classList.add('buildings');slots.buildings.classList.add('buildings');
  L.drawAreas(slots.areas,D);L.drawValley(slots.valley,D);L.drawForest(slots.forest,D);L.drawRelief(slots.relief,D);L.drawVeg(slots.veg,D);
  L.drawBuiltUp(slots.builtup,D);L.drawSymbols(slots.symbols,D);L.drawWater(slots.water,D);L.drawBuildings(slots.buildings,D);
- L.drawRoads(slots.roads,D);L.drawCovered(slots.covered,D);L.drawMisc(slots.misc,D);L.drawDots(slots.dots,D);L.grid(slots.grid);
+ L.drawRoads(slots.roads,D);L.drawCovered(slots.covered,D);L.drawBridges(slots.bridges,D);L.drawRail(slots.rail,D);L.drawMisc(slots.misc,D);L.drawDots(slots.dots,D);L.grid(slots.grid);
  L.frame(world);
 }
 function screen(x,y){return [(x-state.cx)*state.k+state.w/2,(state.cy-y)*state.k+state.h/2]}
