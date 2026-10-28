@@ -35,39 +35,18 @@ const PHOTO_MIN_K=.055,POLAROID_FULL_K=.3;
 let LITHO_D=null,LITHO_PEAKS=null;
 const all=[...D.sites,...D.unplaced.map(s=>({...s,kind:'Unlocated',confidence:'U',short:s.name}))];
 function el(tag,attrs={},parent=null){const n=document.createElementNS(NS,tag);for(const [k,v]of Object.entries(attrs))if(v!==null&&v!==undefined)n.setAttribute(k,v);if(parent)parent.appendChild(n);return n}
-function pathData(pts,close=false){return pts.map((p,i)=>(i?'L':'M')+p[0]+','+(-p[1])).join(' ')+(close?' Z':'')}
 function scene(){
- // Litho sheet: paper under the content, the content clipped to the designed
- // frame, the frame itself drawn on top. Falls back to the bare world when
- // litho.js is absent (offline artifact built before the redesign).
+ // Survey sheet (litho.js): margin under everything, the land clipped to the frame,
+ // layers in fixed slots, the frame on top. Colours come from map.css.
  const L=window.DerryLitho,defs=el('defs',{},map);
- let host=world,slots=null,D=null;
- if(L){L.paper(world);host=L.clip(world,defs);slots=L.makeSlots(host);D=L.prepWater(L.adapt(PAYLOAD));LITHO_D=D;LITHO_PEAKS=L.peaks(D)}
- // The raster relief belongs to the classic look; litho replaces it with a tonal wash.
- if(!slots){const ex=PAYLOAD.extent;el('image',{x:ex[0],y:-ex[3],width:ex[2]-ex[0],height:ex[3]-ex[1],href:PAYLOAD.relief,class:'relief'},host)}
- const lighten=c=>'#'+[1,3,5].map(i=>Math.round(parseInt(c.slice(i,i+2),16)*.62+255*.38).toString(16).padStart(2,'0')).join('');
- // Classes the litho renderer draws itself; the classic pass skips them.
- const LITHO_DONE=new Set(['valley','water-edge','water-core','covered','path','rail','rail-fill','rail-ties','bridge','bridge-fill',
-  'contour','barrens','forest','forest-light','veg','building','misc']);
- const lithoDone=o=>slots&&o.cls&&(LITHO_DONE.has(o.cls)||o.cls.startsWith('road-'));
- for(const o of PAYLOAD.base){let n;if(lithoDone(o))continue;const target=slots?slots[L.slotOf(o)]:host;
-  const at={fill:o.fill||'none',stroke:o.stroke||'none','stroke-width':o.width||0,'stroke-linecap':'round','stroke-linejoin':'round',class:(o.layer||'base')+(o.cls?' c-'+o.cls:'')};if(o.dash)at['stroke-dasharray']=o.dash.join(' ');
-  if(o.type==='line'||o.type==='poly')n=el('path',{...at,d:pathData(o.points,o.type==='poly')},target);
-  else if(o.type==='circle')n=el('circle',{...at,cx:o.x,cy:-o.y,r:o.r},target);
-  else if(o.type==='rect')n=el('rect',{...at,x:-o.w/2,y:-o.h/2,width:o.w,height:o.h,transform:`translate(${o.x},${-o.y}) rotate(${-o.angle})`},target);
-  // Open water reads flat as one tint; a narrower lighter core over the fill keeps the banks darker.
-  if(!slots&&o.type==='line'&&!o.dash&&o.stroke===PAYLOAD.palette.water)el('path',{d:pathData(o.points),fill:'none',stroke:lighten(o.stroke),'stroke-width':o.width*.5,'stroke-linecap':'round','stroke-linejoin':'round',class:o.layer||'base'},target);
- }
- if(slots){
-  // The legend toggles target these classes: 'relief' and 'buildings'.
-  slots.relief.classList.add('relief');slots.builtup.classList.add('buildings');slots.buildings.classList.add('buildings');
-  L.drawValley(slots.valley,D);L.drawForest(slots.forest,D,defs);L.drawVeg(slots.veg,D);L.drawRelief(slots.relief,D);
-  L.drawBuiltUp(slots.builtup,D);L.drawSymbols(slots.symbols,D);L.drawWater(slots.water,D);L.drawRoads(slots.roads,D);
-  L.drawCovered(slots.covered,D);L.drawMisc(slots.misc,D);L.drawBuildings(slots.buildings,D,defs);L.drawDots(slots.dots,D);
-  // Weak phones first lose tree crowns density (README performance ladder).
-  L.drawTrees(slots.trees,D,defs,matchMedia('(max-width:780px)').matches?1200:2600);
- }
- if(L)L.frame(world,defs);
+ map.classList.add('dm');L.makePatterns(defs);L.paper(world);
+ const slots=L.makeSlots(L.clip(world,defs)),D=L.prepWater(L.adapt(PAYLOAD));LITHO_D=D;LITHO_PEAKS=L.peaks(D);
+ // The Layers toggles target these classes: 'relief' and 'buildings'.
+ slots.relief.classList.add('relief');slots.builtup.classList.add('buildings');slots.buildings.classList.add('buildings');
+ L.drawAreas(slots.areas,D);L.drawValley(slots.valley,D);L.drawForest(slots.forest,D);L.drawRelief(slots.relief,D);L.drawVeg(slots.veg,D);
+ L.drawBuiltUp(slots.builtup,D);L.drawSymbols(slots.symbols,D);L.drawWater(slots.water,D);L.drawBuildings(slots.buildings,D);
+ L.drawRoads(slots.roads,D);L.drawCovered(slots.covered,D);L.drawMisc(slots.misc,D);L.drawDots(slots.dots,D);L.grid(slots.grid);
+ L.frame(world);
 }
 function screen(x,y){return [(x-state.cx)*state.k+state.w/2,(state.cy-y)*state.k+state.h/2]}
 function geo(x,y){return [state.cx+(x-state.w/2)/state.k,state.cy-(y-state.h/2)/state.k]}
@@ -79,8 +58,8 @@ function render(){
  const {w,h,k,cx,cy}=state;map.setAttribute('viewBox',`0 0 ${w} ${h}`);world.setAttribute('transform',`translate(${w/2-cx*k},${h/2+cy*k}) scale(${k})`);
  // Litho foundation: --u is one screen pixel in world units, so styles can pin
  // stroke widths to the screen via calc(var(--u)*N); data-z drives LOD classes.
- map.style.setProperty('--u',(1/k)+'px');map.dataset.z=k<.16?'far':k<.42?'mid':'near';
- if(window.DerryLitho)window.DerryLitho.updatePatterns(k);
+ const LOD=window.DerryLitho.LOD;map.style.setProperty('--u',(1/k)+'px');map.dataset.z=k<LOD.far?'far':k<LOD.mid?'mid':'near';
+ map.dataset.bld=k<LOD.plan?'tint':'plan';window.DerryLitho.updatePatterns(k);
  markers.replaceChildren();labels.replaceChildren();const occupied=[],names=[];
  const points=D.sites.filter(hits).filter(s=>state.search||s.id===state.selected||k>.14||s.rank===1||s.kind==='Outlying').sort((a,b)=>(a.id===state.selected?-1:b.id===state.selected?1:a.rank-b.rank||a.id-b.id));
  for(const s of points){const [x,y]=screen(s.x,s.y);if(x<-30||y<-30||x>w+30||y>h+30)continue;let mx=x,my=y,ok=false;
@@ -101,12 +80,12 @@ function render(){
   g.addEventListener('click',e=>{e.stopPropagation();if(!state.measuring)select(s.id,false)});g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(s.id,false)}});
   if(state.names&&(s.id===state.selected||k>.42||s.rank===1||(k>.2&&s.rank===2)))names.push({s,mx,my});
  }
- // Litho: conceptual hill heights (▲≈NN), under the markers, from mid zoom.
- if(LITHO_PEAKS&&k>=.16)for(const[px,py,hh]of LITHO_PEAKS){const[sx,sy]=screen(px,-py);
+ // Conceptual spot heights (▲≈NN) from mid zoom, under the markers; part of the relief layer.
+ if(state.relief&&LITHO_PEAKS&&k>=.16)for(const[px,py,hh]of LITHO_PEAKS){const[sx,sy]=screen(px,-py);
   if(sx<-20||sy<-20||sx>w+20||sy>h+20)continue;
-  const bb=[sx-4,sy-5,sx+30,sy+5];if(occupied.some(b=>intersects(bb,b)))continue;occupied.push(bb);
-  el('path',{d:`M${sx} ${sy-3.6}L${sx+3.2} ${sy+2}H${sx-3.2}Z`,fill:'#6b5c42'},labels);
-  const pt=el('text',{x:sx+5,y:sy+3,class:'halo','stroke-width':3,style:'font:italic 9.5px Georgia,serif',fill:'#6b5c42'},labels);pt.textContent='≈'+hh;}
+  const bb=[sx-5,sy-7,sx+34,sy+6];if(occupied.some(b=>intersects(bb,b)))continue;occupied.push(bb);
+  el('path',{d:`M${sx} ${sy-4.2}L${sx+3.8} ${sy+2.4}H${sx-3.8}Z`,class:'peak-mark'},labels);
+  const pt=el('text',{x:sx+6,y:sy+3.5,class:'peak'},labels);pt.textContent='≈'+hh;}
  photoLayer.replaceChildren();if(state.photos&&k>PHOTO_MIN_K)drawPhotos(occupied);
  for(const {s,mx,my}of names){const tw=s.short.length*6.5;let placed=false;for(const dy of [4,-13]){for(const left of [false,true]){const tx=mx+(left?-14:14),ty=my+dy,bb=[left?tx-tw:tx,ty-11,left?tx:tx+tw,ty+3];if(bb[0]<7||bb[2]>w-7||bb[1]<7||bb[3]>h-7||occupied.some(b=>intersects(bb,b)))continue;const t=el('text',{x:tx,y:ty,'text-anchor':left?'end':'start',class:'map-name'},markers);t.textContent=s.short;occupied.push(bb);placed=true;break}if(placed)break}}
  for(const l of [...PAYLOAD.labels].sort((a,b)=>({region:0,road:1,water:2,land:3}[a.kind]-{region:0,road:1,water:2,land:3}[b.kind]))){if(l.kind==='road'&&k<.15)continue;if(l.views.includes('camp')&&l.kind!=='road'&&k<.40)continue;if(l.kind==='region'&&k>.65)continue;
@@ -117,7 +96,7 @@ function render(){
   const st=LITHO_D?(l.kind==='region'?'font:600 16px Georgia,serif;letter-spacing:3px':l.kind==='water'?'font-style:italic;fill:#3f6f7c':road?'font-size:8.5px;letter-spacing:1.6px;fill:#6b5c42':'font-style:italic;font-size:10.5px;fill:#5d6b52')
              :(l.kind==='region'?'font:600 16px Georgia,serif':l.kind==='water'?'font-style:italic;fill:#507e89':'');
   const t=el('text',{x,y,transform:`rotate(${-l.angle} ${x} ${y})`,'text-anchor':'middle',class:'map-road',style:st},labels);t.textContent=txt;}
- if(LITHO_D)window.DerryLitho.gridRefs(labels,{cx,cy:-cy,k,w,h});
+ window.DerryLitho.gridRefs(labels,{cx,cy:-cy,k,w,h});
  const target=130/k,base=10**Math.floor(Math.log10(target)),n=[1,2,5,10].filter(x=>x*base<=target).pop()||1,val=n*base;q('#scaleLine').style.width=(val*k)+'px';q('#scaleText').textContent=format(val);
  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
  drawMeasure();
@@ -186,7 +165,7 @@ q('#filters').innerHTML=Object.keys(PAYLOAD.colors).map(c=>`<label><input type="
 if(window.DerryLitho&&q('#iconKey')){const IK=[['house',_('Home')],['cross',_('Church')],['flag',_('School')],['book',_('Library')],['plus',_('Hospital')],['tomb',_('Cemetery')],['rail',_('Station / depot')],['bridge',_('Bridge')],['wave',_('Dam')],['tent',_('Camp / clubhouse')],['tree',_('Park / woods')],['cup',_('Café / bar')],['star',_('Theater / hotel')],['obelisk',_('Memorial')],['shop',_('Shop / service')],['civic',_('Civic building')],['factory',_('Industry')],['pipe',_('Drain / pipe')],['clock',_('Historical event')],['alert',_('Encounter')]];
  q('#iconKey').innerHTML=IK.map(([ic,lab])=>`<span><svg viewBox="-8 -8 16 16" width="15" height="15" aria-hidden="true"><circle r="7" fill="#fbf9f1" stroke="#7a8577" stroke-width="1"/><path d="${window.DerryLitho.IC[ic]}" fill="none" stroke="#315e5a" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>${esc(lab)}</span>`).join('')}q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);list();render()});
 q('#search').oninput=e=>{state.search=e.target.value.trim().toLowerCase();q('#clearSearch').hidden=!e.target.value;list();render()};q('#clearSearch').onclick=()=>{q('#search').value='';state.search='';q('#clearSearch').hidden=true;list();render();q('#search').focus()};
-q('#showPhotos').onchange=e=>{state.photos=e.target.checked;render()};q('#showNames').onchange=e=>{state.names=e.target.checked;render()};q('#showRelief').onchange=e=>{world.querySelectorAll('.relief').forEach(n=>n.style.display=e.target.checked?'':'none')};q('#showBuildings').onchange=e=>{world.querySelectorAll('.buildings').forEach(n=>n.style.display=e.target.checked?'':'none')};
+q('#showPhotos').onchange=e=>{state.photos=e.target.checked;render()};q('#showNames').onchange=e=>{state.names=e.target.checked;render()};q('#showRelief').onchange=e=>{state.relief=e.target.checked;world.querySelectorAll('.relief').forEach(n=>n.style.display=state.relief?'':'none');render()};q('#showBuildings').onchange=e=>{world.querySelectorAll('.buildings').forEach(n=>n.style.display=e.target.checked?'':'none')};
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#reset').onclick=()=>fit('city');q('#measure').onclick=()=>toggleMeasure();
 q('#placesToggle').onclick=()=>{const open=q('#workspace').classList.toggle('open');q('#placesToggle').setAttribute('aria-expanded',open);state.panelAutoOpened=false};
 q('#panelClose').onclick=()=>{state.panelAutoOpened=false;q('#workspace').classList.remove('open');q('#placesToggle').setAttribute('aria-expanded','false')};
@@ -204,6 +183,8 @@ function deepLink(){const p=new URLSearchParams(location.search).get('place');if
 new ResizeObserver(entries=>{const r=entries[0].contentRect;state.w=r.width;state.h=r.height;if(!state.ready){state.ready=true;fit('city');deepLink()}else render()}).observe(q('.stage'));
 list();
 // Exposed read-only diagnostics make the offline artifact easy to validate.
-window.DerryAtlas={get revision(){return PAYLOAD.revision},get siteCount(){return D.sites.length},get unlocatedCount(){return D.unplaced.length},get photoFeatureCount(){return Object.keys(PHOTOS).length},get view(){return {...state,active:[...state.active]}},select,fit,format};
+window.DerryAtlas={get revision(){return PAYLOAD.revision},get siteCount(){return D.sites.length},get unlocatedCount(){return D.unplaced.length},get photoFeatureCount(){return Object.keys(PHOTOS).length},get view(){return {...state,active:[...state.active]}},select,fit,format,
+ // Exact view (payload metres, y up), for side-by-side checks against the reference renderer.
+ setView(cx,cy,k){state.cx=cx;state.cy=cy;state.k=k;state.view='';render()}};
 
 })().catch(error=>{const el=document.querySelector('#toast');el.hidden=false;el.textContent=error.message+' '+(typeof gettext==='function'?gettext('Please reload the page.'):'Please reload the page.');console.error(error);});

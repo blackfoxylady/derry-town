@@ -1,86 +1,54 @@
-// Litho map style: sheet furniture and rendering helpers ported from the
-// design handoff (docs/Улучшение дизайна карты/handoff/derry-map-render.js).
+// Survey map style (redesign block 12): the sheet, its layers and helpers, ported
+// from the Design reference renderer (handoff/blocks/12-cartography/renderer/derry-map.js).
 // World coordinates here are screen-oriented (y grows downward), matching the
 // inside of #world where map.js already draws geometry as (x, -y_payload).
+// Colours live in map.css (.m-* classes over the --map-* tokens), not here.
 (function(){
 'use strict';
 const NS='http://www.w3.org/2000/svg';
 function el(t,a,p){const n=document.createElementNS(NS,t);for(const k in a){const v=a[k];if(v!=null&&v!==false)n.setAttribute(k,v)}if(p)p.appendChild(n);return n}
-function pd(p,z){let s='M'+p[0][0]+' '+p[0][1];for(let i=1;i<p.length;i++)s+='L'+p[i][0]+' '+p[i][1];return z?s+'Z':s}
+const r1=v=>Math.round(v*10)/10;
+function pd(p,z){let s='M'+r1(p[0][0])+' '+r1(p[0][1]);for(let i=1;i<p.length;i++)s+='L'+r1(p[i][0])+' '+r1(p[i][1]);return z?s+'Z':s}
 // u(n): stroke width pinned to n screen px at any zoom (map.js sets --u = 1/k px).
 // mx(w,n): world width w, but never thinner than n screen px.
 const u=n=>`stroke-width:calc(var(--u)*${n})`;
 const mx=(w,n)=>`stroke-width:max(${w}px,calc(var(--u)*${n}))`;
 const dash=(a,b)=>`stroke-dasharray:calc(var(--u)*${a}) calc(var(--u)*${b})`;
-// The designed sheet frame; content outside is clipped, the margin gets a dot raster.
+// The sheet frame; content outside is clipped to it.
 const FR=[-6150,-3450,3450,4380];
-const PAL={paper:'#f5f1e3',frameC:'#8b7a5a',ink:'#2f3d36'};
-// Patterns keep a fixed screen-pixel cell: cells are authored 10×10 and rescaled on zoom.
+// Zoom levels by k (screen px per metre): far < 0.16 ≤ mid < 0.42 ≤ near; house
+// footprints replace the built-up tint from 0.8 (map.js sets data-z / data-bld).
+const LOD={far:.16,mid:.42,plan:.8};
+const PAL={paper:'#f4f1e8'};
+// Patterns keep a fixed screen size: cells are authored in screen px, scaled by 1/k on zoom.
 const patterns=[];
-function pattern(defs,id,px,draw,rot){const p=el('pattern',{id,patternUnits:'userSpaceOnUse',width:10,height:10},defs);draw(p);patterns.push([p,px,rot]);return`url(#${id})`}
-function updatePatterns(k){for(const[p,px,rot]of patterns){const s=px/10/k;p.setAttribute('patternTransform',`scale(${s})${rot?` rotate(${rot})`:''}`)}}
-const dots=(c,r,pts)=>p=>pts.forEach(([x,y])=>el('circle',{cx:x,cy:y,r,fill:c},p));
+function makePatterns(defs){
+ const wood=el('pattern',{id:'dm-wood',width:10,height:10,patternUnits:'userSpaceOnUse'},defs);
+ el('rect',{width:10,height:10,class:'m-wood'},wood);
+ el('circle',{cx:2.5,cy:2.5,r:.9,class:'m-wood-dot'},wood);el('circle',{cx:7.5,cy:7.2,r:.9,class:'m-wood-dot'},wood);
+ const crown=el('pattern',{id:'dm-crown',width:28,height:28,patternUnits:'userSpaceOnUse'},defs);
+ [[6,7,4.2],[19,4,3.4],[14,17,4.6],[3,22,3.2],[24,23,3.8]].forEach(([cx,cy,r])=>el('circle',{cx,cy,r,class:'m-crown'},crown));
+ patterns.push(wood,crown);
+}
+function updatePatterns(k){for(const p of patterns)p.setAttribute('patternTransform',`scale(${1/k})`)}
 
-// --- Sheet: paper under everything, a clip for the content, frame on top.
-function paper(world){el('rect',{x:-12000,y:-10000,width:22000,height:22000,fill:PAL.paper,class:'litho-paper'},world)}
+// --- Sheet: margin under everything, the land clipped to the frame, frame and grid on top.
+function paper(world){el('rect',{x:-12000,y:-10000,width:22000,height:22000,class:'m-paper'},world)}
 function clip(world,defs){
  const cp=el('clipPath',{id:'clipF'},defs);
  el('rect',{x:FR[0],y:FR[1],width:FR[2]-FR[0],height:FR[3]-FR[1]},cp);
- return el('g',{'clip-path':'url(#clipF)'},world);
+ const sheet=el('g',{'clip-path':'url(#clipF)'},world);
+ el('rect',{x:FR[0],y:FR[1],width:FR[2]-FR[0],height:FR[3]-FR[1],class:'m-land'},sheet);
+ return sheet;
 }
-function frame(world,defs){
- const [x0,y0,x1,y1]=FR,B=90,c=PAL.frameC;
- const margin=pattern(defs,'lithoMargin',8,dots('#d9d2ba',1.1,[[2.5,2.5],[7.5,7.5]]));
- el('path',{d:`M${x0-4000} ${y0-4000}H${x1+4000}V${y1+4000}H${x0-4000}Z M${x0-B} ${y0-B}V${y1+B}H${x1+B}V${y0-B}Z`,fill:margin,'fill-rule':'evenodd'},world);
- el('rect',{x:x0,y:y0,width:x1-x0,height:y1-y0,fill:'none',stroke:c,style:u(.8)},world);
- el('rect',{x:x0-B,y:y0-B,width:x1-x0+2*B,height:y1-y0+2*B,fill:'none',stroke:c,style:u(1.4)},world);
- // Alternating 500 m bands between the two frame lines.
- let d='';const s=B*.42;
- for(let x=x0,i=0;x<x1;x+=500,i++)if(i%2){const w=Math.min(500,x1-x);d+=`M${x} ${y0-B/2-s/2}h${w}v${s}h${-w}Z M${x} ${y1+B/2-s/2}h${w}v${s}h${-w}Z`}
- for(let y=y0,i=0;y<y1;y+=500,i++)if(i%2){const h=Math.min(500,y1-y);d+=`M${x0-B/2-s/2} ${y}v${h}h${s}v${-h}Z M${x1+B/2-s/2} ${y}v${h}h${s}v${-h}Z`}
- el('path',{d,fill:c},world);
- // 1 km grid over the content.
- let gd='';for(let x=x0+1000;x<x1;x+=1000)gd+=`M${x} ${y0}V${y1}`;for(let y=y0+1000;y<y1;y+=1000)gd+=`M${x0} ${y}H${x1}`;
- el('path',{d:gd,fill:'none',stroke:c,opacity:.28,style:u(.6)},world);
- cartouche(world,x1-120,y1-120);
- el('rect',{x:x0-B/2-s/2,y:y0-B/2-s/2,width:x1-x0+B+s,height:y1-y0+B+s,fill:'none',stroke:c,style:u(.6)},world);
-}
-// Sheet cartouche, bottom right where the map is empty.
-// DRAFT WORDING — the texts await the author's sign-off.
-function cartouche(G,rx,by){
- const W=2050,H=1060,x=rx-W,y=by-H,c=PAL.frameC,ink=PAL.ink;
- el('rect',{x:x+14,y:y+18,width:W,height:H,fill:'#5e4e38',opacity:.08},G);
- el('rect',{x,y,width:W,height:H,fill:'#f7f3e6',stroke:c,style:u(1.4)},G);
- el('rect',{x:x+28,y:y+28,width:W-56,height:H-56,fill:'none',stroke:c,style:u(.6)},G);
- const t=(tx,ty,txt,a)=>{const n=el('text',{x:tx,y:ty,'text-anchor':'middle','font-family':'Georgia,serif',fill:ink,...a},G);n.textContent=txt};
- const cx=x+W/2;
- t(cx,y+170,'MAINE · PENOBSCOT COUNTY',{'font-size':62,'letter-spacing':14,fill:'#6b5c42'});
- t(cx,y+400,'DERRY',{'font-size':250,'font-weight':700,'letter-spacing':60});
- el('path',{d:`M${cx-600} ${y+470}H${cx-60}M${cx+60} ${y+470}H${cx+600}M${cx} ${y+445}l25 25l-25 25l-25 -25Z`,fill:c,stroke:c,style:u(.8)},G);
- t(cx,y+570,'a reconstructed town plan after Stephen King’s IT',{'font-size':66,'font-style':'italic',fill:'#4a4a3e'});
- t(cx,y+650,'1957–58 · 1984–85',{'font-size':56,'letter-spacing':10,fill:'#6b5c42'});
- // Plain 0–1000 m bar in 250 m blocks; the historical "extension scale" left of
- // zero confused readers and is gone.
- const sx=cx-500,sy=y+770;
- for(let i=0;i<4;i++)el('rect',{x:sx+i*250,y:sy,width:250,height:34,fill:i%2?'#f7f3e6':ink,stroke:ink,style:u(.8)},G);
- [['0',0],['250',250],['500',500],['1000 m',1000]].forEach(([l,d])=>t(sx+d,sy+100,l,{'font-size':50}));
- t(cx,y+H-80,'Relief conceptual · heights approximate, in metres',{'font-size':44,'font-style':'italic',fill:'#6b5c42'});
- const nx=x+W-230,ny=y+780;
- el('path',{d:`M${nx} ${ny-150}L${nx+55} ${ny+60}L${nx} ${ny+25}Z`,fill:ink},G);
- el('path',{d:`M${nx} ${ny-150}L${nx-55} ${ny+60}L${nx} ${ny+25}Z`,fill:'#f7f3e6',stroke:ink,style:u(.8)},G);
- t(nx,ny-175,'N',{'font-size':70,'font-weight':700});
-}
-// Screen-stuck A–J / 1–8 grid index chips, drawn into the overlay every view change.
+// The 1 km grid inside the sheet (its own slot, over the content) and one frame line.
+function grid(g){let d='';for(let x=-6000;x<=FR[2];x+=1000)d+=`M${x} ${FR[1]}V${FR[3]}`;for(let y=-3000;y<=FR[3];y+=1000)d+=`M${FR[0]} ${y}H${FR[2]}`;el('path',{d,class:'m-grid',style:u(.6)},g)}
+function frame(world){el('rect',{x:FR[0],y:FR[1],width:FR[2]-FR[0],height:FR[3]-FR[1],class:'m-frame',style:u(1.4)},world)}
+// Grid letters A–J / 1–8 for the 1 km squares, stuck to the screen edges; drawn into the overlay every view change.
 function gridRefs(g,view){
- const[x0,y0,x1,y1]=FR,ink='#6b5c42';
- const S=(x,y)=>[(x-view.cx)*view.k+view.w/2,(y-view.cy)*view.k+view.h/2];
- const tl=S(x0,y0),top=Math.max(tl[1]-8,62),left=Math.max(tl[0]-8,14);
- const chip=(x,y,t)=>{el('rect',{x:x-8,y:y-8,width:16,height:16,rx:8,fill:'#f7f3e6',stroke:'#b9ab88','stroke-width':.8,'pointer-events':'none'},g);
-  const n=el('text',{x,y:y+3.4,'text-anchor':'middle',style:'font:700 9.5px Georgia,serif',fill:ink,'pointer-events':'none'},g);n.textContent=t};
- if(S(x0,y1)[1]<top+20||tl[1]>view.h)return;
- for(let i=0,x=x0;x<x1;x+=1000,i++){const cx=S(Math.min(x+500,(x+x1)/2),0)[0];if(cx>30&&cx<view.w-70)chip(cx,top,'ABCDEFGHIJ'[i])}
- if(S(x1,0)[0]<left+20||tl[0]>view.w)return;
- for(let j=0,y=y0;y<y1;y+=1000,j++){const cy=S(0,Math.min(y+500,(y+y1)/2))[1];if(cy>top+18&&cy<view.h-80)chip(left,cy,String(j+1))}
+ const sx=x=>(x-view.cx)*view.k+view.w/2,sy=y=>(y-view.cy)*view.k+view.h/2;
+ for(let i=0;i<10;i++){const x=sx(-5500+i*1000);if(x<20||x>view.w-20)continue;el('text',{x:r1(x),y:r1(Math.max(14,sy(FR[1])-8)),class:'gref'},g).textContent='ABCDEFGHIJ'[i]}
+ for(let j=0;j<8;j++){const y=sy(-2500+j*1000);if(y<20||y>view.h-20)continue;el('text',{x:r1(Math.max(12,sx(FR[0])-10)),y:r1(y+4),class:'gref'},g).textContent=String(j+1)}
 }
 
 // --- Adapter: payload.base (cls-tagged, map y) -> litho layer structures (screen y).
@@ -113,20 +81,20 @@ function adapt(payload){
    const plain=o.fill==='#c7beb0'&&!o.stroke;
    D.buildings.push([o.x,-o.y,o.w,o.h,-(o.angle||0),plain?0:1,o.fill,o.stroke]);continue}
   if(o.type==='circle'){D.dots.push({x:o.x,y:-o.y,r:o.r,fill:o.fill,stroke:o.stroke,w:o.width,lyr:o.layer});continue}
-  if(o.points)D.misc.push({p:flip(o.points),close:o.type==='poly',fill:o.fill,s:o.stroke,w:o.width,dash:o.dash,lyr:o.layer});
+  // Other polygons (fields, sand, yards) are areas; the remaining lines are small objects.
+ if(o.points&&o.type==='poly'){D.areas.push({p:flip(o.points),fill:o.fill,stroke:o.stroke,w:o.width});continue}
+ if(o.points)D.misc.push({p:flip(o.points),fill:o.fill,s:o.stroke,w:o.width,dash:o.dash,lyr:o.layer});
  }
  D.labels=(payload.labels||[]).map(l=>({t:l.text,x:l.x,y:-l.y}));
  return D;
 }
 
-// --- Slots: litho paint order; unported classes keep their classic drawing inside their slot.
-const SLOT_ORDER=['under','valley','areas','forest','veg','relief','builtup','symbols','water','roads','covered','misc','buildings','dots','trees','flow'];
-const SLOT_OF={valley:'valley','water-edge':'water','water-core':'water',covered:'covered',
- rail:'roads','rail-fill':'roads','rail-ties':'roads',path:'roads',contour:'relief',
- barrens:'forest',forest:'forest','forest-light':'forest',park:'areas',lot:'areas',veg:'veg',
- building:'buildings',misc:'misc'};
-function slotOf(o){const c=o.cls||'misc';if(SLOT_OF[c])return SLOT_OF[c];if(c.startsWith('road-'))return'roads';return'misc'}
+// --- Slots: survey paint order (renderer layers 3–16), all inside the clipped sheet.
+const SLOT_ORDER=['areas','valley','forest','relief','veg','builtup','symbols','water','buildings','roads','covered','misc','dots','grid'];
 function makeSlots(host){const s={};for(const n of SLOT_ORDER)s[n]=el('g',{class:'slot-'+n},host);return s}
+// Payload fills of parks, yards, fields and sand → survey area classes.
+const AREA={'#dce2c7':'m-park','#d7cbb5':'m-yard','#d5c7a2':'m-yard','#c3b18c':'m-yard','#e7e1bf':'m-sand','#e0ddc9':'m-field','#d4d4b7':'m-field'};
+function drawAreas(g,D){for(const a of D.areas)el('path',{d:pd(a.p,1),class:AREA[a.fill]||'m-field'},g)}
 
 // --- Water (handoff blocks 1 and 5): extended rivers, bank rings, tapered brooks,
 // canal lock and portals, ripple; the covered channel draws after the roads.
@@ -170,9 +138,8 @@ function chunks(p,n){const L=[0];for(let i=1;i<p.length;i++)L.push(L[i-1]+Math.h
 function dirAt(p,st){const a=st?p[0]:p[p.length-1],b=st?p[1]:p[p.length-2];return[a,Math.atan2(a[1]-b[1],a[0]-b[0])]}
 const WATER_OPTS={valley:'#dde3c9',valleyRing:'#dde3c9',rings:{n:3,gap:4.5,cap:18,lw:2.6,c:'#a5c3c9'},
  bank:'#5f8c97',bankMin:1.2,water:'#87b0ba',ripple:'#b3cfd4',covered:'#5f8c97',portals:'#5b4e38'};
-function drawValley(g,D){const o=WATER_OPTS;
- for(const v of D.valley)el('path',{d:pd(v.p),fill:'none',stroke:o.valley,'stroke-width':v.w,'stroke-linecap':'round','stroke-linejoin':'round'},g);
-}
+// Valley floor: a wide soft band under the stream, world width from the data.
+function drawValley(g,D){for(const v of D.valley)el('path',{d:pd(v.p),class:'m-valley',style:`stroke-width:${v.w}px`},g)}
 function drawWater(g,D){const o=WATER_OPTS;
  const W=D.water.filter(w=>!w.edge);
  const cap=w=>w.id==='canal'||w.id==='outlet'?'butt':'round';
@@ -222,15 +189,11 @@ function drawCovered(g,D){const o=WATER_OPTS;
   el('path',{d:pd(c.p),fill:'none',stroke:o.water,opacity:.45,style:mx(10,2.6),'stroke-linecap':'butt'},g)}
 }
 
-// --- Relief (handoff block 3): a warm tonal wash for closed contours over 650 m,
-// overlaps accumulate (higher reads warmer), plus dashed form lines from mid zoom.
+// --- Relief: only the bold contour set (the other one duplicates it), thin and pale.
+function isClosed(p){return Math.hypot(p[0][0]-p[p.length-1][0],p[0][1]-p[p.length-1][1])<40}
 function drawRelief(g,D){
- const CS=D.contours.filter(c=>c.i===1),isCl=c=>Math.hypot(c.p[0][0]-c.p[c.p.length-1][0],c.p[0][1]-c.p[c.p.length-1][1])<30;
- const big=c=>{const[x0,y0,x1,y1]=bbox(c.p);return Math.max(x1-x0,y1-y0)>650};
- for(const c of CS)if(isCl(c)&&big(c))el('path',{d:pd(c.p,1),fill:'#a08a62',opacity:.075,stroke:'none'},g);
- for(const c of CS)if(!isCl(c)||big(c))el('path',{d:pd(c.p,isCl(c)),fill:'none',stroke:'#a8966f',class:'lod-mid',style:u(.8)+';'+dash(4,3),'stroke-linecap':'round'},g);
+ for(const c of D.contours)if(c.i===1){const z=isClosed(c.p);el('path',{d:pd(c.p,z),class:'m-contour'+(z?' is-closed':''),style:u(.8)},g)}
 }
-function bbox(p){let a=1e9,b=1e9,c=-1e9,d=-1e9;for(const[x,y]of p){if(x<a)a=x;if(y<b)b=y;if(x>c)c=x;if(y>d)d=y}return[a,b,c,d]}
 // Hill spot heights for the overlay: innermost closed contours, heights are declaredly conceptual.
 function peaks(D){
  const cl=D.contours.filter(c=>c.i===1&&Math.hypot(c.p[0][0]-c.p[c.p.length-1][0],c.p[0][1]-c.p[c.p.length-1][1])<30);
@@ -248,36 +211,29 @@ function peaks(D){
 function inPoly(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const[xi,yi]=p[i],[xj,yj]=p[j];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c}return c}
 function rng(seed){let s=seed>>>0||1;return()=>{s^=s<<13;s^=s>>>17;s^=s<<5;return(s>>>0)/4294967296}}
 
-// --- Built-up tone (handoff block 4): a 70 m grid cell is painted when its 3×3
-// neighbourhood holds 5+ houses; one path, drawn under the buildings.
+// --- Built-up tint below k 0.8: every house joined to every neighbour within 95 m,
+// stroked 60 m wide with round caps and joins, so a street of houses reads as one
+// smooth band (no beads, no staircase). One path; footprints take over from k 0.8.
 function drawBuiltUp(g,D){
- const c=70,grid={};for(const b of D.buildings){const k=Math.floor(b[0]/c)+','+Math.floor(b[1]/c);grid[k]=(grid[k]||0)+1}
- let d='';for(const key in grid){const[x,y]=key.split(',').map(Number);let n=0;for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)n+=grid[(x+i)+','+(y+j)]||0;if(n>=5)d+='M'+(x*c-8)+' '+(y*c-8)+'h'+(c+16)+'v'+(c+16)+'h'+(-c-16)+'Z'}
- el('path',{d,fill:'#e2c3a4',stroke:'#e2c3a4','stroke-width':44,'stroke-linejoin':'round',opacity:.55},g);
+ const B=D.buildings,cell=95,grid=new Map();
+ B.forEach((b,i)=>{const k=Math.floor(b[0]/cell)+':'+Math.floor(b[1]/cell);(grid.get(k)||grid.set(k,[]).get(k)).push(i)});
+ let d='';
+ B.forEach((b,i)=>{const gx=Math.floor(b[0]/cell),gy=Math.floor(b[1]/cell);
+  d+=`M${r1(b[0])} ${r1(b[1])}h0`;   // a lone house still gets a dot
+  for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++)for(const j of grid.get((gx+ox)+':'+(gy+oy))||[])
+   if(j>i&&(B[j][0]-b[0])**2+(B[j][1]-b[1])**2<cell*cell)d+=`M${r1(b[0])} ${r1(b[1])}L${r1(B[j][0])} ${r1(B[j][1])}`});
+ el('path',{d,class:'m-builtup lod-massing',style:'stroke-width:60px'},g);
 }
 
-// --- Woodland and vegetation (handoff block 5).
-function drawForest(g,D,defs){
- const dots=(c,r,pts)=>p=>pts.forEach(([x,y])=>el('circle',{cx:x,cy:y,r,fill:c},p));
- const hatch=pattern(defs,'lithoForest',9,dots('#8ea27f',.85,[[2,2],[7,4.5],[4,8],[9.5,9],[0,6]]));
- const hatch2=pattern(defs,'lithoForest2',7,dots('#6f8a63',1,[[2,2],[7,3],[4,7],[9,8],[5,5]]));
- for(const f of D.forest){const bar=f.t==='barrens',d=pd(f.p,1);
-  el('path',{d,fill:bar?'#c4d1af':f.t},g);
-  el('path',{d,fill:bar?hatch:hatch2},g);
-  if(bar)el('path',{d,fill:'none',stroke:'#a6bb95',style:u(3.2),'stroke-linecap':'round'},g)}
+// --- Woods: one patterned fill, tree crowns from near zoom, a 1px edge.
+function drawForest(g,D){
+ const d=D.forest.map(f=>pd(f.p,1)).join('');
+ el('path',{d,class:'m-wood-area',fill:'url(#dm-wood)'},g);
+ el('path',{d,class:'m-wood-crowns lod-near',fill:'url(#dm-crown)'},g);
+ el('path',{d,class:'m-wood-edge',style:u(1)},g);
 }
-function drawVeg(g,D){
- for(const v of D.veg)el('path',{d:pd(v.p),fill:'none',stroke:v.t?'#7a9069':'#95a883','stroke-width':v.t?2:1.8,style:u(v.t?1.1:.8),'stroke-linecap':'round'},g);
-}
-// Tree crown symbols, deterministic scatter (seed 7), mid zoom and closer.
-function trees(D,step,cap,seed){const R=rng(seed),pts=[];for(const f of D.forest){const[a,b,c,d]=bbox(f.p);const st=f.t==='barrens'?step:step*.7;for(let x=a;x<c;x+=st)for(let y=b;y<d;y+=st){const px=x+(R()-.5)*st*.9,py=y+(R()-.5)*st*.9;if(inPoly(px,py,f.p)&&R()>.18)pts.push([px,py,R()])}}if(pts.length>cap){const k=cap/pts.length;return pts.filter(p=>p[2]<k||p[2]>.999)}return pts}
-function drawTrees(g,D,defs,cap){
- const id='lithoTree',s=el('g',{id},defs);
- el('circle',{cx:1.8,cy:2.4,r:9,fill:'#5e4e38',opacity:.16},s);
- [[-3,1,5.5],[3,1.5,5.5],[0,-3,6]].forEach(([x,y,r])=>el('circle',{cx:x,cy:y,r,fill:'#a9bd94',stroke:'#7a9069','stroke-width':.8},s));
- const tg=el('g',{class:'lod-mid'},g);
- for(const[x,y,r]of trees(D,80,cap||2600,7))el('use',{href:'#lithoTree',transform:`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${(.8+r*.45).toFixed(2)})`},tg);
-}
+// Wet-ground ticks from mid zoom: short marks, one path.
+function drawVeg(g,D){el('path',{d:D.veg.map(v=>pd(v.p)).join(''),class:'m-veg lod-mid',style:u(1)},g)}
 // Conventional signs: marsh tufts around "Wet ground", bamboo around "Bamboo thickets",
 // sparse tufts along the valley floor; nothing lands within 8–10 m of water.
 function drawSymbols(g,D){
@@ -293,15 +249,14 @@ function drawSymbols(g,D){
  for(const v of D.valley)for(let i=1;i<v.p.length;i++){const a=v.p[i-1],b=v.p[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]),nx=-(b[1]-a[1])/L,ny=(b[0]-a[0])/L;for(let t=0;t<L;t+=60){if(rr()<.55)continue;const f=t/L,of=(rr()-.5)*v.w*.9,x=a[0]+(b[0]-a[0])*f+nx*of,y=a[1]+(b[1]-a[1])*f+ny*of;if(!wet(x,y,10))tuft(x,y,.8)}}
 }
 
-// --- Buildings (handoff block 7): one node set reused via <use>; shadow from mid zoom.
-function drawBuildings(g,D,defs){
- const bg=el('g',{id:'lithoBld'},defs);
- for(const[x,y,w,h,a,cl]of D.buildings)if(cl===0)el('rect',{x:-w/2,y:-h/2,width:w,height:h,transform:`translate(${x} ${y}) rotate(${a})`},bg);
- el('use',{href:'#lithoBld',fill:'#5e4e38',opacity:.26,transform:'translate(2.2 2.6)',class:'lod-mid'},g);
- el('use',{href:'#lithoBld',fill:'#b3a48c'},g);
- for(const[x,y,w,h,a,cl,f,s]of D.buildings)if(cl!==0){const t=`translate(${x} ${y}) rotate(${a})`;
-  el('rect',{x:-w/2,y:-h/2,width:w,height:h,transform:`translate(3 3.5) `+t,fill:'#5e4e38',opacity:.26},g);
-  el('rect',{x:-w/2,y:-h/2,width:w,height:h,transform:t,fill:f,stroke:s||null,'stroke-width':s?1.5:null},g)}
+// --- Buildings: footprints from k 0.8 (one path) and landmarks at every zoom (one path).
+function drawBuildings(g,D){
+ let dB='',dK='';
+ for(const[x,y,w,h,ang,cl]of D.buildings){const a=ang*Math.PI/180,c=Math.cos(a),si=Math.sin(a),hw=w/2,hh=h/2;
+  const d=pd([[-hw,-hh],[hw,-hh],[hw,hh],[-hw,hh]].map(([p,q])=>[x+p*c-q*si,y+p*si+q*c]),1);
+  if(cl)dK+=d;else dB+=d}
+ el('path',{d:dB,class:'m-bld lod-plan',style:u(.7)},g);
+ el('path',{d:dK,class:'m-bld-key',style:'stroke-width:max(calc(var(--u)*.8),4px)'},g);
 }
 function drawMisc(g,D){
  for(const m of D.misc)el('path',{d:pd(m.p,m.close),fill:m.close?(m.fill||'none'):'none',stroke:m.s||'none','stroke-width':m.w,
@@ -359,7 +314,7 @@ function roadLabel(g,lab,view,roads){
  return true;
 }
 
-window.DerryLitho={el,pd,u,mx,dash,FR,PAL,pattern,updatePatterns,paper,clip,frame,gridRefs,IC,iconOf,badge,roadLabel,
- adapt,prepWater,makeSlots,slotOf,drawValley,drawWater,drawCovered,drawRoads,
- drawRelief,drawBuiltUp,drawForest,drawVeg,drawTrees,drawSymbols,drawBuildings,drawDots,drawMisc,peaks,inner,chunks,dirAt};
+window.DerryLitho={el,pd,u,mx,dash,FR,LOD,makePatterns,updatePatterns,paper,clip,grid,frame,gridRefs,IC,iconOf,badge,roadLabel,
+ adapt,prepWater,makeSlots,drawAreas,drawValley,drawWater,drawCovered,drawRoads,
+ drawRelief,drawBuiltUp,drawForest,drawVeg,drawSymbols,drawBuildings,drawDots,drawMisc,peaks,inner,chunks,dirAt};
 })();

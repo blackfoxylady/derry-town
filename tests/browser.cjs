@@ -37,9 +37,15 @@ const path=require('node:path');
   assert.equal(await page.locator('.place-directory-list a[href="/places/12-derry-public-library/"]').count(),1);
   assert.equal(await page.locator('.directory-jump').isVisible(),true);
   assert.equal(await page.locator('.place-group[open]').count(),name==='mobile'?1:7);
-  // Litho world: paper + clipped slot groups + sheet frame; buildings collapse into <use>.
+  // Survey sheet: margin + land clipped into slot groups + one frame; houses are two paths
+  // (footprints, landmarks), the built-up tint one, the woods three; no cartouche, no tree symbols.
   assert(await page.locator('#world .slot-water *').count()>10);
-  assert(await page.locator('#world *').count()>2000);
+  assert.equal(await page.locator('#world .slot-buildings path').count(),2);
+  assert.equal(await page.locator('#world .m-builtup').count(),1);
+  assert.equal(await page.locator('#world .slot-forest path').count(),3);
+  assert.equal(await page.locator('#world .m-frame').count(),1);
+  assert.equal(await page.locator('#world use, #world text').count(),0);
+  assert.equal(await page.evaluate(()=>document.querySelector('#map').dataset.bld),'tint');
   assert(await page.locator('.mark').count()>15);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   assert(await page.locator('.brand h1').evaluate(n=>n.getBoundingClientRect().top>=0));
@@ -67,6 +73,7 @@ const path=require('node:path');
   await page.locator('.map-legend summary').click();
   await page.locator('#showRelief').uncheck();
   assert.equal(await page.locator('#world .relief').first().evaluate(n=>getComputedStyle(n).display),'none');
+  assert.equal(await page.locator('#landLabels .peak').count(),0);
   await page.locator('#showRelief').check();
   await page.locator('#showBuildings').uncheck();
   assert.equal(await page.locator('#world .buildings').first().evaluate(n=>getComputedStyle(n).display),'none');
