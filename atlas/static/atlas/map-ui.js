@@ -210,11 +210,13 @@ window.DerryMapUI = function (ctx) {
    u.setAttribute('aria-label', sub(n_('No location: show the %s place without a point in the list', 'No location: show the %s places without a point in the list', nu), {n: nu}));
   });
  }
- // Category: a checklist under the chip (↑/↓, Space, Esc, Tab leaves); a bottom sheet on the phone.
+ // Category: a checklist under the chip (↑/↓, Space, Esc, Tab leaves); a modal bottom sheet on the phone.
  function setCat(open, refocus) {
   const asSheet = open && phone.matches;
   catMenu.hidden = !open; catBtn.setAttribute('aria-expanded', String(open));
   catMenu.classList.toggle('is-sheet', asSheet); scrim.hidden = !asSheet;
+  catMenu.setAttribute('role', asSheet ? 'dialog' : 'group');
+  if (asSheet) catMenu.setAttribute('aria-modal', 'true'); else catMenu.removeAttribute('aria-modal');
   draft = asSheet ? new Set(state.active) : null;
   controls();
   if (open) catItems[0].focus(); else if (refocus) catBtn.focus();
@@ -235,6 +237,15 @@ window.DerryMapUI = function (ctx) {
   const i = catItems.indexOf(document.activeElement);
   if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && i >= 0) { e.preventDefault(); catItems[(i + (e.key === 'ArrowDown' ? 1 : catItems.length - 1)) % catItems.length].focus(); }
   else if (e.key === 'Escape') { e.preventDefault(); setCat(false, true); }
+ });
+ document.addEventListener('keydown', e => {
+  if (!draft || catMenu.hidden || e.key !== 'Tab') return;
+  const items = [...catMenu.querySelectorAll('button:not([disabled]):not([tabindex="-1"]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])')].filter(el => el.offsetParent !== null);
+  if (!items.length) return;
+  const first = items[0], last = items[items.length - 1];
+  if (!catMenu.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+  else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
  });
  catMenu.addEventListener('focusout', e => { if (!draft && !catMenu.hidden && !catMenu.contains(e.relatedTarget) && e.relatedTarget !== catBtn) setCat(false); });
  document.addEventListener('click', e => { if (!catMenu.hidden && !draft && !q('.cat').contains(e.target)) setCat(false); });

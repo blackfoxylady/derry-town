@@ -88,6 +88,22 @@ const path=require('node:path');
    await page.locator('[data-sheet-to="full"]').click();
    assert.equal(await page.locator('#index').getAttribute('data-sheet'),'full');
    assert.equal(await page.locator('#list').isVisible(),true);
+   // Category is a modal sheet: Tab stays inside, Esc closes it and restores the opener.
+   await page.locator('#catBtn').click();
+   assert.equal(await page.locator('#catMenu').getAttribute('role'),'dialog');
+   assert.equal(await page.locator('#catMenu').getAttribute('aria-modal'),'true');
+   await page.locator('#catMenu [data-cat-close]').focus();
+   await page.keyboard.press('Shift+Tab');
+   assert.equal(await page.evaluate(()=>document.activeElement.hasAttribute('data-cat-apply')),true);
+   await page.keyboard.press('Tab');
+   assert.equal(await page.evaluate(()=>document.activeElement.hasAttribute('data-cat-close')),true);
+   await page.locator('#map').focus();
+   await page.keyboard.press('Tab');
+   assert.equal(await page.evaluate(()=>document.activeElement.hasAttribute('data-cat-close')),true);
+   await page.keyboard.press('Escape');
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'catBtn');
+   assert.equal(await page.locator('#catMenu').getAttribute('role'),'group');
+   assert.equal(await page.locator('#catMenu').getAttribute('aria-modal'),null);
    await page.locator('.sheet-pill').click();
    assert.equal(await page.locator('#index').getAttribute('data-sheet'),'peek');
   }
