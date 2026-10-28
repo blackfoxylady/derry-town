@@ -93,21 +93,56 @@ svg#map.dragging{cursor:grabbing}svg#map.measuring{cursor:crosshair}
 .directory-jump span{font:var(--weight-semibold) var(--text-m) var(--font-display);letter-spacing:.03em}
 .directory-jump small{font-size:var(--text-xs);color:var(--color-ink-2)}
 .directory-jump:hover{background:var(--color-surface-sunk)}
-@media (min-width:64em){.brand-chip,.place-card__unlocated{display:none}}
-/* Under 1024 px (until the phone sheet, block 09b): the map on top, the panel below it. */
+@media (min-width:64em){.brand-chip,.place-card__unlocated,.index-grab,.index-peek,.sheet-pill{display:none}}
+/* Phone and tablet < 1024 px (block 09b): a full-screen map with a floating brand chip and a
+   bottom sheet over it. The sheet is the index panel itself in four positions (data-sheet):
+   peek (search + counts + "List ↑"), half (search results), full (the list), card (the place).
+   It sits over the stage, so the stage never resizes while it moves. */
 @media (max-width:63.99em){
- .app{display:flex;flex-direction:column;height:auto}
- .stage{flex:none;height:calc(100vh - 44px);height:calc(100dvh - 44px)}
- .directory-jump{flex:none;min-height:44px}
- .index{border-right:0;border-top:var(--border-2) solid var(--color-line-strong)}
+ .app{display:block;position:relative;height:auto}
+ .stage{height:100vh;height:100dvh}
+ .directory-jump{min-height:44px}
  .index-head{display:none}
- .index .place-list{max-height:70vh}
- .viewbar{top:64px}
- .tools{top:64px;right:10px}
- .map-legend{right:10px;bottom:12px;width:170px}
- .scale-panel{left:10px;bottom:12px}
- .map-notice{top:116px;left:10px;right:10px}
+ .index{position:absolute;left:0;right:0;bottom:44px;z-index:var(--z-sheet);border:0;border-top:var(--border-2) solid var(--color-line-strong);border-radius:var(--radius-4) var(--radius-4) 0 0;box-shadow:var(--shadow-sheet);overflow:hidden;transition:height var(--duration-2,.2s) var(--ease-out,ease-out)}
+ .index.is-dragging{transition:none}
+ .index[data-sheet="peek"]{height:auto}
+ .index[data-sheet="half"]{height:52vh;height:52dvh}
+ .index[data-sheet="full"]{height:calc(100dvh - 70px)}
+ .index[data-sheet="card"]{height:66vh;height:66dvh}
+ .index-grab{flex:none;display:flex;justify-content:center;align-items:flex-start;height:20px;padding-top:8px;touch-action:none;cursor:grab}
+ .index-grab::before{content:"";width:40px;height:4px;border-radius:2px;background:var(--color-control)}
+ .index-tools{padding:0 16px 10px;border-bottom:0}
+ .index-peek{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:0 16px 14px}
+ .index[data-sheet="peek"] .filters,.index[data-sheet="peek"] .index-listhead,.index[data-sheet="peek"] .place-list,
+ .index[data-sheet="half"] .filters,.index[data-sheet="half"] .index-peek,
+ .index[data-sheet="full"] .index-peek{display:none}
+ .index[data-sheet="half"] .index-tools,.index[data-sheet="full"] .index-tools{border-bottom:var(--border-1) solid var(--color-line)}
+ .index .place-list{max-height:none}
+ .place-row{padding-left:16px;padding-right:16px}
+ .index-listhead{padding-left:16px}
+ /* Card: pager and × on the right, no "All places"; "Open place page" pinned to the bottom. */
+ .place-card__back{display:none}
+ .place-card__nav{border-bottom:0;padding:0 4px 0 16px}
+ .place-card__body{padding:0 16px 16px;gap:10px}
+ .place-card__title{font-size:1.625rem;line-height:1.05}
+ .place-card .card-photo{--photo-w:124px}
+ .place-card__note{font-size:var(--text-m);line-height:1.5}
+ .place-card__foot{padding:10px 16px 14px}
+ .map-notice{display:none}
+ /* The "Show map" pill over the full list. */
+ .sheet-pill{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:1;min-height:48px;padding:0 22px;border-radius:var(--radius-pill);box-shadow:0 4px 14px rgb(24 38 46 / .3)}
+ .index:not([data-sheet="full"]) .sheet-pill{display:none}
+ /* Map furniture sits above the sheet's peek line; +/− stay clear of the sheet. */
+ .tools{top:10px;right:10px}
+ .viewbar{top:62px;left:10px;transform:none}
+ .viewbar button{padding:0 10px}
+ .scale-panel{left:10px;max-width:170px;bottom:calc(var(--sheet-h,140px) + 12px)}
+ .map-legend{right:10px;width:150px;bottom:calc(var(--sheet-h,140px) + 12px)}
+ html[data-sheet="full"] .scale-panel,html[data-sheet="full"] .map-legend,html[data-sheet="full"] .toast{display:none}
+ .toast{bottom:calc(var(--sheet-h,140px) + 64px)}
+ .cookie{bottom:calc(var(--sheet-h,140px) + 8px)}
 }
+@media (prefers-reduced-motion:reduce){.index{transition:none}}
 @media print{.index,.viewbar,.tools,.map-legend,.toast,.brand-chip,.map-notice{display:none!important}.app,.stage{display:block;height:100vh;width:100vw}svg#map{width:100%;height:100%}#photoLayer{display:none}}
 /* Survey cartography (block 12): layer classes over the --map-* tokens, ported from the
    Design renderer (derry-map.css, style "survey"). Widths are set inline in screen px via --u. */

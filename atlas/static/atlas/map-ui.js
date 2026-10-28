@@ -12,6 +12,7 @@ window.DerryMapUI = function (ctx) {
  const glyph = letter => tpl.querySelector(`[data-glyph="${letter}"]`).outerHTML;
  const icon = name => tpl.querySelector(`[data-icon="${name}"]`).innerHTML;
  const browse = q('#browse'), listEl = q('#list'), card = q('#detail'), notice = q('#mapNotice');
+ const phone = matchMedia('(max-width:63.99em)'), sheet = q('#index');
  // The pager walks every place in the list order: 1…84, then U1…U8.
  const rankOf = s => typeof s.id === 'number' ? s.id : 1000 + Number(s.id.slice(1));
  const order = all.slice().sort((a, b) => rankOf(a) - rankOf(b));
@@ -50,6 +51,8 @@ window.DerryMapUI = function (ctx) {
  search.addEventListener('input', () => {
   state.search = search.value.trim().toLowerCase(); clear.hidden = !search.value;
   search.parentElement.classList.toggle('search--filled', !!search.value); list(); ctx.render();
+  if (state.search && sheet.dataset.sheet === 'peek') setSheet('half');
+  else if (!state.search && sheet.dataset.sheet === 'half') setSheet('peek');
  });
  clear.addEventListener('click', () => { search.value = ''; search.dispatchEvent(new Event('input')); search.focus(); });
 
@@ -66,7 +69,7 @@ window.DerryMapUI = function (ctx) {
   const next = order[order.findIndex(s => s.id === state.selected) + Number(b.dataset.step)];
   if (next) ctx.select(next.id, {zoom: true, paging: true});
  }));
- let opener = null, listScroll = 0;
+ let opener = null, listScroll = 0, beforeCard = 'peek';
 
  function cardBody(s) {
   const L = s.confidence, lv = T.levels[L], fp = photos[String(s.id)];
@@ -80,7 +83,7 @@ window.DerryMapUI = function (ctx) {
   // Up to two polaroids, captioned with the year; the rest are behind the gallery link.
   const pics = fp ? `<div class="card-photos">${fp.photos.slice(0, 2).map(p => `<a class="card-photo" href="${esc(photoUrl(p.id))}"><img src="${esc(p.thumb)}" alt="${esc(p.caption || s.name)}" loading="lazy"><span class="card-photo__cap" aria-hidden="true">${p.year || ''}</span></a>`).join('')}</div>`
    + `<p class="place-card__more"><a class="link link--arrow" href="${esc(fp.gallery || galleryUrl + '?place=' + s.id)}">${esc(_('All photos of this place'))}</a></p>` : '';
-  const refs = (s.refs || []).length ? `<details class="card-sec" open><summary>${esc(_('In the novel'))}<small>${esc(n_('%s chapter', '%s chapters', s.chapters).replace('%s', s.chapters))}</small></summary><ol class="refs">`
+  const refs = (s.refs || []).length ? `<details class="card-sec"${phone.matches ? '' : ' open'}><summary>${esc(_('In the novel'))}<small>${esc(n_('%s chapter', '%s chapters', s.chapters).replace('%s', s.chapters))}</small></summary><ol class="refs">`
    + s.refs.map(([ch, title, part]) => `<li><span class="refs__ch">${esc(ch)}<span class="visually-hidden"> · </span></span><span>${esc(title)}</span>${part ? `<span class="refs__part"><span class="visually-hidden"> · </span>§${esc(part)}</span>` : ''}</li>`).join('') + '</ol></details>' : '';
   return head + unlocated + pics + (s.note ? `<p class="place-card__note">${esc(s.note)}</p>` : '') + refs;
  }
@@ -103,7 +106,8 @@ window.DerryMapUI = function (ctx) {
   // A pager arrow that just went disabled hands focus to the other one.
   if (focused?.disabled) steps[focused === steps[0] ? 1 : 0].focus();
   body.scrollTop = 0;
-  browse.hidden = true; card.hidden = false;
+  if (!wasOpen) beforeCard = sheet.dataset.sheet === 'card' ? 'peek' : sheet.dataset.sheet;
+  browse.hidden = true; card.hidden = false; setSheet('card');
   toggletip(body.querySelector('.place-meta__conf'));
   showNotice(s.confidence === 'U' ? s : null);
   markCurrent(); setAddress(s.id);
@@ -112,7 +116,7 @@ window.DerryMapUI = function (ctx) {
  }
 
  function close() {
-  card.hidden = true; browse.hidden = false; listEl.scrollTop = listScroll;
+  card.hidden = true; browse.hidden = false; setSheet(beforeCard); listEl.scrollTop = listScroll;
   showNotice(null); markCurrent(); setAddress(null);
   // Focus goes back to what opened the card: the row, else the marker, else the map.
   const o = opener; opener = null;
@@ -152,6 +156,58 @@ window.DerryMapUI = function (ctx) {
   document.querySelectorAll('.lang a').forEach(a => { a.href = put(new URL(a.href, location.href)); });
  }
 
- return {list, open, close, hot, closeTip, markCurrent};
+ // ---- Phone sheet (< 1024 px) ------------------------------------------------------------
+ // The panel is a bottom sheet over the map: peek (search, counts, "List ↑"), half (search
+ // results), full (the list, with a "Show map" pill) and card. The grabber drags between them;
+ // × on the card returns to where the sheet was. --sheet-h keeps the scale, key and cookie
+ // notice above it.
+ function setSheet(pos) {
+  sheet.dataset.sheet = document.documentElement.dataset.sheet = pos;
+  q('[data-sheet-to="full"]').setAttribute('aria-expanded', String(pos === 'full'));
+  syncHeight();
+ }
+ function syncHeight() {
+  const h = phone.matches ? Math.round(sheet.getBoundingClientRect().height) : 0;
+  document.documentElement.style.setProperty('--sheet-h', h + 'px');
+ }
+ sheet.addEventListener('transitionend', syncHeight);
+ phone.addEventListener('change', syncHeight);
+ // "List ↑" and "Show map" swap places, so focus moves to the other one.
+ sheet.querySelectorAll('[data-sheet-to]').forEach(b => b.addEventListener('click', () => {
+  setSheet(b.dataset.sheetTo);
+  sheet.querySelector(`[data-sheet-to="${b.dataset.sheetTo === 'full' ? 'peek' : 'full'}"]`).focus();
+ }));
+ const grab = sheet.querySelector('.index-grab');
+ grab.addEventListener('pointerdown', e => {
+  if (!phone.matches) return;
+  grab.setPointerCapture(e.pointerId);
+  const y0 = e.clientY, h0 = sheet.getBoundingClientRect().height, max = innerHeight - 70;
+  let dy = 0;
+  sheet.classList.add('is-dragging');
+  const move = ev => { dy = ev.clientY - y0; sheet.style.height = Math.max(96, Math.min(max, h0 - dy)) + 'px'; syncHeight(); };
+  const up = () => {
+   grab.removeEventListener('pointermove', move); grab.removeEventListener('pointerup', up); grab.removeEventListener('pointercancel', up);
+   sheet.classList.remove('is-dragging'); sheet.style.height = ''; snap(dy);
+  };
+  grab.addEventListener('pointermove', move); grab.addEventListener('pointerup', up); grab.addEventListener('pointercancel', up);
+ });
+ // A drag of 40 px moves one position; a tap toggles peek and the list. Down from peek does
+ // nothing; half exists only while searching; the card closes on a firm drag down.
+ function snap(dy) {
+  const pos = sheet.dataset.sheet;
+  if (pos === 'card') { if (dy > 80) ctx.close(); else syncHeight(); return; }
+  const stops = state.search ? ['peek', 'half', 'full'] : ['peek', 'full'];
+  let i = stops.indexOf(pos); if (i < 0) i = 0;
+  if (Math.abs(dy) < 8) i = pos === 'peek' ? stops.length - 1 : 0;
+  else if (dy <= -40) i = Math.min(stops.length - 1, i + 1);
+  else if (dy >= 40) i = Math.max(0, i - 1);
+  setSheet(stops[i]);
+ }
+ // Screen pixels the card covers at the bottom of the map (phone only): the place is centred above it.
+ const cover = () => phone.matches ? Math.round(innerHeight * 0.66) : 0;
+ const sheetCover = () => phone.matches ? Math.round(sheet.getBoundingClientRect().height) : 0;
+ requestAnimationFrame(syncHeight);
+
+ return {list, open, close, hot, closeTip, markCurrent, cover, sheetCover};
 };
 })();

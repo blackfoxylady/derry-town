@@ -53,7 +53,8 @@ function scene(){
 }
 function screen(x,y){return [(x-state.cx)*state.k+state.w/2,(state.cy-y)*state.k+state.h/2]}
 function geo(x,y){return [state.cx+(x-state.w/2)/state.k,state.cy-(y-state.h/2)/state.k]}
-function fit(id){const v=PAYLOAD.views.find(v=>v.id===id);state.view=id;const [a,b,c,d]=v.bounds;state.cx=(a+c)/2;state.cy=(b+d)/2;state.k=Math.min((state.w-48)/(c-a),(state.h-48)/(d-b));render();}
+// Views fit with a 24 px margin (D40), above the phone sheet when there is one.
+function fit(id){const v=PAYLOAD.views.find(v=>v.id===id),pad=ui.sheetCover();state.view=id;const [a,b,c,d]=v.bounds;state.k=Math.min((state.w-48)/(c-a),(state.h-48-pad)/(d-b));state.cx=(a+c)/2;state.cy=(b+d)/2-pad/2/state.k;render();}
 function catOk(s){return s.kind==='Unlocated'||state.active.has(s.kind)}
 function searchOk(s){return !state.search||[s.id,s.name,s.short,s.note,s.period,...(s.search_aliases||[])].join(' ').toLowerCase().replace(/–/g,'-').includes(state.search.replace(/–/g,'-'))}
 function hits(s){return catOk(s)&&searchOk(s)}
@@ -191,12 +192,14 @@ function openPhotoFeature(key){const f=PHOTOS[key];if(!f)return;if(f.object_type
 const CONF_META={A:_('named in the novel'),B:_('inferred'),C:_('proposed'),U:_('no location')};
 // Short category names, as in meta lines ("Civic" / "Город"): marker labels for screen readers.
 const KIND_SHORT={Homes:p_('kind short','Homes'),Civic:p_('kind short','Civic'),Encounters:p_('kind short','Encounters'),Historical:p_('kind short','Historical'),Barrens:p_('kind short','Barrens'),Outlying:p_('kind short','Outlying')};
-// Choosing a place centres it unless it already sits in the middle 60% of the map; from the
-// list, the pager or a link it also zooms in to street level. An unlocated place leaves the map.
+// Choosing a place centres it unless it already sits in the middle 60% of the visible map (on
+// the phone, the part above the card sheet); from the list, the pager or a link it also zooms
+// in to street level. An unlocated place leaves the map.
 function select(id,opts={}){const s=all.find(s=>s.id===id);if(!s)return;if(typeof opts!=='object')opts={};
  state.selected=id;
- if(typeof id==='number'){const [x,y]=screen(s.x,s.y),inMiddle=x>state.w*.2&&x<state.w*.8&&y>state.h*.2&&y<state.h*.8;
-  if(opts.zoom&&state.k<.48){state.k=.48;state.cx=s.x;state.cy=s.y;state.view=''}else if(!inMiddle){state.cx=s.x;state.cy=s.y;state.view=''}}
+ if(typeof id==='number'){const cover=ui.cover(),vh=state.h-cover,[x,y]=screen(s.x,s.y),inMiddle=x>state.w*.2&&x<state.w*.8&&y>vh*.2&&y<vh*.8;
+  const centre=()=>{state.cx=s.x;state.cy=s.y-cover/2/state.k;state.view=''};
+  if(opts.zoom&&state.k<.48){state.k=.48;centre()}else if(!inMiddle)centre()}
  render();ui.open(s,opts)}
 // Closing (× or Esc) drops the ring and leaves the map where it is; focus returns to the opener.
 function closeDetail(){if(state.selected==null)return;const id=state.selected;state.selected=null;render();

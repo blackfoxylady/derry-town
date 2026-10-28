@@ -1091,3 +1091,13 @@ msgstr[2] "Все %(count)s мест списком"
 
 msgid "%(mapped)s on the map · %(unlocated)s unlocated · about the map"
 msgstr "%(mapped)s на карте · %(unlocated)s без координат · о карте"
+
+#: atlas/templates/atlas/index.html (block 09b: phone sheet)
+msgid "%(mapped_count)s on the map · %(unlocated_count)s unlocated"
+msgstr "%(mapped_count)s на карте · %(unlocated_count)s без координат"
+
+msgid "List"
+msgstr "Список"
+
+msgid "Show map"
+msgstr "Показать карту"

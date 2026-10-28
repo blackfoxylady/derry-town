@@ -69,14 +69,31 @@ const path=require('node:path');
   // The list: 92 rows, the number in the marker style, meta "Kind · period · confidence".
   assert.equal(await page.locator('#list .place-row').count(),92);
   assert.match(await page.locator('#list .place-row[data-place="5"] .place-row__meta').innerText(),/^Civic · .+ · inferred$/);
+  if(name==='mobile'){
+   // Phone (block 09b): a bottom sheet over a full-screen map: peek → "List ↑" → full → "Show map".
+   assert.equal(await page.locator('#index').getAttribute('data-sheet'),'peek');
+   assert.equal(await page.locator('#list').isVisible(),false);
+   await page.locator('[data-sheet-to="full"]').click();
+   assert.equal(await page.locator('#index').getAttribute('data-sheet'),'full');
+   assert.equal(await page.locator('#list').isVisible(),true);
+   await page.locator('.sheet-pill').click();
+   assert.equal(await page.locator('#index').getAttribute('data-sheet'),'peek');
+  }
   await page.locator('#search').fill('library');
+  if(name==='mobile')assert.equal(await page.locator('#index').getAttribute('data-sheet'),'half');
   assert((await page.locator('#list .place-row').count())>=1);
   await page.locator('#list .place-row[data-place="12"]').click();
   // The card replaces the list; focus goes to its heading; ?place follows the card.
   assert.equal(await page.locator('#browse').isVisible(),false);
   assert.match(await page.locator('#detail h2').innerText(),/Library/);
   assert.equal(await page.evaluate(()=>document.activeElement.id),'place-title');
-  assert.match(await page.locator('#detail .place-card__back').innerText(),/Back to results/);
+  assert.match(await page.locator('#detail .place-card__back').textContent(),/Back to results/);
+  if(name==='mobile'){
+   assert.equal(await page.locator('#index').getAttribute('data-sheet'),'card');
+   // The place stays visible above the card sheet.
+   const mk=await page.locator('#markers .mk[data-id="12"]').boundingBox(),sheetTop=(await page.locator('#index').boundingBox()).y;
+   assert(mk&&mk.y+mk.height<sheetTop);
+  }
   assert.match(page.url(),/\?place=12$/);
   assert.match(await page.locator('.lang a[hreflang="ru"]').first().getAttribute('href'),/place=12/);
   assert.match(await page.locator('#detail .card-sec summary').innerText(),/In the novel\s*3 chapters/i);
@@ -89,6 +106,7 @@ const path=require('node:path');
   await page.keyboard.press('Escape');
   assert.equal(await page.locator('#detail').isVisible(),false);
   assert.equal(await page.evaluate(()=>document.activeElement.dataset.place),'12');
+  if(name==='mobile')assert.equal(await page.locator('#index').getAttribute('data-sheet'),'half');
   assert.doesNotMatch(page.url(),/place=/);
   await page.locator('#clearSearch').click();
   await page.locator('#search').fill('Juniper Hill');
@@ -98,7 +116,7 @@ const path=require('node:path');
   if(name==='desktop')assert.match(await page.locator('#mapNotice').innerText(),/has no point on the map/);
   await page.locator('#detail [data-step="1"]').click();
   assert.equal(await page.evaluate(()=>DerryAtlas.view.selected),'U6');
-  await page.locator('#detail .place-card__back').click();
+  await page.locator('#detail button[data-close][aria-label]').click();
   assert.equal(await page.locator('#mapNotice').innerText(),'');
   await page.locator('#clearSearch').click();
   for(const view of ['central','barrens','camp']){
@@ -197,8 +215,9 @@ const path=require('node:path');
   await page.goto(url+'/?place=12',{waitUntil:'networkidle'});
   await page.waitForFunction(()=>window.DerryAtlas?.view.selected===12,null,{timeout:120000});
   assert.match(await page.locator('#detail h2').innerText(),/Place 12:/i);
-  // The deep link centres the place.
-  assert.equal(await page.evaluate(()=>{const v=DerryAtlas.view;return Math.round(v.cx)===-1510&&Math.round(v.cy)===-540}),true);
+  // The deep link centres the place (on the phone, in the map above the card sheet).
+  assert.equal(await page.evaluate(()=>Math.round(DerryAtlas.view.cx)),-1510);
+  if(name==='desktop')assert.equal(await page.evaluate(()=>Math.round(DerryAtlas.view.cy)),-540);
   // The card links to the standalone place page (indexable, English slug), in the same tab.
   const placeHref=await page.locator('#detail .place-card__foot a').getAttribute('href');
   assert.equal(await page.locator('#detail .place-card__foot a').getAttribute('target'),null);
