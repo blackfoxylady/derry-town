@@ -1125,3 +1125,62 @@ msgstr "Легенда: насколько точна каждая точка. �
 
 msgid "All places"
 msgstr "Все места"
+
+#: atlas/templates/atlas/index.html (block 11: map controls)
+msgid "Layers"
+msgstr "Слои"
+
+msgid "Close layers"
+msgstr "Закрыть слои"
+
+msgid "Polaroids of the places with photos"
+msgstr "Полароиды мест с фотографиями"
+
+msgid "Labels next to the numbered pins"
+msgstr "Подписи у пронумерованных точек"
+
+msgid "Contour lines and spot heights"
+msgstr "Горизонтали и отметки высот"
+
+msgid "Built-up tint and house footprints"
+msgstr "Тон застройки и контуры домов"
+
+msgid "Views, layers and measure"
+msgstr "Виды, слои и измерение"
+
+msgid "Click two points to measure · Esc to stop"
+msgstr "Щёлкните две точки · Esc — выйти"
+
+msgid "Tap two points"
+msgstr "Коснитесь двух точек"
+
+msgid "Done"
+msgstr "Готово"
+
+msgid "reconstructed"
+msgstr "по реконструкции"
+
+#: atlas/templates/atlas/index.html (block 14: below the map)
+msgid "How the map was made"
+msgstr "Как сделана карта"
+
+msgid ""
+"Browse the %(counter)s location reconstructed from Stephen King’s IT. Every "
+"name links to a standalone page with book evidence and an explanation of its "
+"position."
+msgid_plural ""
+"Browse the %(counter)s locations reconstructed from Stephen King’s IT. Every "
+"name links to a standalone page with book evidence and an explanation of its "
+"position."
+msgstr[0] ""
+"Просмотрите %(counter)s место, реконструированное по роману Стивена Кинга "
+"«Оно». Каждое название ведёт на отдельную страницу с книжными "
+"свидетельствами и обоснованием положения."
+msgstr[1] ""
+"Просмотрите %(counter)s места, реконструированные по роману Стивена Кинга "
+"«Оно». Каждое название ведёт на отдельную страницу с книжными "
+"свидетельствами и обоснованием положения."
+msgstr[2] ""
+"Просмотрите %(counter)s мест, реконструированных по роману Стивена Кинга "
+"«Оно». Каждое название ведёт на отдельную страницу с книжными "
+"свидетельствами и обоснованием положения."

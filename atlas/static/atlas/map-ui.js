@@ -198,14 +198,16 @@ window.DerryMapUI = function (ctx) {
   }
   photosBtn.setAttribute('aria-pressed', String(state.withPhotos));
   q('#photosCount').textContent = count(s => photos[String(s.id)] && ctx.filterOk(s, 'photos'));
-  key.querySelectorAll('[data-hide]').forEach(b => {
+  document.querySelectorAll('.key [data-hide]').forEach(b => {
    const L = b.dataset.hide, off = state.hide.has(L), n = count(s => s.confidence === L && ctx.filterOk(s, 'hide'));
    b.setAttribute('aria-pressed', String(!off)); b.querySelector('.key__count').textContent = n;
    b.disabled = !n && !off;
   });
-  const u = key.querySelector('[data-list]'), nu = count(s => s.confidence === 'U' && ctx.filterOk(s));
-  u.querySelector('.key__count').textContent = nu; u.disabled = !nu;
-  u.setAttribute('aria-label', sub(n_('No location: show the %s place without a point in the list', 'No location: show the %s places without a point in the list', nu), {n: nu}));
+  const nu = count(s => s.confidence === 'U' && ctx.filterOk(s));
+  document.querySelectorAll('.key [data-list]').forEach(u => {
+   u.querySelector('.key__count').textContent = nu; u.disabled = !nu;
+   u.setAttribute('aria-label', sub(n_('No location: show the %s place without a point in the list', 'No location: show the %s places without a point in the list', nu), {n: nu}));
+  });
  }
  // Category: a checklist under the chip (↑/↓, Space, Esc, Tab leaves); a bottom sheet on the phone.
  function setCat(open, refocus) {
@@ -238,12 +240,12 @@ window.DerryMapUI = function (ctx) {
  photosBtn.addEventListener('click', () => { state.withPhotos = !state.withPhotos; apply(); });
  // The key: A, B, C toggle those pins on the map and in the list; "No location →" lists the
  // places without a point (the map does not change).
- key.addEventListener('click', e => {
+ document.querySelectorAll('.key').forEach(k => k.addEventListener('click', e => {
   const b = e.target.closest('.key__item'); if (!b || b.disabled) return;
-  if (b.dataset.list) { state.list = 'unlocated'; listEl.scrollTop = 0; apply(); return; }
+  if (b.dataset.list) { state.list = 'unlocated'; listEl.scrollTop = 0; apply(); if (phone.matches) setSheet('full'); return; }
   const L = b.dataset.hide; if (state.hide.has(L)) state.hide.delete(L); else state.hide.add(L);
-  apply(); tipText(b);
- });
+  apply(); if (k === key) tipText(b);
+ }));
  // Tooltip after 0.4 s on hover or focus; the text is there at once for screen readers.
  let tipTimer = 0;
  function tipText(b) {

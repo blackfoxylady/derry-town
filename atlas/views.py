@@ -260,7 +260,7 @@ def _ru_plural(number, one, few, many):
 @require_safe
 def index(request):
     features = list(Feature.objects.filter(object_type__in=('site', 'unplaced')).only(
-        'key', 'object_type', 'name', 'kind', 'period'))
+        'key', 'object_type', 'name', 'kind', 'period', 'confidence'))
     mapped_count = sum(feature.object_type == 'site' for feature in features)
     unlocated_count = len(features) - mapped_count
 
@@ -273,11 +273,8 @@ def index(request):
         kind = 'Unlocated' if feature.object_type == 'unplaced' else feature.kind
         buckets.setdefault(kind or 'Other', []).append(feature)
 
-    labels = {
-        'Homes': _('Homes'), 'Civic': _('Civic'), 'Barrens': _('Barrens'),
-        'Encounters': _('Encounters'), 'Historical': _('Historical'),
-        'Outlying': _('Outlying'), 'Unlocated': _('Unlocated'), 'Other': _('Other'),
-    }
+    labels = {kind: kind_label(kind) for kind in kind_order}
+    labels.update({'Unlocated': CONFIDENCE_LABELS['U'], 'Other': _('Other')})
 
     def feature_sort(feature):
         return (0, int(feature.key)) if feature.key.isdigit() else (1, feature.key)
@@ -299,6 +296,7 @@ def index(request):
             })
         place_groups.append({
             'slug': slugify(kind), 'title': labels.get(kind, kind), 'items': items,
+            'kind': kind if kind in kind_order else '',
         })
 
     place_count = len(features)
@@ -332,7 +330,7 @@ def index(request):
         'mapped_count': mapped_count, 'unlocated_count': unlocated_count,
         'place_count': place_count, 'place_groups': place_groups,
         'directory_jump': directory_jump, 'directory_stats': directory_stats,
-        'map_terms': map_terms,
+        'map_terms': map_terms, 'levels': confidence_levels(),
     }
     context['jsonld'] = schema.index(request, page_title, meta_description)
     response = render(request, 'atlas/index.html', context)

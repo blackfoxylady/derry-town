@@ -263,3 +263,13 @@ msgstr "Все отметки скрыты."
 
 msgid "Show all"
 msgstr "Показать все"
+
+#: atlas/static/atlas/map.js (block 11: measure)
+msgid "≈ %(m)s · %(ft)s · in the reconstruction"
+msgstr "≈ %(m)s · %(ft)s · по реконструкции"
+
+msgid "%s ft"
+msgid_plural "%s ft"
+msgstr[0] "%s фут"
+msgstr[1] "%s фута"
+msgstr[2] "%s футов"

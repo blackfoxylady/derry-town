@@ -14,7 +14,7 @@ const p_=typeof pgettext==='function'?pgettext:(c,s)=>s;
 const LANG=document.documentElement.lang||'en';
 // The directory is fully expanded in server HTML. On phones only, progressively
 // collapse it to native accordions while leaving every link in the document.
-const directoryMedia=matchMedia('(max-width:780px)');
+const directoryMedia=matchMedia('(max-width:63.99em)');
 function syncDirectory(){const groups=[...document.querySelectorAll('.place-group')];if(!groups.length)return;
  const target=location.hash&&document.getElementById(location.hash.slice(1));
  groups.forEach((group,index)=>{group.open=!directoryMedia.matches||group===target||(!target&&index===0)})}
@@ -75,7 +75,7 @@ function render(){
  // via calc(var(--u)*N); data-z and data-bld drive the LOD classes.
  const z=k<L.LOD.far?'far':k<L.LOD.mid?'mid':'near';map.style.setProperty('--u',(1/k)+'px');map.dataset.z=z;
  map.dataset.bld=k<L.LOD.plan?'tint':'plan';L.updatePatterns(k);
- q('#zoomIn').disabled=k>=MAX_K-1e-9;
+ q('#zoomIn').disabled=k>=MAX_K-1e-9;q('#zoomOut').disabled=k<=MIN_K+1e-9;
  markers.replaceChildren();labels.replaceChildren();const occupied=[];
  const inView=(x,y,m)=>x>-m&&y>-m&&x<w+m&&y<h+m;
  // Area, water and land labels first: region and water names block place labels.
@@ -222,27 +222,61 @@ function zoomToPlaces(places){const pts=places.filter(s=>typeof s.id==='number')
  const t0=performance.now();(function step(t){const p=Math.min(1,(t-t0)/300),e=p<.5?2*p*p:1-(-2*p+2)**2/2;
   state.k=from.k*(to.k/from.k)**e;state.cx=from.cx+(to.cx-from.cx)*e;state.cy=from.cy+(to.cy-from.cy)*e;render();if(p<1)requestAnimationFrame(step)})(t0)}
 function zoom(f,x=state.w/2,y=state.h/2){const [gx,gy]=geo(x,y);state.k=Math.min(MAX_K,Math.max(MIN_K,state.k*f));state.cx=gx-(x-state.w/2)/state.k;state.cy=gy+(y-state.h/2)/state.k;state.view='';render()}
-function showToast(msg){q('#toast').textContent=msg;q('#toast').hidden=!msg}
-function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();if(!state.measure.length)return;state.measure.forEach(p=>{const[x,y]=screen(...p);el('circle',{cx:x,cy:y,r:4,fill:'#a34b35',stroke:'#fff','stroke-width':1.3},layer)});if(state.measure.length===2){const a=screen(...state.measure[0]),b=screen(...state.measure[1]);el('path',{d:`M${a}L${b}`,fill:'none',stroke:'#a34b35','stroke-width':2,'stroke-dasharray':'5 3'},layer);showToast(format(Math.hypot(state.measure[0][0]-state.measure[1][0],state.measure[0][1]-state.measure[1][1]))+' · '+_('straight line in this reconstruction'));}}
-function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').classList.toggle('on',state.measuring);q('#measure').setAttribute('aria-pressed',state.measuring);map.classList.toggle('measuring',state.measuring);showToast(state.measuring?_('Select two points to measure. Drag to pan. Escape clears.'):'');render()}
+// Measuring (block 11): two points, a dashed line and "≈ 470 m · 1,540 ft · in the reconstruction".
+// The points are kept in map metres, so the line survives a pan; either end can be dragged.
+function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();q('#measureResult').textContent='';if(!state.measure.length)return;
+ const pts=state.measure.map(p=>screen(...p));
+ if(pts.length===2){const d=`M${pts[0]}L${pts[1]}`;el('path',{d,class:'ms-halo'},layer);el('path',{d,class:'ms-line'},layer)}
+ pts.forEach((p,i)=>el('circle',{cx:p[0].toFixed(1),cy:p[1].toFixed(1),r:7,class:'ms-pt','data-pt':i},layer));
+ if(pts.length<2)return;
+ const m=Math.hypot(state.measure[0][0]-state.measure[1][0],state.measure[0][1]-state.measure[1][1]),ft=Math.round(m*3.28084/10)*10;
+ const text=_('≈ %(m)s · %(ft)s · in the reconstruction').replace('%(m)s',format(m)).replace('%(ft)s',n_('%s ft','%s ft',ft).replace('%s',ft.toLocaleString(LANG)));
+ const g=el('g',{class:'ms-label',transform:`translate(${((pts[0][0]+pts[1][0])/2).toFixed(1)} ${((pts[0][1]+pts[1][1])/2).toFixed(1)})`},layer),bg=el('rect',{y:-14,height:28,rx:4},g);
+ const t=el('text',{x:0,y:1,'text-anchor':'middle','dominant-baseline':'middle'},g);t.textContent=text;
+ const w=t.getComputedTextLength()+20;bg.setAttribute('x',-w/2);bg.setAttribute('width',w);q('#measureResult').textContent=text}
+function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').setAttribute('aria-pressed',String(state.measuring));map.classList.toggle('measuring',state.measuring);q('#measureHint').hidden=!state.measuring;render()}
 // Category keys are canonical data; only the visible labels translate.
 // Editorial order, as in the directory below the map.
 const KIND_ORDER=['Homes','Civic','Barrens','Encounters','Historical','Outlying'];
 const KIND_LABELS={Homes:_('Homes'),Civic:_('Civic'),Encounters:_('Encounters'),Historical:_('Historical'),Barrens:_('Barrens'),Outlying:_('Outlying')};
 scene();
 const ui=window.DerryMapUI({state,all,photos:PHOTOS,placeUrl,photoUrl,galleryUrl:URLS.gallery,hits,filterOk,searchOk,norm,kindShort:KIND_SHORT,kindLabels:KIND_LABELS,kinds:[...KIND_ORDER.filter(k=>k in PAYLOAD.colors),...Object.keys(PAYLOAD.colors).filter(k=>!KIND_ORDER.includes(k))],confMeta:CONF_META,_,n_,select,close:closeDetail,render,zoomToPlaces,resetFilters});
-q('#showPhotos').onchange=e=>{state.photos=e.target.checked;render()};q('#showNames').onchange=e=>{state.names=e.target.checked;render()};q('#showRelief').onchange=e=>{state.relief=e.target.checked;world.querySelectorAll('.relief').forEach(n=>n.style.display=state.relief?'':'none');render()};q('#showBuildings').onchange=e=>{world.querySelectorAll('.buildings').forEach(n=>n.style.display=e.target.checked?'':'none')};
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#reset').onclick=()=>fit('city');q('#measure').onclick=()=>toggleMeasure();
-const pointers=new Map();let last=null,start=null,moved=false,lastPinch=0,hadPinch=false;
+// Layers (block 11): four switches, in the desktop popover and in the phone sheet, remembered in
+// localStorage; relief starts off on the phone (it saves drawing time).
+const LAYERS_KEY='derry.layers';
+function loadLayers(){let saved=null;try{saved=JSON.parse(localStorage.getItem(LAYERS_KEY))}catch(e){}
+ const layers={photos:true,names:true,relief:!matchMedia('(max-width:63.99em)').matches,buildings:true};
+ if(saved&&typeof saved==='object')for(const k in layers)if(typeof saved[k]==='boolean')layers[k]=saved[k];return layers}
+function applyLayers(){world.querySelectorAll('.relief').forEach(n=>n.style.display=state.relief?'':'none');world.querySelectorAll('.buildings').forEach(n=>n.style.display=state.buildings?'':'none');
+ document.querySelectorAll('[data-layer]').forEach(x=>x.checked=state[x.dataset.layer])}
+Object.assign(state,loadLayers());applyLayers();
+document.querySelectorAll('[data-layer]').forEach(x=>x.addEventListener('change',()=>{state[x.dataset.layer]=x.checked;
+ try{localStorage.setItem(LAYERS_KEY,JSON.stringify({photos:state.photos,names:state.names,relief:state.relief,buildings:state.buildings}))}catch(e){}applyLayers();render()}));
+// The layers popover under its button: × , Esc or a click outside closes it.
+const layersPop=q('#layers'),layersBtn=q('#layersBtn');
+function setLayers(open,refocus){layersPop.hidden=!open;layersBtn.setAttribute('aria-expanded',String(open));if(open)layersPop.querySelector('input').focus();else if(refocus)layersBtn.focus()}
+layersBtn.onclick=()=>setLayers(layersPop.hidden);layersPop.querySelector('[data-layers-close]').onclick=()=>setLayers(false,true);
+document.addEventListener('click',e=>{if(!layersPop.hidden&&!layersPop.contains(e.target)&&!layersBtn.contains(e.target))setLayers(false)});
+// Phone: one "Map" sheet holds the views, measure, the key and the layers; ×, a scrim tap or a
+// swipe down on the grabber closes it.
+const mapSheet=q('#mapSheet'),mapSheetBtn=q('#mapSheetBtn'),mapSheetScrim=q('#mapSheetScrim');
+function setMapSheet(open,refocus){mapSheet.hidden=!open;mapSheetScrim.hidden=!open;mapSheetBtn.setAttribute('aria-expanded',String(open));if(open)mapSheet.querySelector('[data-map-sheet-close]').focus();else if(refocus)mapSheetBtn.focus()}
+mapSheetBtn.onclick=()=>setMapSheet(true);mapSheet.querySelector('[data-map-sheet-close]').onclick=()=>setMapSheet(false,true);mapSheetScrim.onclick=()=>setMapSheet(false,true);
+mapSheet.querySelector('[data-measure-start]').onclick=()=>{setMapSheet(false);toggleMeasure(true)};
+mapSheet.addEventListener('click',e=>{if(e.target.closest('[data-view],[data-list]'))setMapSheet(false)});
+const mapGrab=mapSheet.querySelector('.map-sheet__grab');
+mapGrab.addEventListener('pointerdown',e=>{const y0=e.clientY;mapGrab.setPointerCapture(e.pointerId);const up=ev=>{mapGrab.removeEventListener('pointerup',up);if(ev.clientY-y0>60)setMapSheet(false,true)};mapGrab.addEventListener('pointerup',up)});
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#measure').onclick=()=>toggleMeasure();q('[data-measure-done]').onclick=()=>toggleMeasure(false);
+const pointers=new Map();let last=null,start=null,moved=false,lastPinch=0,hadPinch=false,dragPt=null;
 function local(e){const r=map.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
-map.addEventListener('pointerdown',e=>{if(e.button!==0)return;const p=local(e);pointers.set(e.pointerId,p);map.setPointerCapture(e.pointerId);start=p;last=p;moved=false;if(pointers.size>1){hadPinch=true;const v=[...pointers.values()];lastPinch=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1])}map.classList.add('dragging')});
-map.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const p=local(e);pointers.set(e.pointerId,p);if(pointers.size===2){const v=[...pointers.values()],d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);if(lastPinch>0&&d>0)zoom(d/lastPinch,(v[0][0]+v[1][0])/2,(v[0][1]+v[1][1])/2);lastPinch=d;moved=true;return}if(last){const dx=p[0]-last[0],dy=p[1]-last[1];if(start&&Math.hypot(p[0]-start[0],p[1]-start[1])>4)moved=true;if(moved){state.cx-=dx/state.k;state.cy+=dy/state.k;state.view='';render()}}last=p});
-map.addEventListener('pointerup',e=>{const p=local(e),wasMoved=moved||hadPinch;pointers.delete(e.pointerId);if(!pointers.size){map.classList.remove('dragging');last=null;lastPinch=0;hadPinch=false}else last=[...pointers.values()][0];if(state.measuring&&!wasMoved){if(state.measure.length===2)state.measure=[];state.measure.push(geo(...p));drawMeasure()}if(!state.measuring&&!wasMoved){const hit=document.elementFromPoint(e.clientX,e.clientY);const pol=hit?.closest('.ph');if(pol)openPhotoFeature(pol.dataset.key);else{const target=hit?.closest('.mk,.mk-hit');if(target)select(Number(target.dataset.id),{opener:{mk:target.dataset.id}})}}});
+map.addEventListener('pointerdown',e=>{if(e.button!==0)return;const p=local(e);const end=state.measuring&&e.target.closest?.('.ms-pt');dragPt=end?Number(end.dataset.pt):null;pointers.set(e.pointerId,p);map.setPointerCapture(e.pointerId);start=p;last=p;moved=false;if(pointers.size>1){hadPinch=true;const v=[...pointers.values()];lastPinch=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1])}map.classList.add('dragging')});
+map.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const p=local(e);pointers.set(e.pointerId,p);if(dragPt!=null&&pointers.size===1){state.measure[dragPt]=geo(...p);moved=true;drawMeasure();return}if(pointers.size===2){const v=[...pointers.values()],d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);if(lastPinch>0&&d>0)zoom(d/lastPinch,(v[0][0]+v[1][0])/2,(v[0][1]+v[1][1])/2);lastPinch=d;moved=true;return}if(last){const dx=p[0]-last[0],dy=p[1]-last[1];if(start&&Math.hypot(p[0]-start[0],p[1]-start[1])>4)moved=true;if(moved){state.cx-=dx/state.k;state.cy+=dy/state.k;state.view='';render()}}last=p});
+map.addEventListener('pointerup',e=>{const p=local(e),wasMoved=moved||hadPinch;pointers.delete(e.pointerId);if(!pointers.size){map.classList.remove('dragging');last=null;lastPinch=0;hadPinch=false}else last=[...pointers.values()][0];if(dragPt!=null){dragPt=null;return}if(state.measuring&&!wasMoved){if(state.measure.length===2)state.measure=[];state.measure.push(geo(...p));drawMeasure()}if(!state.measuring&&!wasMoved){const hit=document.elementFromPoint(e.clientX,e.clientY);const pol=hit?.closest('.ph');if(pol)openPhotoFeature(pol.dataset.key);else{const target=hit?.closest('.mk,.mk-hit');if(target)select(Number(target.dataset.id),{opener:{mk:target.dataset.id}})}}});
 map.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);last=null;map.classList.remove('dragging')});
 map.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.003),...local(e))},{passive:false});map.addEventListener('dblclick',e=>{if(!state.measuring&&!e.target.closest('.mk,.mk-hit,.ph'))zoom(1.8,...local(e))});
 map.addEventListener('keydown',e=>{if(e.key==='+'||e.key==='='){e.preventDefault();zoom(1.4)}else if(e.key==='-'){e.preventDefault();zoom(1/1.4)}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.cx+=({'ArrowLeft':-80,'ArrowRight':80}[e.key]||0)/state.k;state.cy+=({'ArrowUp':80,'ArrowDown':-80}[e.key]||0)/state.k;state.view='';render()}});
 // Only from the map page itself (panel or stage): Esc down in the directory leaves the card alone.
-document.addEventListener('keydown',e=>{if(e.key!=='Escape'||e.defaultPrevented||!(e.target===document.body||e.target.closest?.('.app')))return;if(ui.closeTip())return;if(state.measuring)toggleMeasure(false);else closeDetail()});
+document.addEventListener('keydown',e=>{if(e.key!=='Escape'||e.defaultPrevented||!(e.target===document.body||e.target.closest?.('.app')))return;if(ui.closeTip())return;if(!layersPop.hidden){setLayers(false,true);return}if(!mapSheet.hidden){setMapSheet(false,true);return}if(state.measuring)toggleMeasure(false);else closeDetail()});
 // Deep link from the photo gallery: /?place=12 or /?place=U3 opens the place card.
 // Read before the first apply() rewrites the address.
 const START_PLACE=new URLSearchParams(location.search).get('place');

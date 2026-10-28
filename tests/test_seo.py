@@ -273,9 +273,9 @@ class SeoTests(TestCase):
         self.assertContains(response, '1 on the map · 1 unlocated · about the map')
         self.assertContains(response, 'href="/places/12-derry-public-library/"')
         self.assertContains(response, 'href="/places/u3-tracker-brothers/"')
-        self.assertContains(response, 'class="directory-copy"', count=2)
+        self.assertContains(response, 'class="dir-item__copy"', count=2)
         body = response.content.decode()
-        self.assertLess(body.index('>Civic<'), body.index('>Unlocated<'))
+        self.assertLess(body.index('id="group-civic"'), body.index('id="group-unlocated"'))
 
         response = self.client.get('/ru/')
         self.assertContains(response, '<h2 id="all-places-title">Все места Дерри</h2>')

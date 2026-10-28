@@ -33,8 +33,11 @@ const path=require('node:path');
   await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,null,{timeout:120000});
   assert.equal(await page.evaluate(()=>DerryAtlas.unlocatedCount),8);
   // The crawlable directory is present independently of the JS-built sidebar.
-  assert.equal(await page.locator('.place-directory-list a').count(),92);
-  assert.equal(await page.locator('.place-directory-list a[href="/places/12-derry-public-library/"]').count(),1);
+  assert.equal(await page.locator('.dir-list a').count(),92);
+  assert.equal(await page.locator('.dir-list a[href="/places/12-derry-public-library/"]').count(),1);
+  // Below the map (block 14): the four-row confidence legend and a jump chip per group.
+  assert.equal(await page.locator('.map-legend-card li').count(),4);
+  assert.equal(await page.locator('.dir-nav a').count(),7);
   assert.equal(await page.locator('.directory-jump').isVisible(),true);
   assert.equal(await page.locator('.place-group[open]').count(),name==='mobile'?1:7);
   // Survey sheet: margin + land clipped into slot groups + one frame; houses are two paths
@@ -165,8 +168,10 @@ const path=require('node:path');
   assert.equal(await page.evaluate(()=>DerryAtlas.view.selected),'U1');
   await page.locator('#detail button[data-close][aria-label]').click();
   assert.equal(await page.locator('#mapNotice').innerText(),'');
+  // Block 11: on the phone the views, measure, the key and the layers live in the "Map" sheet.
+  const viewBtn=async view=>{if(name==='mobile'){await page.locator('#mapSheetBtn').click();await page.locator(`#mapSheet [data-view="${view}"]`).click()}else await page.locator(`.viewbar [data-view="${view}"]`).click()};
   for(const view of ['central','barrens','camp']){
-   await page.locator(`[data-view="${view}"]`).click();
+   await viewBtn(view);
    assert.equal(await page.evaluate(()=>DerryAtlas.view.view),view);
   }
   await page.screenshot({path:path.join(out,name+'-clearing.png'),fullPage:true});
@@ -176,21 +181,27 @@ const path=require('node:path');
   for(let i=0;i<12;i++)await page.evaluate(()=>document.querySelector('#zoomIn').disabled||document.querySelector('#zoomIn').click());
   assert.equal(await page.evaluate(()=>Math.round(DerryAtlas.view.k*100)),220);
   assert.equal(await page.locator('#zoomIn').isDisabled(),true);
-  await page.locator(`[data-view="camp"]`).click();
+  await viewBtn('camp');
   await page.locator('#map').focus();await page.keyboard.press('ArrowRight');
-  await page.locator('.map-legend summary').click();
-  await page.locator('#showRelief').uncheck();
+  // Layers: a popover (desktop) or the Map sheet (phone); relief starts off on the phone; the
+  // choice survives a reload.
+  const L=name==='mobile'?'#sheet-':'#';
+  if(name==='mobile'){assert.equal(await page.evaluate(()=>DerryAtlas.view.relief),false);await page.locator('#mapSheetBtn').click();await page.locator(L+'showRelief').check()}
+  else await page.locator('#layersBtn').click();
+  await page.locator(L+'showRelief').uncheck();
   assert.equal(await page.locator('#world .relief').first().evaluate(n=>getComputedStyle(n).display),'none');
   assert.equal(await page.locator('#landLabels .peak').count(),0);
-  await page.locator('#showRelief').check();
-  await page.locator('#showBuildings').uncheck();
+  await page.locator(L+'showRelief').check();
+  await page.locator(L+'showBuildings').uncheck();
   assert.equal(await page.locator('#world .buildings').first().evaluate(n=>getComputedStyle(n).display),'none');
-  await page.locator('#showBuildings').check();
-  assert(await page.locator('.lbl--place').count()>0);await page.locator('#showNames').uncheck();assert.equal(await page.locator('.lbl--place').count(),0);
-  await page.locator('#showNames').check();
-  await page.locator('#showPhotos').uncheck();assert.equal(await page.locator('#photoLayer .ph,.ph-dot').count(),0);
-  await page.locator('#showPhotos').check();
-  await page.locator('.map-legend summary').click();
+  await page.locator(L+'showBuildings').check();
+  assert(await page.locator('.lbl--place').count()>0);await page.locator(L+'showNames').uncheck();assert.equal(await page.locator('.lbl--place').count(),0);
+  await page.locator(L+'showNames').check();
+  await page.locator(L+'showPhotos').uncheck();assert.equal(await page.locator('#photoLayer .ph,.ph-dot').count(),0);
+  assert.equal(JSON.parse(await page.evaluate(()=>localStorage.getItem('derry.layers'))).photos,false);
+  await page.locator(L+'showPhotos').check();
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator(name==='mobile'?'#mapSheet':'#layers').isVisible(),false);
   // Photo layer (block 13): sepia dots far out, medallions at mid zoom (hover pops the print),
   // polaroids close in. Desktop only (hover); a fresh install may hold zero photos.
   if(name==='desktop'&&await page.evaluate(()=>DerryAtlas.photoFeatureCount)){
@@ -215,12 +226,16 @@ const path=require('node:path');
    }
    await page.evaluate(()=>DerryAtlas.fit('city'));
   }
-  await page.locator('#measure').click();
+  // Measure: metres and feet, with the reconstruction caveat; Esc leaves the mode.
+  if(name==='mobile'){await page.locator('#mapSheetBtn').click();await page.locator('[data-measure-start]').click()}
+  else await page.locator('#measure').click();
+  assert.equal(await page.locator('#measureHint').isVisible(),true);
   const box=await page.locator('#map').boundingBox();
-  await page.mouse.click(box.x+box.width*.25,box.y+box.height*.48);
-  await page.mouse.click(box.x+box.width*.65,box.y+box.height*.55);
-  assert.match(await page.locator('#toast').innerText(),/( m| km) · straight line/);
+  await page.mouse.click(box.x+box.width*.25,box.y+box.height*.3);
+  await page.mouse.click(box.x+box.width*.65,box.y+box.height*.45);
+  assert.match(await page.locator('#measureResult').textContent(),/^≈ [\d.,]+ (m|km) · [\d,]+ ft · in the reconstruction$/);
   await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#measureHint').isVisible(),false);
   const url=process.env.DERRY_URL||'http://127.0.0.1:8765';
   await page.goto(url+'/method/',{waitUntil:'networkidle'});
   assert.match(await page.locator('.method-page h1').innerText(),/Built from the novel/);

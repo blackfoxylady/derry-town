@@ -38,45 +38,64 @@
 <div class="menu-scrim" id="menuScrim" hidden></div>
 <button type="button" class="btn btn--primary sheet-pill" data-sheet-to="peek">{% include 'atlas/icons/map.svg' %}{% trans "Show map" %}</button>
 </aside>
-<main class="stage" aria-label="{% trans 'Interactive map' %}"><svg id="map" xmlns="http://www.w3.org/2000/svg" tabindex="0" aria-label="{% trans 'Derry map. Use arrow keys to pan and plus or minus to zoom.' %}"><g id="world"></g><g id="landLabels"></g><g id="markers"></g><g id="photoLayer"></g><g id="measureLayer"></g></svg>
+<main class="stage" aria-label="{% trans 'Interactive map' %}">
 <button type="button" class="brand-chip" aria-label="{% trans 'Derry: open the site menu' %}" aria-haspopup="dialog" aria-expanded="false" aria-controls="site-menu" data-menu-open>{% include 'atlas/icons/brand-mark.svg' %}<span class="brand__name" aria-hidden="true">DERRY</span><span class="brand-chip__div" aria-hidden="true"></span><span class="brand-chip__menu" aria-hidden="true">{% include 'atlas/icons/menu.svg' %}</span></button>
 <div class="viewbar segmented" role="group" aria-label="{% trans 'Map view' %}"><button type="button" data-view="city" aria-pressed="true">{% trans "Town" %}</button><button type="button" data-view="central" aria-pressed="false">{% trans "Centre" %}</button><button type="button" data-view="barrens" aria-pressed="false">{% trans "Barrens" %}</button><button type="button" data-view="camp" aria-pressed="false">{% trans "Clearing" %}</button></div>
-<div class="key" id="mapKey" role="group" aria-label="{% trans 'Map key: how sure is each pin. Press a kind to hide or show those pins.' %}">{% for letter in 'ABC' %}<button type="button" class="key__item" aria-pressed="true" data-hide="{{ letter }}" aria-describedby="keyTip"><span class="key__glyph" aria-hidden="true">{% if letter == 'A' %}{% include 'atlas/icons/glyph-a.svg' %}{% elif letter == 'B' %}{% include 'atlas/icons/glyph-b.svg' %}{% else %}{% include 'atlas/icons/glyph-c.svg' %}{% endif %}</span><span class="key__label">{% if letter == 'A' %}{% trans "Named in the novel" context "confidence" %}{% elif letter == 'B' %}{% trans "Inferred" context "confidence" %}{% else %}{% trans "Proposed" context "confidence" %}{% endif %}</span><span class="key__count"></span></button><span class="key__sep" aria-hidden="true"></span>{% endfor %}<button type="button" class="key__item key__item--link" data-list="unlocated"><span class="key__glyph" aria-hidden="true">{% include 'atlas/icons/glyph-u.svg' %}</span><span class="key__label">{% trans "No location" context "confidence" %}</span><span class="key__count"></span><span class="key__go" aria-hidden="true">{% include 'atlas/icons/arrow-right.svg' %}</span></button><span class="key__tip" id="keyTip" role="tooltip" hidden></span></div>
+<div class="map-tools"><div class="map-ctrl"><button type="button" id="zoomIn" aria-label="{% trans 'Zoom in' %}" title="{% trans 'Zoom in' %}">{% include 'atlas/icons/plus.svg' %}</button><button type="button" id="zoomOut" aria-label="{% trans 'Zoom out' %}" title="{% trans 'Zoom out' %}">{% include 'atlas/icons/minus.svg' %}</button></div>
+<div class="map-ctrl map-ctrl--desk"><button type="button" id="measure" aria-pressed="false" aria-label="{% trans 'Measure a straight-line distance' %}" title="{% trans 'Measure a straight-line distance' %}">{% include 'atlas/icons/measure.svg' %}</button><button type="button" id="layersBtn" aria-expanded="false" aria-controls="layers" aria-label="{% trans 'Layers' %}" title="{% trans 'Layers' %}">{% include 'atlas/icons/layers.svg' %}</button></div>
+<div class="map-ctrl map-ctrl--phone"><button type="button" id="mapSheetBtn" aria-expanded="false" aria-controls="mapSheet" aria-label="{% trans 'Views, layers and measure' %}" title="{% trans 'Views, layers and measure' %}">{% include 'atlas/icons/layers.svg' %}</button></div></div>
+<div class="layers" id="layers" role="dialog" aria-labelledby="layersTitle" hidden><div class="layers__head"><span class="eyebrow" id="layersTitle">{% trans "Layers" %}</span><button type="button" class="btn btn--icon" data-layers-close aria-label="{% trans 'Close layers' %}">{% include 'atlas/icons/close.svg' %}</button></div>{% include 'atlas/map_layers.html' with prefix='' %}</div>
+<div class="measure-hint" id="measureHint" role="status" hidden><span class="measure-hint__desk">{% trans "Click two points to measure · Esc to stop" %}</span><span class="measure-hint__phone">{% trans "Tap two points" %}</span><span class="visually-hidden" id="measureResult"></span><button type="button" class="measure-hint__done" data-measure-done>{% trans "Done" %}</button></div>
+<div class="key" id="mapKey" role="group" aria-label="{% trans 'Map key: how sure is each pin. Press a kind to hide or show those pins.' %}">{% include 'atlas/map_key.html' %}<span class="key__tip" id="keyTip" role="tooltip" hidden></span></div>
 <div class="map-flags"><div class="map-pill" id="mapPill" role="status"></div><div class="map-notice" id="mapNotice" role="status"></div></div>
-<div class="tools"><button id="zoomIn" aria-label="{% trans 'Zoom in' %}" title="{% trans 'Zoom in' %}">+</button><button id="zoomOut" aria-label="{% trans 'Zoom out' %}" title="{% trans 'Zoom out' %}">−</button><button id="reset" class="small" aria-label="{% trans 'Show all Derry' %}" title="{% trans 'Show all Derry' %}">⌂</button><button id="measure" class="small" aria-label="{% trans 'Measure straight-line distance' %}" title="{% trans 'Measure a straight-line distance' %}">↔</button></div>
-<div class="scale-panel"><div class="scale-line" id="scaleLine"></div><div class="scale-text"><span>0</span><span id="scaleText"></span></div><div class="scale-caption">{% trans "Reconstructed distances · metres / kilometres" %}</div></div><details class="map-legend"><summary>{% trans "Map key & layers" %}</summary><div class="legend-items"><label><input type="checkbox" id="showPhotos" checked>{% trans "Photographs" %}</label><label><input type="checkbox" id="showNames" checked>{% trans "Place names" %}</label><label><input type="checkbox" id="showRelief" checked>{% trans "Conceptual relief" %}</label><label><input type="checkbox" id="showBuildings" checked>{% trans "Illustrative buildings" %}</label><p>{% blocktranslate %}Green: woodland / park<br>Blue: surface water<br>Dashed blue: covered channel<br>Dashed brown: inferred footpath{% endblocktranslate %}</p><p>{% blocktranslate %}Contours are not measured elevations. All coordinates and boundaries are reconstructed.{% endblocktranslate %}</p></div></details><div class="toast" id="toast" hidden></div></main>
+<svg id="map" xmlns="http://www.w3.org/2000/svg" tabindex="0" aria-label="{% trans 'Derry map. Use arrow keys to pan and plus or minus to zoom.' %}"><g id="world"></g><g id="landLabels"></g><g id="markers"></g><g id="photoLayer"></g><g id="measureLayer"></g></svg>
+<div class="map-scale" aria-hidden="true"><span class="map-scale__bar" id="scaleLine"></span><span class="map-scale__labels"><span>0</span><span id="scaleText"></span></span><span class="map-scale__note">{% trans "reconstructed" %}</span></div><div class="toast" id="toast" hidden></div>
+<div class="map-sheet-scrim" id="mapSheetScrim" hidden></div>
+<section class="map-sheet" id="mapSheet" aria-labelledby="mapSheetTitle" hidden><div class="map-sheet__grab" aria-hidden="true"></div>
+<div class="map-sheet__head"><h2 id="mapSheetTitle">{% trans "Map" %}</h2><button type="button" class="btn btn--icon" data-map-sheet-close aria-label="{% trans 'Close' %}">{% include 'atlas/icons/close.svg' %}</button></div>
+<span class="eyebrow">{% trans "View" %}</span>
+<div class="segmented segmented--fill" role="group" aria-label="{% trans 'Map view' %}"><button type="button" data-view="city" aria-pressed="true">{% trans "Town" %}</button><button type="button" data-view="central" aria-pressed="false">{% trans "Centre" %}</button><button type="button" data-view="barrens" aria-pressed="false">{% trans "Barrens" %}</button><button type="button" data-view="camp" aria-pressed="false">{% trans "Clearing" %}</button></div>
+<button type="button" class="btn btn--compact btn--quiet map-sheet__measure" data-measure-start>{% include 'atlas/icons/measure.svg' %}{% trans "Measure" context "using the map" %}</button>
+<span class="eyebrow">{% trans "How sure is each pin" %}</span>
+<div class="key key--grid" role="group" aria-label="{% trans 'Map key: how sure is each pin. Press a kind to hide or show those pins.' %}">{% include 'atlas/map_key.html' with grid=True %}</div>
+<span class="eyebrow">{% trans "Layers" %}</span>
+{% include 'atlas/map_layers.html' with prefix='sheet-' %}
+</section></main>
 <a class="directory-jump" href="#all-places"><span>{{ directory_jump }} <b aria-hidden="true">↓</b></span><small>{{ directory_stats }}</small></a>
 </div>
 {{ map_terms|json_script:"map-terms" }}
 <template id="glyphs">{% for letter in 'ABCU' %}<span class="conf-glyph" data-glyph="{{ letter }}" aria-hidden="true">{% if letter == 'A' %}{% include 'atlas/icons/glyph-a.svg' %}{% elif letter == 'B' %}{% include 'atlas/icons/glyph-b.svg' %}{% elif letter == 'C' %}{% include 'atlas/icons/glyph-c.svg' %}{% else %}{% include 'atlas/icons/glyph-u.svg' %}{% endif %}</span>{% endfor %}<span data-icon="back">{% include 'atlas/icons/arrow-left.svg' %}</span><span data-icon="close">{% include 'atlas/icons/close.svg' %}</span><span data-icon="check">{% include 'atlas/icons/check.svg' %}</span><span data-icon="info">{% include 'atlas/icons/info.svg' %}</span></template>
 <section class="map-context" aria-labelledby="map-context-title">
-<div class="map-context-inner">
-{% if LANGUAGE_CODE == 'ru' %}
-<div class="eyebrow">Карта вымышленного города</div>
+<div class="map-context__inner">
+<div class="map-context__text">
+{% if LANGUAGE_CODE == 'ru' %}<span class="eyebrow">Карта вымышленного города</span>
 <h2 id="map-context-title">Карта Дерри из романа Стивена Кинга «Оно»</h2>
-<p>Дерри, штат Мэн, не существует как реальный муниципалитет. Эта интерактивная карта реконструирует город по роману <i>«Оно»</i> и объединяет его основные периоды — 1957–58 и 1984–85 годы — с историческими местами. Названные улицы, маршруты и соседние ориентиры образуют каркас карты; там, где книга не указывает точный участок или координату, уровень уверенности отделяет прямую текстовую связь от вывода и предположения.</p>
-<p>Бангор повлиял на образ Дерри, но его реальная уличная сеть сюда не перенесена. Карта показывает внутреннюю географию романа, а не канонический или геодезически точный план.</p>
-<p class="map-context-actions"><a class="quiet" href="{% url 'printable_map' %}">Скачать карту для печати · PDF и SVG</a></p>
-{% else %}
-<div class="eyebrow">A map of a fictional city</div>
+<p class="map-context__prose">Дерри, штат Мэн, не существует как реальный муниципалитет. Эта интерактивная карта реконструирует город по роману <i>«Оно»</i> и объединяет его основные периоды — 1957–58 и 1984–85 годы — с историческими местами. Названные улицы, маршруты и соседние ориентиры образуют каркас карты; там, где книга не указывает точный участок или координату, уровень уверенности отделяет прямую текстовую связь от вывода и предположения.</p>
+<p class="map-context__prose">Бангор повлиял на образ Дерри, но его реальная уличная сеть сюда не перенесена. Карта показывает внутреннюю географию романа, а не канонический или геодезически точный план.</p>
+<p class="map-context__links"><a class="link link--arrow" href="{% url 'printable_map' %}">Скачать карту для печати · PDF и SVG</a><a class="link link--arrow" href="{% url 'method' %}">{% trans "How the map was made" %}</a></p>
+{% else %}<span class="eyebrow">A map of a fictional city</span>
 <h2 id="map-context-title">A map of Derry from Stephen King’s <i>IT</i></h2>
-<p>Derry, Maine does not exist as a real municipality. This interactive map reconstructs the city from the novel <i>IT</i>, combining its principal periods of 1957–58 and 1984–85 with historical sites. Named streets, routes and neighboring landmarks form the framework; where the book does not identify an exact lot or coordinate, confidence levels distinguish a direct textual relationship from an inference or proposal.</p>
-<p>Bangor helped shape Derry, but its real street grid has not been transferred here. The map represents the novel’s internal geography, not a canonical or surveyed town plan.</p>
-<p class="map-context-actions"><a class="quiet" href="{% url 'printable_map' %}">Download the printable map · PDF &amp; SVG</a></p>
-{% endif %}
+<p class="map-context__prose">Derry, Maine does not exist as a real municipality. This interactive map reconstructs the city from the novel <i>IT</i>, combining its principal periods of 1957–58 and 1984–85 with historical sites. Named streets, routes and neighboring landmarks form the framework; where the book does not identify an exact lot or coordinate, confidence levels distinguish a direct textual relationship from an inference or proposal.</p>
+<p class="map-context__prose">Bangor helped shape Derry, but its real street grid has not been transferred here. The map represents the novel’s internal geography, not a canonical or surveyed town plan.</p>
+<p class="map-context__links"><a class="link link--arrow" href="{% url 'printable_map' %}">Download the printable map · PDF &amp; SVG</a><a class="link link--arrow" href="{% url 'method' %}">{% trans "How the map was made" %}</a></p>
+{% endif %}</div>
+<aside class="map-legend-card" aria-labelledby="legend-title"><span class="eyebrow" id="legend-title">{% trans "How sure is each pin" %}</span>
+<ul>{% for level in levels %}<li>{% with letter=level.letter %}{% include 'atlas/place_glyph.html' %}{% endwith %}<span><b>{{ level.label }}</b> — {{ level.explanation }}</span></li>{% endfor %}</ul></aside>
 </div>
 </section>
 <section class="place-directory" id="all-places" aria-labelledby="all-places-title">
-<div class="place-directory-inner">
-<div class="eyebrow">{% trans "The places remembered" %}</div>
+<div class="place-directory__inner">
+<div class="place-directory__head">
+<span class="eyebrow">{% trans "The places remembered" %}</span>
 <h2 id="all-places-title">{% trans "All places in Derry" %}</h2>
-<p class="place-directory-intro">{% blocktranslate %}Browse the locations reconstructed from Stephen King’s IT. Every name links to a standalone page with book evidence and an explanation of its position.{% endblocktranslate %}</p>
-<nav class="place-directory-nav" aria-label="{% trans 'Place categories' %}">{% for group in place_groups %}<a href="#group-{{ group.slug }}">{{ group.title }} <span>{{ group.items|length }}</span></a>{% endfor %}</nav>
-<div class="place-groups">
-{% for group in place_groups %}<details class="place-group{% if group.slug == 'unlocated' %} unlocated{% endif %}" id="group-{{ group.slug }}" open>
-<summary><span>{{ group.title }}</span><small>{{ group.items|length }}</small></summary>
-<ul class="place-directory-list">
-{% for item in group.items %}<li><a href="{{ item.url }}"><span class="directory-num">{{ item.number }}</span><span class="directory-copy"><b>{{ item.name }}</b>{% if item.feature.period %}<small>{{ item.feature.period|period }}</small>{% endif %}</span></a></li>{% endfor %}
+<p class="map-context__prose">{% blocktranslate count counter=place_count %}Browse the {{ counter }} location reconstructed from Stephen King’s IT. Every name links to a standalone page with book evidence and an explanation of its position.{% plural %}Browse the {{ counter }} locations reconstructed from Stephen King’s IT. Every name links to a standalone page with book evidence and an explanation of its position.{% endblocktranslate %}</p>
+<nav class="dir-nav" aria-label="{% trans 'Place categories' %}">{% for group in place_groups %}<a href="#group-{{ group.slug }}" class="chip">{{ group.title }} <span class="chip__count">{{ group.items|length }}</span></a>{% endfor %}</nav>
+</div>
+<div class="dir-groups">
+{% for group in place_groups %}<details class="dir-group place-group" id="group-{{ group.slug }}" open>
+<summary><span class="dir-group__title{% if group.kind %} cat--{{ group.kind|lower }}{% endif %}">{% if group.kind %}<span class="menu__swatch" aria-hidden="true"></span>{% endif %}{{ group.title }}</span><small>{{ group.items|length }}</small></summary>
+<ul class="dir-list">
+{% for item in group.items %}<li><a href="{{ item.url }}" class="dir-item"><span class="num {% if item.feature.object_type == 'unplaced' %}num--u{% else %}num--{{ item.feature.confidence|lower }} num--{{ item.feature.kind|lower }}{% endif %}" aria-hidden="true">{{ item.number }}</span><span class="dir-item__copy"><b>{{ item.name }}</b>{% if item.feature.period %}<small>{{ item.feature.period|period }}</small>{% endif %}</span></a></li>{% endfor %}
 </ul>
 </details>{% endfor %}
 </div>
