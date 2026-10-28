@@ -1,39 +1,114 @@
-
-:root{--paper:#f6f3e9;--ink:#263d38;--muted:#64736b;--line:#d3d6c8;--accent:#a34b35}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;overflow-x:clip;background:var(--paper);color:var(--ink);font:14px/1.45 var(--font-ui)}button,input{font:inherit}button{cursor:pointer;color:inherit}button:disabled{opacity:.35;cursor:default}.app{height:100vh;height:100dvh;display:grid;grid-template-rows:minmax(74px,auto) 1fr auto}header{display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid var(--line);padding:10px 22px;background:#f8f6ee;z-index:5}header .brand{display:flex;align-items:baseline;gap:20px}.brand h1{font:700 34px var(--font-display);letter-spacing:3px;margin:0}.brand p{margin:0;color:var(--muted);font-size:12px;max-width:380px}.header-actions{display:flex;align-items:center;gap:9px}.pill{font-size:10px;letter-spacing:1.1px;color:var(--muted)}.quiet{border:1px solid #c7cebf;border-radius:5px;background:transparent;padding:7px 12px;font-size:12px}.workspace{min-height:0;display:grid;grid-template-columns:330px 1fr}aside{min-height:0;border-right:1px solid var(--line);display:flex;flex-direction:column;background:#faf8f1;z-index:4}.search-area{padding:18px 18px 10px;border-bottom:1px solid var(--line)}.eyebrow{font-size:10px;font-weight:700;line-height:1.45;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:9px}.search{width:100%;padding:11px 12px;border:1px solid #bdc8b8;border-radius:5px;background:white;color:var(--ink);font-size:13px}.counts{display:flex;justify-content:space-between;align-items:center;padding-top:9px;color:var(--muted);font-size:11px}.filters{padding-top:8px;font-size:12px}.filters summary{cursor:pointer;color:var(--muted)}.filtergrid{display:grid;grid-template-columns:1fr 1fr;gap:7px 4px;padding:10px 0 3px}.filtergrid label{display:flex;align-items:center;gap:5px}.filtergrid input{accent-color:#315e5a}.sidebar-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain}.intro{padding:17px 18px 15px;color:var(--muted);font-size:12px;border-bottom:1px solid var(--line)}.intro p{margin:0 0 9px}.intro b{color:var(--ink)}.place-list{list-style:none;padding:0;margin:0}.place-list li{border-bottom:1px solid #e4e5dc}.place-list button{display:flex;gap:11px;width:100%;text-align:left;border:0;background:transparent;padding:10px 16px;align-items:center}.place-list button:hover{background:#efeee4}.place-list button.selected{background:#e3e8d8;border-left:3px solid #426650;padding-left:13px}.num{display:grid;place-items:center;flex:0 0 27px;width:27px;height:27px;border-radius:50%;border:1px solid currentColor;font-size:10px;font-weight:750;line-height:1.45}.item-title{display:block;font-size:12px;line-height:1.35}.item-sub{display:block;color:var(--muted);font-size:10px;margin-top:3px}.detail{padding:18px;border-bottom:1px solid #b9c6b4;background:#eaf0e1}.detail-top{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}.detail h2{font:600 22px/1.17 var(--font-display);margin:6px 0 8px}.detail p{font-size:12px;margin:10px 0}.detail .meta{font-size:10px;color:#576a57;text-transform:uppercase;letter-spacing:.55px}.close{border:0;background:none;font-size:24px;line-height:1;padding:0 2px}.badge{font-size:11px;font-weight:700;padding:5px 7px;border:1px solid #b7c6ac;border-radius:4px;display:inline-block;background:#f6f6ec;min-height:0;line-height:1.45;white-space:normal}.detail details{font-size:11px;margin:13px 0 0}.detail summary{cursor:pointer;font-weight:650}.refs{margin:7px 0 0;padding:0;list-style:none;color:#586b59}.refs li{padding:5px 0;border-bottom:1px solid #d1dbc9}.refs b{color:#334e39}.detail .note{font-size:10px;color:#6b765f}.stage{position:relative;overflow:hidden;min-width:0;background:var(--map-margin);touch-action:none}svg#map{display:block;width:100%;height:100%;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}svg#map.dragging{cursor:grabbing}svg#map.measuring{cursor:crosshair}.viewbar{position:absolute;left:18px;top:18px;display:flex;padding:4px;background:#faf8f1ed;border:1px solid #c4ccbc;border-radius:7px;box-shadow:0 2px 12px #273d3610;gap:2px}.viewbar button{background:none;border:0;border-radius:4px;padding:8px 12px;font-size:12px}.viewbar button.active{background:#315e5a;color:#fff}.tools{position:absolute;right:18px;top:18px;display:flex;flex-direction:column;gap:7px}.tools button{width:37px;height:37px;background:#faf8f1f0;border:1px solid #c0c9b9;border-radius:5px;font-size:20px;box-shadow:0 2px 6px #273d3610}.tools button.small{font-size:15px}.tools button.on{background:#315e5a;color:white}.scale-panel{position:absolute;left:18px;bottom:17px;padding:8px 11px;background:#faf8f1ed;border-radius:5px;border:1px solid #d1d6c7;pointer-events:none}.scale-line{height:6px;border:1px solid var(--ink);background:linear-gradient(90deg,var(--ink) 0 25%,transparent 25% 50%,var(--ink) 50% 75%,transparent 75%);margin-bottom:4px}.scale-text{font-size:11px;display:flex;justify-content:space-between}.scale-caption{font-size:9px;color:var(--muted);margin-top:5px}.map-legend{position:absolute;bottom:17px;right:18px;width:206px;background:#faf8f1ed;border:1px solid #c7cebf;border-radius:5px;padding:10px 12px;font-size:10px}.map-legend summary{font-weight:700;cursor:pointer;letter-spacing:.6px;font-size:10px}.legend-items{display:grid;gap:5px;margin-top:9px}.legend-items label{display:flex;align-items:center;gap:6px}.legend-items input{accent-color:#315e5a}.legend-items p{color:var(--muted);margin:4px 0 2px;font-size:10px}.toast{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);max-width:90%;border:1px solid #bac7b1;border-radius:6px;padding:9px 14px;background:#faf8f1ed;text-align:center;font-size:12px;box-shadow:0 2px 6px #1e302915;pointer-events:none}dialog{max-width:770px;width:calc(100vw - 30px);max-height:85vh;border:1px solid #acbda3;border-radius:10px;padding:26px;background:#faf8f1;color:var(--ink);box-shadow:0 20px 100px #172b3855}dialog::backdrop{background:#172a2c77}dialog h2{font:700 29px var(--font-display);margin:0 0 14px}dialog h3{font-size:13px;margin-top:22px}dialog p,dialog li{font-size:13px}dialog a{color:#315e5a}dialog .close{float:right}.source{padding:11px 0;border-top:1px solid #d6ddcd}.source a{font-weight:650}.source p{font-size:12px;margin:5px 0;color:#586b59}.help{color:var(--muted);font-size:11px;margin-top:16px}.mobile-toggle{display:none}.empty{padding:20px;font-size:12px;color:#7a6752}#map:focus-visible{outline-offset:calc(-1 * (var(--focus-width) + var(--focus-offset)))}
-@media(max-width:780px){.app{grid-template-rows:minmax(65px,auto) 1fr}header{padding:8px 13px;flex-wrap:wrap;gap:2px 12px}header .brand{gap:10px}.brand h1{font-size:25px}.brand p{font-size:10px;max-width:170px}.pill{display:none}.quiet{padding:7px 8px;font-size:11px}.workspace{grid-template-columns:1fr;grid-template-rows:1fr;position:relative}aside{position:absolute;left:10px;top:60px;bottom:74px;width:min(330px,calc(100% - 66px));border:1px solid #c3ccba;border-radius:7px;box-shadow:0 4px 20px #1f3a3420;display:none}.workspace.open aside{display:flex}.stage{grid-row:1}.viewbar{left:10px;top:10px;padding:3px}.viewbar button{font-size:11px;padding:8px 9px}.tools{top:64px;right:10px}.map-legend{right:10px;bottom:12px;width:159px;padding:8px;font-size:9px}.scale-panel{left:10px;bottom:12px;max-width:175px}.scale-caption{font-size:8px}.mobile-toggle{display:inline-block}.search-area{padding:12px}.intro,.detail{padding:13px}.toast{bottom:93px;left:50%;width:80%;font-size:11px}.source p{font-size:11px}}
-@media print{header,aside,.viewbar,.tools,.map-legend,.toast{display:none!important}.app,.workspace,.stage{display:block;height:100vh;width:100vw}svg#map{width:100%;height:100%}}
-/* The place-index overlay gets its own close button on small screens only. */
-.search-head{display:flex;justify-content:space-between;align-items:flex-start}#panelClose{display:none;font-size:22px;margin-top:-6px}
-@media(max-width:780px){#panelClose{display:block}}
-/* The header "Photos" link shares the .quiet button look. */
-a.quiet{text-decoration:none;color:inherit;display:inline-block}
-/* The DERRY wordmark links home but keeps its plain-text look. */
-.brand h1 a{color:inherit;text-decoration:none}
-/* Compact header: the actions drop to their own full-width row, so the language
-   switcher stays reachable on any phone. The header row grows via minmax(...,auto). */
-@media(max-width:780px){header .brand{display:block;min-width:0}.brand p{display:none}.brand h1{line-height:1.1}.header-actions{flex-basis:100%;flex-wrap:wrap;gap:6px 7px}.header-actions .quiet{white-space:nowrap}}
-/* Mid widths: the reconstruction pill is the first thing to give way. */
-@media(max-width:950px){.pill{display:none}}
-/* Touch: the visible glyphs stay small, so extend the tap area to ~44px. */
-@media(max-width:780px){.close{position:relative}.close::after{content:"";position:absolute;inset:-12px}}
-@media print{#photoLayer{display:none}}
-/* Place card: a short strip of polaroid thumbnails above the sources. */
-.card-photos{display:flex;flex-wrap:wrap;gap:10px;margin:13px 0 2px}
-.card-photo{display:block;width:76px;background:#fffef7;padding:4px 4px 13px;box-shadow:0 1px 3px rgba(31,48,41,.32);transform:rotate(-1.6deg);transition:transform .15s}
-.card-photos .card-photo:nth-child(even){transform:rotate(1.7deg)}
-.card-photo:hover,.card-photo:focus-visible{transform:rotate(0deg) scale(1.07)}
-.card-photo img{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#e8e4d4}
-.card-photos-more{font-size:11px}
-.card-photos-more a{color:#315e5a;font-weight:650}
-/* The old screen-fixed neatline is gone: the litho sheet draws its own frame in world space. */
-/* Language switcher in the header: a segmented control in the .quiet style. */
-header .lang{display:inline-flex;border:1px solid #c7cebf;border-radius:5px;overflow:hidden;font-size:12px}
-header .lang a,header .lang b{padding:7px 9px;font-weight:400;color:inherit;text-decoration:none}
-header .lang b{background:#315e5a;color:#fff;font-weight:600}
-/* The map header keeps its own switcher until block 09: undo the shell's .lang sizing from components.css. */
-header .lang{font:inherit;font-size:12px}header .lang>*{display:inline-block;min-width:0;min-height:0}
-/* Quiet link from the place card to its standalone page. */
-.card-page{font-size:11px;margin:10px 0 0}.card-page a{color:#586b59}
+/* Map page (block 09). Desktop ≥ 1024: the 384 px index panel on the left (its head is the
+   site header), the map filling the rest, a 44 px strip under the map only. */
+html{scroll-behavior:smooth}
+body{margin:0;overflow-x:clip;background:var(--color-paper);color:var(--color-ink)}
+.app{height:100vh;height:100dvh;display:grid;grid-template-columns:var(--sidebar-w) minmax(0,1fr);grid-template-rows:minmax(0,1fr) 44px}
+.index{grid-column:1;grid-row:1/span 2;min-height:0;display:flex;flex-direction:column;background:var(--color-surface);border-right:var(--border-1) solid var(--color-line);z-index:2}
+.index-head .lang{flex:none}
+.index-browse{flex:1;min-height:0;display:flex;flex-direction:column}
+.index-browse[hidden],.place-card[hidden]{display:none}
+.index-tools{display:flex;flex-direction:column;gap:10px;padding:14px 20px 12px;border-bottom:var(--border-1) solid var(--color-line)}
+.index-tools .search--filled .input{padding-right:46px}
+.index-listhead{display:flex;justify-content:space-between;align-items:center;min-height:40px;padding:4px 12px 0 20px}
+/* Category checkboxes: a stopgap until the Category menu (block 10). */
+.filters{font-size:var(--text-s)}
+.filters summary{cursor:pointer;color:var(--color-ink-2);min-height:28px;display:flex;align-items:center}
+.filtergrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;padding:8px 0 2px}
+.filtergrid label{display:flex;align-items:center;gap:6px}
+.filtergrid input{accent-color:var(--color-ink)}
+/* The list: one button per place, the number in the marker style. */
+.index .place-list{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;list-style:none;margin:0;padding:0}
+.place-row{display:flex;align-items:center;gap:var(--space-3);width:100%;min-height:56px;padding:var(--space-2) var(--space-5);border:0;border-bottom:var(--border-1) solid var(--color-line);background:none;color:var(--color-ink);font:inherit;text-align:left;cursor:pointer}
+.place-row:hover,.place-row.is-hot{background:var(--color-surface-sunk)}
+.place-row[aria-current="true"]{background:var(--color-surface-sunk);box-shadow:inset 3px 0 0 var(--color-ink)}
+.place-row:focus-visible{outline-offset:-3px}
+.place-row .num{width:30px;height:30px}
+.place-row__body{flex:1;min-width:0}
+.place-row__title{display:block;font:var(--weight-medium) var(--text-m)/1.3 var(--font-ui)}
+.place-row__meta{display:block;font-size:var(--text-xs);line-height:1.35;color:var(--color-ink-2)}
+.pencil-word{color:var(--color-pencil)}
+.place-list .empty{padding:var(--space-5);font-size:var(--text-s);color:var(--color-ink-2)}
+/* Place card: nav row, scrolling body, "Open place page" pinned to the bottom. */
+.place-card{flex:1;min-height:0;display:flex;flex-direction:column}
+.place-card__nav{flex:none;display:flex;align-items:center;gap:4px;padding:6px 8px 6px 12px;border-bottom:var(--border-1) solid var(--color-line)}
+.place-card__back{border-color:transparent;padding:0 8px}
+.place-card__pager{margin-left:auto;display:flex;align-items:center}
+.place-card__pager .t-meta{min-width:4.5em;text-align:center;font-variant-numeric:tabular-nums}
+.place-card__body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:14px;padding:18px 20px 16px}
+.place-card__head{display:flex;flex-direction:column;gap:8px}
+.place-card__title{margin:0;font:var(--weight-semibold) 1.75rem/1.08 var(--font-display)}
+.place-card__title:focus{outline:none}
+.place-card__title:focus-visible{outline:var(--focus-width) solid var(--color-focus);outline-offset:3px}
+.place-card .card-photos{display:flex;gap:14px;align-items:flex-start;padding:4px 0 0}
+.place-card .card-photo{--photo-w:148px;transform:rotate(-1.6deg)}
+.place-card .card-photo:nth-child(even){transform:rotate(1.7deg)}
+.place-card .card-photo:hover,.place-card .card-photo:focus-visible{transform:rotate(0deg) scale(1.04)}
+/* The ⓘ tip spans the card width (anchored to the meta row), so it never overflows the panel. */
+.place-card .place-meta{position:relative}.place-card .place-meta__tipwrap{position:static}
+.place-card .place-meta__tip{left:0;right:0;width:auto}.place-card .place-meta__tip::after{display:none}
+.place-card__note{margin:0;font:var(--text-l)/1.55 var(--font-read)}
+.place-card .refs{list-style:none;margin:0 0 6px;padding:0}
+.place-card .refs li{display:grid;grid-template-columns:52px 1fr auto;gap:8px;align-items:baseline;padding:8px 0;border-top:var(--border-1) solid var(--color-line);font-size:var(--text-s);line-height:1.35}
+.place-card__foot{flex:none;display:flex;padding:12px 20px 16px;border-top:var(--border-1) solid var(--color-line)}
+.place-card__foot .btn{flex:1}
+.place-card__more{margin:0;font-size:var(--text-s)}
+.place-card__unlocated{margin:0;font-size:var(--text-s);color:var(--color-ink-2)}
+/* The map stage. */
+.stage{grid-column:2;grid-row:1;position:relative;overflow:hidden;min-width:0;background:var(--map-margin);touch-action:none}
+svg#map{display:block;width:100%;height:100%;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+svg#map.dragging{cursor:grabbing}svg#map.measuring{cursor:crosshair}
+#map:focus-visible{outline-offset:calc(-1 * (var(--focus-width) + var(--focus-offset)))}
+/* View tabs: centred at the top edge, clear of the grid letters. */
+.viewbar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:var(--z-map-controls);box-shadow:var(--shadow-float)}
+/* Unlocated place: a dark notice over the top of the map. */
+.map-notice{position:absolute;top:72px;left:16px;right:72px;z-index:var(--z-map-controls);display:flex;pointer-events:none}
+.map-notice:empty{display:none}
+.map-notice__box{pointer-events:auto;display:inline-flex;align-items:center;gap:10px;max-width:100%;padding:8px 8px 8px 12px;background:var(--color-ink);color:var(--color-ink-inverse);border-radius:var(--radius-3);box-shadow:var(--shadow-float);font-size:var(--text-s);line-height:1.35}
+.map-notice__box svg{display:block;width:18px;height:18px;flex:none}
+.map-notice__box svg rect{stroke:var(--color-ink-inverse)}.map-notice__box svg text{fill:var(--color-ink-inverse)}
+.map-notice__box .btn{color:var(--color-ink-inverse);border-color:rgb(255 255 255 / .5);flex:none}
+.map-notice__box .btn:hover{background:rgb(255 255 255 / .12)}
+.map-notice__box .btn:focus-visible{outline-color:var(--color-ink-inverse)}
+/* Zoom, measure and layers: the old controls on the new tokens until block 11. */
+.tools{position:absolute;right:16px;top:16px;display:flex;flex-direction:column;gap:8px;z-index:var(--z-map-controls)}
+.tools button{display:grid;place-items:center;width:var(--target);height:var(--target);background:var(--color-surface);border:var(--border-1) solid var(--color-control);border-radius:var(--radius-3);box-shadow:var(--shadow-float);color:var(--color-ink);font-size:20px;cursor:pointer}
+.tools button.small{font-size:16px}
+.tools button.on{background:var(--color-ink);color:var(--color-ink-inverse)}
+.tools button:disabled{opacity:.35;cursor:default}
+.scale-panel{position:absolute;left:16px;bottom:16px;padding:8px 11px;background:var(--color-surface);border:var(--border-1) solid var(--color-control);border-radius:var(--radius-3);pointer-events:none;z-index:var(--z-map-controls)}
+.scale-line{height:6px;border:1px solid var(--color-ink);background:linear-gradient(90deg,var(--color-ink) 0 25%,transparent 25% 50%,var(--color-ink) 50% 75%,transparent 75%);margin-bottom:4px}
+.scale-text{font:var(--text-2xs)/1 var(--font-display);display:flex;justify-content:space-between}
+.scale-caption{font-size:var(--text-2xs);color:var(--color-ink-2);margin-top:5px}
+.map-legend{position:absolute;bottom:16px;right:16px;width:220px;background:var(--color-surface);border:var(--border-1) solid var(--color-control);border-radius:var(--radius-3);padding:8px 12px;font-size:var(--text-2xs);z-index:var(--z-map-controls)}
+.map-legend summary{font-weight:var(--weight-semibold);cursor:pointer;min-height:28px;display:flex;align-items:center}
+.legend-items{display:grid;gap:6px;margin-top:6px}
+.legend-items label{display:flex;align-items:center;gap:6px}
+.legend-items input{accent-color:var(--color-ink)}
+.legend-items p{color:var(--color-ink-2);margin:4px 0 2px}
+.toast{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);max-width:90%;padding:9px 14px;background:var(--color-surface);border:var(--border-1) solid var(--color-control);border-radius:var(--radius-3);box-shadow:var(--shadow-float);text-align:center;font-size:var(--text-s);pointer-events:none;z-index:var(--z-map-controls)}
+.toast[hidden]{display:none}
+.brand-chip{position:absolute;top:10px;left:10px;z-index:var(--z-map-controls)}
+/* The strip under the map: a jump to the server-rendered directory. */
+.directory-jump{grid-column:2;grid-row:2;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px 14px;padding:0 16px;border-top:var(--border-1) solid var(--color-line);background:var(--color-surface);color:var(--color-ink);text-decoration:none;text-align:center}
+.directory-jump span{font:var(--weight-semibold) var(--text-m) var(--font-display);letter-spacing:.03em}
+.directory-jump small{font-size:var(--text-xs);color:var(--color-ink-2)}
+.directory-jump:hover{background:var(--color-surface-sunk)}
+@media (min-width:64em){.brand-chip,.place-card__unlocated{display:none}}
+/* Under 1024 px (until the phone sheet, block 09b): the map on top, the panel below it. */
+@media (max-width:63.99em){
+ .app{display:flex;flex-direction:column;height:auto}
+ .stage{flex:none;height:calc(100vh - 44px);height:calc(100dvh - 44px)}
+ .directory-jump{flex:none;min-height:44px}
+ .index{border-right:0;border-top:var(--border-2) solid var(--color-line-strong)}
+ .index-head{display:none}
+ .index .place-list{max-height:70vh}
+ .viewbar{top:64px}
+ .tools{top:64px;right:10px}
+ .map-legend{right:10px;bottom:12px;width:170px}
+ .scale-panel{left:10px;bottom:12px}
+ .map-notice{top:116px;left:10px;right:10px}
+}
+@media print{.index,.viewbar,.tools,.map-legend,.toast,.brand-chip,.map-notice{display:none!important}.app,.stage{display:block;height:100vh;width:100vw}svg#map{width:100%;height:100%}#photoLayer{display:none}}
 /* Survey cartography (block 12): layer classes over the --map-* tokens, ported from the
    Design renderer (derry-map.css, style "survey"). Widths are set inline in screen px via --u. */
 .dm .m-paper{fill:var(--map-margin)}
@@ -136,11 +211,9 @@ header .lang{font:inherit;font-size:12px}header .lang>*{display:inline-block;min
 #map[data-z=far] .lod-mid,#map[data-z=far] .lod-near,#map[data-z=mid] .lod-near{display:none}
 #map[data-bld=tint] .lod-plan,#map[data-bld=plan] .lod-massing{display:none}
 
-/* Server-rendered place directory below the interactive map. */
-.directory-jump{min-height:46px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:3px 18px;padding:7px 18px;border-top:1px solid var(--line);background:#faf8f1;color:var(--ink);text-decoration:none;text-align:center;z-index:5}
-.directory-jump span{font:600 13px var(--font-display);letter-spacing:.15px}
-.directory-jump small{color:var(--muted);font-size:10px;letter-spacing:.25px}
-.directory-jump:hover{background:#efeee4}
+/* Server-rendered place directory below the interactive map (restyled in block 14; the old palette is scoped here until then). */
+.map-context,.place-directory{--paper:#f6f3e9;--ink:#263d38;--muted:#64736b;--line:#d3d6c8}
+.map-context .quiet{display:inline-block;border:1px solid #c7cebf;border-radius:5px;padding:7px 12px;font-size:12px;color:inherit;text-decoration:none}
 .map-context{border-top:1px solid #c9cebf;background:#faf8f1}
 .map-context-inner{max-width:1180px;margin:0 auto;padding:46px 28px 48px}
 .map-context h2{max-width:760px;font:700 27px/1.18 var(--font-display);margin:6px 0 14px}
@@ -174,9 +247,6 @@ header .lang{font:inherit;font-size:12px}header .lang>*{display:inline-block;min
 
 @media(max-width:1050px){.place-directory-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:780px){
- .app{grid-template-rows:minmax(65px,auto) 1fr auto}
- .directory-jump{min-height:48px;gap:1px 12px;padding:6px 10px}
- .directory-jump span{font-size:12px}.directory-jump small{font-size:9px}
  .map-context-inner{padding:36px 16px 38px}.map-context h2{font-size:24px}.map-context p{font-size:13px}
  .place-directory-inner{padding:45px 16px 64px}
  .place-directory h2{font-size:29px}

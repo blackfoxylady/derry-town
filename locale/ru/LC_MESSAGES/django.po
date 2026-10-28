@@ -1065,3 +1065,29 @@ msgstr "Фотографии — изображения эпохи, создан
 
 msgid "Photograph %(n)s of %(total)s"
 msgstr "Фотография %(n)s из %(total)s"
+
+#: atlas/templates/atlas/index.html (block 09)
+msgid "Skip to the map"
+msgstr "Перейти к карте"
+
+msgid "Map of Derry, Maine: a literary atlas of Stephen King’s IT"
+msgstr "Карта Дерри, штат Мэн: литературный атлас романа Стивена Кинга «Оно»"
+
+msgid "Search a place, person or event"
+msgstr "Поиск места, персонажа или события"
+
+msgid "Derry: open the site menu"
+msgstr "Дерри: открыть меню сайта"
+
+msgid "Map view"
+msgstr "Вид карты"
+
+#: atlas/views.py
+msgid "All %(count)s place as a list"
+msgid_plural "All %(count)s places as a list"
+msgstr[0] "Все %(count)s место списком"
+msgstr[1] "Все %(count)s места списком"
+msgstr[2] "Все %(count)s мест списком"
+
+msgid "%(mapped)s on the map · %(unlocated)s unlocated · about the map"
+msgstr "%(mapped)s на карте · %(unlocated)s без координат · о карте"

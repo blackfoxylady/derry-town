@@ -316,6 +316,19 @@ main:focus { outline: none; } /* the skip link's target, not a control */
 .menu-btn svg { width: 20px; height: 20px; }
 .menu-btn--icon { width: var(--target); padding: 0; justify-content: center; }
 
+/* Map page, desktop: the head of the index panel is the site header */
+.index-head { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5); border-bottom: var(--border-2) solid var(--color-line-strong); background: var(--color-surface); }
+.index-head__row { display: flex; align-items: center; gap: var(--space-2); }
+.index-head__row .brand { margin-right: auto; }
+.index-head__tag { margin: 0; font-size: var(--text-xs); line-height: 1.4; color: var(--color-ink-2); }
+
+/* Phone map: floating brand chip that opens the menu */
+.brand-chip { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--target); padding: 0 var(--space-2) 0 var(--space-3); background: var(--color-surface); border: var(--border-1) solid var(--color-control); border-radius: var(--radius-3); box-shadow: var(--shadow-float); color: var(--color-ink); cursor: pointer; }
+.brand-chip .brand__mark { width: 24px; height: 24px; }
+.brand-chip .brand__name { font-size: 1.0625rem; }
+.brand-chip__div { width: 1px; align-self: stretch; margin: 10px 2px; background: var(--color-line); }
+.brand-chip__menu, .brand-chip__menu svg { display: block; width: 22px; height: 22px; }
+
 /* Menu panel: one panel for every page and size; div[role=dialog][aria-modal] */
 .scrim { position: fixed; inset: 0; z-index: var(--z-dialog); background: var(--scrim); }
 .panel {

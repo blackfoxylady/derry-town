@@ -21,7 +21,7 @@ from django.conf import settings
 from . import dataset as ds
 from .models import MapState
 
-RENDER_VERSION = '4'
+RENDER_VERSION = '5'
 
 # Litho renderer layer classes. Styles are content-addressed (no semantic keys),
 # so the class is derived from feature id plus style, mirroring the handoff

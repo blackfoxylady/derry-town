@@ -128,3 +128,49 @@ msgstr "предположено"
 
 msgid "no location"
 msgstr "без координат"
+
+#: atlas/static/atlas/map-ui.js (block 09: list and place card)
+msgid "%s place"
+msgid_plural "%s places"
+msgstr[0] "%s место"
+msgstr[1] "%s места"
+msgstr[2] "%s мест"
+
+msgid "All places"
+msgstr "Все места"
+
+msgid "Back to results"
+msgstr "К результатам"
+
+msgid "Previous place"
+msgstr "Предыдущее место"
+
+msgid "Next place"
+msgstr "Следующее место"
+
+msgid "Place %s:"
+msgstr "Место %s:"
+
+msgid "All photos of this place"
+msgstr "Все фотографии этого места"
+
+msgid "In the novel"
+msgstr "В романе"
+
+msgid "%s chapter"
+msgid_plural "%s chapters"
+msgstr[0] "%s глава"
+msgstr[1] "%s главы"
+msgstr[2] "%s глав"
+
+msgid "Open place page"
+msgstr "Страница места"
+
+msgid "%s has no point on the map: the novel doesn’t say where it stands"
+msgstr "У места «%s» нет точки на карте: роман не говорит, где оно находится"
+
+msgid "No point on the map: the novel doesn’t say where it stands."
+msgstr "Точки на карте нет: роман не говорит, где это место."
+
+msgid "Close"
+msgstr "Закрыть"

@@ -30,7 +30,7 @@ const path=require('node:path');
    assert(analyticsRequests.some(url=>url.includes('googletagmanager.com')));
    assert(analyticsRequests.some(url=>url.includes('mc.yandex.ru')));
   }
-  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
+  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,null,{timeout:120000});
   assert.equal(await page.evaluate(()=>DerryAtlas.unlocatedCount),8);
   // The crawlable directory is present independently of the JS-built sidebar.
   assert.equal(await page.locator('.place-directory-list a').count(),92);
@@ -53,20 +53,54 @@ const path=require('node:path');
   assert.equal(await page.locator('#markers path, #map [filter]').count(),0);
   assert.equal(await page.locator('#markers .mk--a').first().getAttribute('aria-label').then(t=>/^\d+ .+, .+, .+$/.test(t)),true);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-  assert(await page.locator('.brand h1').evaluate(n=>n.getBoundingClientRect().top>=0));
+  // Block 09: no page header; a hidden H1, the skip link to the map, the brand in the panel head
+  // (desktop) or the brand chip (phone); both open the site menu.
+  assert.equal(await page.locator('h1').count(),1);
+  assert.match(await page.locator('h1').innerText(),/^Map of Derry, Maine/);
+  assert.equal(await page.locator('.skip-link[href="#map"]').count(),1);
+  const menuOpener=name==='mobile'?'.brand-chip':'.index-head [data-menu-open]';
+  assert.equal(await page.locator(menuOpener).isVisible(),true);
+  await page.locator(menuOpener).click();
+  assert.equal(await page.locator('#site-menu').isVisible(),true);
+  assert.equal(await page.locator('#site-menu a[href="/method/"]').count(),1);
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#site-menu').isVisible(),false);
   await page.screenshot({path:path.join(out,name+'-town.png'),fullPage:true});
-  if(name==='mobile')await page.locator('#placesToggle').click();
+  // The list: 92 rows, the number in the marker style, meta "Kind · period · confidence".
+  assert.equal(await page.locator('#list .place-row').count(),92);
+  assert.match(await page.locator('#list .place-row[data-place="5"] .place-row__meta').innerText(),/^Civic · .+ · inferred$/);
   await page.locator('#search').fill('library');
-  assert((await page.locator('#list button').count())>=1);
-  await page.locator('#list button[data-place="12"]').click();
-  assert.match(await page.locator('#detail').innerText(),/Library/);
+  assert((await page.locator('#list .place-row').count())>=1);
+  await page.locator('#list .place-row[data-place="12"]').click();
+  // The card replaces the list; focus goes to its heading; ?place follows the card.
+  assert.equal(await page.locator('#browse').isVisible(),false);
+  assert.match(await page.locator('#detail h2').innerText(),/Library/);
+  assert.equal(await page.evaluate(()=>document.activeElement.id),'place-title');
+  assert.match(await page.locator('#detail .place-card__back').innerText(),/Back to results/);
+  assert.match(page.url(),/\?place=12$/);
+  assert.match(await page.locator('.lang a[hreflang="ru"]').first().getAttribute('href'),/place=12/);
+  assert.match(await page.locator('#detail .card-sec summary').innerText(),/In the novel\s*3 chapters/i);
   await page.screenshot({path:path.join(out,name+'-library.png'),fullPage:true});
+  // Pager: every place in map-number order; Esc closes and returns focus to the row.
+  assert.equal(await page.locator('#detail .place-card__pager .t-meta').innerText(),'12 / 92');
+  await page.locator('#detail [data-step="1"]').click();
+  assert.equal(await page.evaluate(()=>DerryAtlas.view.selected),13);
+  await page.locator('#detail [data-step="-1"]').click();
+  await page.keyboard.press('Escape');
+  assert.equal(await page.locator('#detail').isVisible(),false);
+  assert.equal(await page.evaluate(()=>document.activeElement.dataset.place),'12');
+  assert.doesNotMatch(page.url(),/place=/);
   await page.locator('#clearSearch').click();
   await page.locator('#search').fill('Juniper Hill');
-  await page.locator('#list button').click();
-  assert.match(await page.locator('#detail').innerText(),/U · No location/);
+  await page.locator('#list .place-row').click();
+  assert.match(await page.locator('#detail').innerText(),/No location/i);
+  assert.equal(await page.locator('#detail .num--u').innerText(),'U4');
+  if(name==='desktop')assert.match(await page.locator('#mapNotice').innerText(),/has no point on the map/);
+  await page.locator('#detail [data-step="1"]').click();
+  assert.equal(await page.evaluate(()=>DerryAtlas.view.selected),'U6');
+  await page.locator('#detail .place-card__back').click();
+  assert.equal(await page.locator('#mapNotice').innerText(),'');
   await page.locator('#clearSearch').click();
-  if(name==='mobile')await page.locator('#placesToggle').click();
   for(const view of ['central','barrens','camp']){
    await page.locator(`[data-view="${view}"]`).click();
    assert.equal(await page.evaluate(()=>DerryAtlas.view.view),view);
@@ -113,7 +147,7 @@ const path=require('node:path');
     await pol.click();
     assert.match(await page.locator('#detail').innerText(),/Library/);
     assert(await page.locator('#detail .card-photo').count()>0);
-    assert(await page.locator('#detail .card-photos-more a').count()===1);
+    assert(await page.locator('#detail .place-card__more a').count()===1);
    }
    await page.evaluate(()=>DerryAtlas.fit('city'));
   }
@@ -123,9 +157,7 @@ const path=require('node:path');
   await page.mouse.click(box.x+box.width*.65,box.y+box.height*.55);
   assert.match(await page.locator('#toast').innerText(),/( m| km) · straight line/);
   await page.keyboard.press('Escape');
-  // Sources & method lives on its own page now, linked from the header.
   const url=process.env.DERRY_URL||'http://127.0.0.1:8765';
-  assert.equal(await page.locator('header a:has-text("Sources & method")').getAttribute('href'),'/method/');
   await page.goto(url+'/method/',{waitUntil:'networkidle'});
   assert.match(await page.locator('.method-page h1').innerText(),/Built from the novel/);
   assert.equal(await page.locator('.source-list__item').count(),7);
@@ -163,10 +195,13 @@ const path=require('node:path');
   assert.doesNotMatch(page.url(),/confidence=|location=/);
   // Photo gallery: map deep link and back; a fresh install may hold zero photos.
   await page.goto(url+'/?place=12',{waitUntil:'networkidle'});
-  await page.waitForFunction(()=>window.DerryAtlas?.view.selected===12,{timeout:120000});
-  assert.match(await page.locator('#detail').innerText(),/Place 12/i);
-  // The card links to the standalone place page (indexable, English slug).
-  const placeHref=await page.locator('#detail .card-page a').getAttribute('href');
+  await page.waitForFunction(()=>window.DerryAtlas?.view.selected===12,null,{timeout:120000});
+  assert.match(await page.locator('#detail h2').innerText(),/Place 12:/i);
+  // The deep link centres the place.
+  assert.equal(await page.evaluate(()=>{const v=DerryAtlas.view;return Math.round(v.cx)===-1510&&Math.round(v.cy)===-540}),true);
+  // The card links to the standalone place page (indexable, English slug), in the same tab.
+  const placeHref=await page.locator('#detail .place-card__foot a').getAttribute('href');
+  assert.equal(await page.locator('#detail .place-card__foot a').getAttribute('target'),null);
   assert.match(placeHref,/^\/places\/12(-|\/)/);
   await page.goto(url+placeHref,{waitUntil:'networkidle'});
   assert.match(await page.locator('.place-page h1').innerText(),/\S/);
@@ -177,7 +212,7 @@ const path=require('node:path');
   assert.equal(new Set(relatedHrefs).size,relatedHrefs.length);
   // The Russian version serves the same map under /ru/.
   await page.goto(url+'/ru/',{waitUntil:'networkidle'});
-  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
+  await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,null,{timeout:120000});
   assert.equal(await page.locator('html').getAttribute('lang'),'ru');
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
   assert.equal(await page.locator('.crumbs li').count(),2);
@@ -211,7 +246,7 @@ const path=require('node:path');
    assert(await page.locator('.viewer__facts').isVisible());
    assert.match(await page.locator('[data-counter]').innerText(),/^\d+ \/ \d+$/);
    const toMap=page.locator('a:has-text("Show on the map")');
-   if(await toMap.count()){await toMap.first().click();await page.waitForFunction(()=>typeof window.DerryAtlas?.view.selected==='number',{timeout:120000})}
+   if(await toMap.count()){await toMap.first().click();await page.waitForFunction(()=>typeof window.DerryAtlas?.view.selected==='number',null,{timeout:120000})}
   }
   assert.deepEqual(errors,[]);
   reports.push({viewport:name,dimensions:size,checks:'map, 84+8 counts, server-rendered place directories, catalog search and filters, detail, unlocated, four views, zoom, keyboard, layers, photo layer, ruler, method page, place page, ru version, gallery deep links',errors});
@@ -230,7 +265,7 @@ const path=require('node:path');
   if(photoHref)pages.push(photoHref);
   for(const lang of ['','/ru'])for(const p of pages){
    await page.goto(url+lang+p,{waitUntil:'networkidle'});
-   if(p==='/')await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,{timeout:120000});
+   if(p==='/')await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,null,{timeout:120000});
    const m=await page.evaluate(()=>{const r=document.querySelector('.lang').getBoundingClientRect();return{over:document.documentElement.scrollWidth-window.innerWidth,langIn:r.left>=0&&r.right<=window.innerWidth}});
    assert.equal(m.over<=0,true,(lang+p)+' overflows horizontally by '+m.over+'px at 390px');
    assert.equal(m.langIn,true,(lang+p)+' clips the language switcher at 390px');

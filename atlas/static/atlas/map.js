@@ -53,7 +53,7 @@ function scene(){
 }
 function screen(x,y){return [(x-state.cx)*state.k+state.w/2,(state.cy-y)*state.k+state.h/2]}
 function geo(x,y){return [state.cx+(x-state.w/2)/state.k,state.cy-(y-state.h/2)/state.k]}
-function fit(id){const v=PAYLOAD.views.find(v=>v.id===id);state.view=id;const [a,b,c,d]=v.bounds;state.cx=(a+c)/2;state.cy=(b+d)/2;state.k=Math.min((state.w-60)/(c-a),(state.h-100)/(d-b));render();}
+function fit(id){const v=PAYLOAD.views.find(v=>v.id===id);state.view=id;const [a,b,c,d]=v.bounds;state.cx=(a+c)/2;state.cy=(b+d)/2;state.k=Math.min((state.w-48)/(c-a),(state.h-48)/(d-b));render();}
 function catOk(s){return s.kind==='Unlocated'||state.active.has(s.kind)}
 function searchOk(s){return !state.search||[s.id,s.name,s.short,s.note,s.period,...(s.search_aliases||[])].join(' ').toLowerCase().replace(/–/g,'-').includes(state.search.replace(/–/g,'-'))}
 function hits(s){return catOk(s)&&searchOk(s)}
@@ -86,7 +86,7 @@ function render(){
  // place and search matches stay full markers); a search dims the places it misses.
  const match=state.search?new Set(D.sites.filter(searchOk).map(s=>s.id)):null;
  const isMatch=s=>match&&match.has(s.id),rank=s=>s.id===state.selected?3:isMatch(s)?2:match?0:1;
- const shown=D.sites.filter(catOk).sort((a,b)=>rank(a)-rank(b)||a.id-b.id),placed=[];
+ const shown=D.sites.filter(s=>catOk(s)||s.id===state.selected).sort((a,b)=>rank(a)-rank(b)||a.id-b.id),placed=[];
  const hitLayer=el('g',{class:'mk-hits'},markers);
  for(const s of shown){const [x,y]=screen(s.x,s.y);if(!inView(x,y,30))continue;
   const sel=s.id===state.selected,dim=match&&!match.has(s.id)&&!sel,full=z!=='far'||sel||isMatch(s);
@@ -104,7 +104,8 @@ function render(){
   el('title',{},g).textContent=s.name;
   // Sepia dot: photographs exist here, but the view is too far out for polaroids.
   if(state.photos&&!dim&&PHOTOS[String(s.id)]&&z==='far')el('circle',{class:'ph-dot',cx:full?9:6,cy:full?-9:-6,r:2.6},g);
-  g.addEventListener('click',e=>{e.stopPropagation();if(!state.measuring)select(s.id,false)});g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(s.id,false);markers.querySelector(`.mk[data-id="${s.id}"]`)?.focus()}});
+  g.addEventListener('click',e=>{e.stopPropagation();if(!state.measuring)select(s.id,{opener:{mk:s.id}})});g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(s.id,{opener:{mk:s.id}})}});
+  g.addEventListener('pointerenter',()=>ui.hot(s.id));g.addEventListener('pointerleave',()=>ui.hot(null));
  }
  // Conceptual spot heights (▲≈NN) from mid zoom; part of the relief layer.
  if(state.relief&&z!=='far')for(const[px,py,hh]of LITHO_PEAKS){const[sx,sy]=screen(px,-py);
@@ -126,7 +127,7 @@ function render(){
    const t=el('text',{x:(b===left?b[2]:b[0]).toFixed(1),y:(y+4.5).toFixed(1),'text-anchor':b===left?'end':'start',class:'lbl lbl--place'+(s.id===state.selected?' is-selected':'')},labels);t.textContent=s.short}}
  L.gridRefs(labels,{cx,cy:-cy,k,w,h});
  const target=130/k,base=10**Math.floor(Math.log10(target)),n=[1,2,5,10].filter(x=>x*base<=target).pop()||1,val=n*base;q('#scaleLine').style.width=(val*k)+'px';q('#scaleText').textContent=format(val);
- document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===state.view));
+ document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===state.view)));
  drawMeasure();
 }
 // Prints search a ring round the marker (top first) after every marker is placed, so they
@@ -185,52 +186,49 @@ function photoPrint(parent,f,transform,cls,tilt=0){const cap=photoCaption(f);
  el('image',{href:f.photos[0].thumb,x:-PI/2,y:-PH/2+4,width:PI,height:PI,preserveAspectRatio:'xMidYMid slice'},t);
  if(cap)el('text',{class:'ph-print__cap',x:0,y:PH/2-5,'text-anchor':'middle'},t).textContent=cap}
 // A polaroid opens the place card when the place has one; roads and other outlines go to the gallery.
-function openPhotoFeature(key){const f=PHOTOS[key];if(!f)return;if(f.object_type==='site')select(Number(key),false);else if(f.object_type==='unplaced')select(key,false);else location.href=f.gallery||URLS.gallery+'?place='+key}
+function openPhotoFeature(key){const f=PHOTOS[key];if(!f)return;if(f.object_type==='site')select(Number(key));else if(f.object_type==='unplaced')select(key);else location.href=f.gallery||URLS.gallery+'?place='+key}
 // Confidence terms (shared with the place pages): full label with the letter, lowercase for meta lines.
-const CONF={A:'A · '+_('Named in the novel'),B:'B · '+_('Inferred'),C:'C · '+_('Proposed'),U:'U · '+_('No location')};
 const CONF_META={A:_('named in the novel'),B:_('inferred'),C:_('proposed'),U:_('no location')};
 // Short category names, as in meta lines ("Civic" / "Город"): marker labels for screen readers.
 const KIND_SHORT={Homes:p_('kind short','Homes'),Civic:p_('kind short','Civic'),Encounters:p_('kind short','Encounters'),Historical:p_('kind short','Historical'),Barrens:p_('kind short','Barrens'),Outlying:p_('kind short','Outlying')};
-function list(){const result=all.filter(hits),mapped=D.sites.filter(hits).length;q('#count').textContent=result.length+' '+n_('place','places',result.length)+' · '+mapped+' '+_('mapped');q('#list').innerHTML=result.length?result.map(s=>`<li><button data-place="${s.id}" class="${state.selected===s.id?'selected':''}"><span class="num" style="color:${PAYLOAD.colors[s.kind]||'#697166'}">${String(s.id).padStart(2,'0')}</span><span><span class="item-title">${esc(s.name)}</span><span class="item-sub">${esc(s.period)} · ${esc(CONF_META[s.confidence]||'')}</span></span></button></li>`).join(''):'<li class="empty">'+esc(_('No matching places. Try a shorter name or enable more categories.'))+'</li>';q('#list').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>select(/^U/.test(b.dataset.place)?b.dataset.place:Number(b.dataset.place),true)));}
-function select(id,focus){const s=all.find(s=>s.id===id);if(!s)return;state.selected=id;q('#intro').hidden=true;const panel=q('#detail');panel.hidden=false;const conf=CONF;
- const refs=s.refs||[];
- const fp=PHOTOS[String(s.id)];
- const photoRow=fp?`<div class="card-photos">${fp.photos.map(p=>`<a class="card-photo" href="${photoUrl(p.id)}" title="${esc(p.caption)}"><img src="${esc(p.thumb)}" alt="${esc(p.caption||s.name)}" loading="lazy"></a>`).join('')}</div><p class="card-photos-more"><a href="${esc(fp.gallery||URLS.gallery+'?place='+String(s.id))}">${esc(_('All photographs of this place'))} →</a></p>`:'';
- panel.innerHTML=`<div class="detail-top"><div><div class="eyebrow">${esc(_('Place %s').replace('%s',String(s.id).padStart(2,'0')))}</div><h2>${esc(s.name)}</h2></div><button class="close" id="closeDetail" aria-label="${esc(_('Close place'))}">×</button></div><div class="meta">${esc(s.period)}</div><p><span class="badge">${conf[s.confidence]}</span></p><p>${esc(s.note)}</p>${photoRow}${refs.length?`<details open><summary>${esc(_('Sources & evidence'))}</summary><ul class="refs">${refs.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details>`:''}<p class="card-page"><a href="${placeUrl(s)}" target="_blank" rel="noopener">${esc(_('Place page'))} →</a></p>`;
- q('#closeDetail').onclick=closeDetail;q('#scroll').scrollTop=0;
- if(typeof id==='number'&&focus){state.cx=s.x;state.cy=s.y;state.k=Math.max(state.k,.48);state.view='';}
- list();render();if(matchMedia('(max-width:780px)').matches&&!q('#workspace').classList.contains('open')){q('#workspace').classList.add('open');q('#placesToggle').setAttribute('aria-expanded','true');state.panelAutoOpened=true;}
-}
-function closeDetail(){state.selected=null;q('#detail').hidden=true;q('#intro').hidden=false;if(state.panelAutoOpened){state.panelAutoOpened=false;q('#workspace').classList.remove('open');q('#placesToggle').setAttribute('aria-expanded','false');}list();render()}
+// Choosing a place centres it unless it already sits in the middle 60% of the map; from the
+// list, the pager or a link it also zooms in to street level. An unlocated place leaves the map.
+function select(id,opts={}){const s=all.find(s=>s.id===id);if(!s)return;if(typeof opts!=='object')opts={};
+ state.selected=id;
+ if(typeof id==='number'){const [x,y]=screen(s.x,s.y),inMiddle=x>state.w*.2&&x<state.w*.8&&y>state.h*.2&&y<state.h*.8;
+  if(opts.zoom&&state.k<.48){state.k=.48;state.cx=s.x;state.cy=s.y;state.view=''}else if(!inMiddle){state.cx=s.x;state.cy=s.y;state.view=''}}
+ render();ui.open(s,opts)}
+// Closing (× or Esc) drops the ring and leaves the map where it is; focus returns to the opener.
+function closeDetail(){if(state.selected==null)return;const id=state.selected;state.selected=null;render();
+ const back=ui.close();(back||q(`#markers .mk[data-id="${id}"]`)||map).focus()}
 function zoom(f,x=state.w/2,y=state.h/2){const [gx,gy]=geo(x,y);state.k=Math.min(MAX_K,Math.max(MIN_K,state.k*f));state.cx=gx-(x-state.w/2)/state.k;state.cy=gy+(y-state.h/2)/state.k;state.view='';render()}
 function showToast(msg){q('#toast').textContent=msg;q('#toast').hidden=!msg}
 function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();if(!state.measure.length)return;state.measure.forEach(p=>{const[x,y]=screen(...p);el('circle',{cx:x,cy:y,r:4,fill:'#a34b35',stroke:'#fff','stroke-width':1.3},layer)});if(state.measure.length===2){const a=screen(...state.measure[0]),b=screen(...state.measure[1]);el('path',{d:`M${a}L${b}`,fill:'none',stroke:'#a34b35','stroke-width':2,'stroke-dasharray':'5 3'},layer);showToast(format(Math.hypot(state.measure[0][0]-state.measure[1][0],state.measure[0][1]-state.measure[1][1]))+' · '+_('straight line in this reconstruction'));}}
 function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').classList.toggle('on',state.measuring);q('#measure').setAttribute('aria-pressed',state.measuring);map.classList.toggle('measuring',state.measuring);showToast(state.measuring?_('Select two points to measure. Drag to pan. Escape clears.'):'');render()}
 scene();
+const ui=window.DerryMapUI({state,all,photos:PHOTOS,placeUrl,photoUrl,galleryUrl:URLS.gallery,hits,kindShort:KIND_SHORT,confMeta:CONF_META,_,n_,select,close:closeDetail,render});
 // Category keys are canonical data; only the visible labels translate.
 const KIND_LABELS={Homes:_('Homes'),Civic:_('Civic'),Encounters:_('Encounters'),Historical:_('Historical'),Barrens:_('Barrens'),Outlying:_('Outlying')};
 q('#filters').innerHTML=Object.keys(PAYLOAD.colors).map(c=>`<label><input type="checkbox" checked data-kind="${c}">${esc(KIND_LABELS[c]||c)}</label>`).join('');
-q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);list();render()});
-q('#search').oninput=e=>{state.search=e.target.value.trim().toLowerCase();q('#clearSearch').hidden=!e.target.value;list();render()};q('#clearSearch').onclick=()=>{q('#search').value='';state.search='';q('#clearSearch').hidden=true;list();render();q('#search').focus()};
+q('#filters').querySelectorAll('input').forEach(x=>x.onchange=()=>{x.checked?state.active.add(x.dataset.kind):state.active.delete(x.dataset.kind);ui.list();render()});
 q('#showPhotos').onchange=e=>{state.photos=e.target.checked;render()};q('#showNames').onchange=e=>{state.names=e.target.checked;render()};q('#showRelief').onchange=e=>{state.relief=e.target.checked;world.querySelectorAll('.relief').forEach(n=>n.style.display=state.relief?'':'none');render()};q('#showBuildings').onchange=e=>{world.querySelectorAll('.buildings').forEach(n=>n.style.display=e.target.checked?'':'none')};
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#reset').onclick=()=>fit('city');q('#measure').onclick=()=>toggleMeasure();
-q('#placesToggle').onclick=()=>{const open=q('#workspace').classList.toggle('open');q('#placesToggle').setAttribute('aria-expanded',open);state.panelAutoOpened=false};
-q('#panelClose').onclick=()=>{state.panelAutoOpened=false;q('#workspace').classList.remove('open');q('#placesToggle').setAttribute('aria-expanded','false')};
 const pointers=new Map();let last=null,start=null,moved=false,lastPinch=0,hadPinch=false;
 function local(e){const r=map.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
 map.addEventListener('pointerdown',e=>{if(e.button!==0)return;const p=local(e);pointers.set(e.pointerId,p);map.setPointerCapture(e.pointerId);start=p;last=p;moved=false;if(pointers.size>1){hadPinch=true;const v=[...pointers.values()];lastPinch=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1])}map.classList.add('dragging')});
 map.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const p=local(e);pointers.set(e.pointerId,p);if(pointers.size===2){const v=[...pointers.values()],d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);if(lastPinch>0&&d>0)zoom(d/lastPinch,(v[0][0]+v[1][0])/2,(v[0][1]+v[1][1])/2);lastPinch=d;moved=true;return}if(last){const dx=p[0]-last[0],dy=p[1]-last[1];if(start&&Math.hypot(p[0]-start[0],p[1]-start[1])>4)moved=true;if(moved){state.cx-=dx/state.k;state.cy+=dy/state.k;state.view='';render()}}last=p});
-map.addEventListener('pointerup',e=>{const p=local(e),wasMoved=moved||hadPinch;pointers.delete(e.pointerId);if(!pointers.size){map.classList.remove('dragging');last=null;lastPinch=0;hadPinch=false}else last=[...pointers.values()][0];if(state.measuring&&!wasMoved){if(state.measure.length===2)state.measure=[];state.measure.push(geo(...p));drawMeasure()}if(!state.measuring&&!wasMoved){const hit=document.elementFromPoint(e.clientX,e.clientY);const pol=hit?.closest('.ph');if(pol)openPhotoFeature(pol.dataset.key);else{const target=hit?.closest('.mk,.mk-hit');if(target)select(Number(target.dataset.id),false)}}});
+map.addEventListener('pointerup',e=>{const p=local(e),wasMoved=moved||hadPinch;pointers.delete(e.pointerId);if(!pointers.size){map.classList.remove('dragging');last=null;lastPinch=0;hadPinch=false}else last=[...pointers.values()][0];if(state.measuring&&!wasMoved){if(state.measure.length===2)state.measure=[];state.measure.push(geo(...p));drawMeasure()}if(!state.measuring&&!wasMoved){const hit=document.elementFromPoint(e.clientX,e.clientY);const pol=hit?.closest('.ph');if(pol)openPhotoFeature(pol.dataset.key);else{const target=hit?.closest('.mk,.mk-hit');if(target)select(Number(target.dataset.id),{opener:{mk:target.dataset.id}})}}});
 map.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);last=null;map.classList.remove('dragging')});
 map.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.003),...local(e))},{passive:false});map.addEventListener('dblclick',e=>{if(!state.measuring&&!e.target.closest('.mk,.mk-hit,.ph'))zoom(1.8,...local(e))});
 map.addEventListener('keydown',e=>{if(e.key==='+'||e.key==='='){e.preventDefault();zoom(1.4)}else if(e.key==='-'){e.preventDefault();zoom(1/1.4)}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.cx+=({'ArrowLeft':-80,'ArrowRight':80}[e.key]||0)/state.k;state.cy+=({'ArrowUp':80,'ArrowDown':-80}[e.key]||0)/state.k;state.view='';render()}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(state.measuring)toggleMeasure(false);else closeDetail()}});
+// Only from the map page itself (panel or stage): Esc down in the directory leaves the card alone.
+document.addEventListener('keydown',e=>{if(e.key!=='Escape'||e.defaultPrevented||!(e.target===document.body||e.target.closest?.('.app')))return;if(ui.closeTip())return;if(state.measuring)toggleMeasure(false);else closeDetail()});
 // Deep link from the photo gallery: /?place=12 or /?place=U3 opens the place card.
-function deepLink(){const p=new URLSearchParams(location.search).get('place');if(p)select(/^\d+$/.test(p)?Number(p):p,true)}
+function deepLink(){const p=new URLSearchParams(location.search).get('place');if(p)select(/^\d+$/.test(p)?Number(p):p.toUpperCase(),{zoom:true,focus:false})}
 new ResizeObserver(entries=>{const r=entries[0].contentRect;state.w=r.width;state.h=r.height;if(!state.ready){state.ready=true;fit('city');deepLink()}else render()}).observe(q('.stage'));
-list();
+ui.list();
 // Exposed read-only diagnostics make the offline artifact easy to validate.
-window.DerryAtlas={get revision(){return PAYLOAD.revision},get siteCount(){return D.sites.length},get unlocatedCount(){return D.unplaced.length},get photoFeatureCount(){return Object.keys(PHOTOS).length},get view(){return {...state,active:[...state.active]}},select,fit,format,
+window.DerryAtlas={get revision(){return PAYLOAD.revision},get siteCount(){return D.sites.length},get unlocatedCount(){return D.unplaced.length},get photoFeatureCount(){return Object.keys(PHOTOS).length},get view(){return {...state,active:[...state.active]}},select,close:closeDetail,fit,format,
  // Exact view (payload metres, y up), for side-by-side checks against the reference renderer.
  setView(cx,cy,k){state.cx=cx;state.cy=cy;state.k=k;state.view='';render()}};
 

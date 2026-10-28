@@ -25,12 +25,12 @@ from .locators import EXAMPLES as LOCATOR_EXAMPLES
 from .rendering import current_payload, RENDER_VERSION
 from .terms import (CONFIDENCE_EXPLANATIONS, CONFIDENCE_LABELS, CONFIDENCE_META,
                     chapter_short, confidence_label, confidence_levels, kind_label,
-                    novel_reference_rows, novel_references, parse_reference, period_label,
+                    novel_reference_rows, parse_reference, period_label,
                     same_chapters_heading)
 
 
 HUB_LASTMOD = date(2026, 9, 29)
-RU_MAP_PAYLOAD_VERSION = '3'
+RU_MAP_PAYLOAD_VERSION = '4'
 HUB_PAGES = {
     'real': {
         'template': 'atlas/derry_real.html',
@@ -303,10 +303,16 @@ def index(request):
 
     place_count = len(features)
     directory_jump = ngettext(
-        'Browse all %(count)s place', 'Browse all %(count)s places', place_count
+        'All %(count)s place as a list', 'All %(count)s places as a list', place_count
     ) % {'count': place_count}
-    directory_stats = _('%(mapped)s mapped · %(unlocated)s unlocated') % {
+    directory_stats = _('%(mapped)s on the map · %(unlocated)s unlocated · about the map') % {
         'mapped': mapped_count, 'unlocated': unlocated_count}
+    # Confidence terms for the place card in map-ui.js: one wording with the place pages.
+    map_terms = {
+        'levels': {level['letter']: {'label': str(level['label']), 'explanation': str(level['explanation'])}
+                   for level in confidence_levels()},
+        'how': str(_('How pins work →')), 'method': reverse('method') + '#how-sure',
+    }
     page_title = _('Map of Derry, Maine — Stephen King’s IT Literary Atlas')
     if _is_ru():
         mapped_noun = _ru_plural(mapped_count, 'место', 'места', 'мест')
@@ -326,6 +332,7 @@ def index(request):
         'mapped_count': mapped_count, 'unlocated_count': unlocated_count,
         'place_count': place_count, 'place_groups': place_groups,
         'directory_jump': directory_jump, 'directory_stats': directory_stats,
+        'map_terms': map_terms,
     }
     context['jsonld'] = schema.index(request, page_title, meta_description)
     response = render(request, 'atlas/index.html', context)
@@ -419,8 +426,8 @@ def map_data(request):
 
 def _presented_payload(payload, ru):
     """Payload карты для показа. Канонические данные английские; здесь
-    ссылки на роман становятся подписями глав (`refs`, позиции в тексте
-    отброшены), у периодов — короткое тире. На RU поверх идут имена, подписи,
+    ссылки на роман становятся строками «In the novel» (`refs`: [гл., название, §],
+    позиции в тексте отброшены; `chapters` — число разных глав), у периодов — короткое тире. На RU поверх идут имена, подписи,
     заметки и переводы периодов и глав; на EN — русские имена как алиасы поиска."""
     if ru:
         payload = localize_map_payload(payload)
@@ -428,7 +435,9 @@ def _presented_payload(payload, ru):
                 if (data := _feature_ru(f))}
     for group in ('sites', 'unplaced'):
         for s in payload['data'][group]:
-            s['refs'] = novel_references([src['reference'] for src in s.pop('sources', [])], ru)
+            rows = novel_reference_rows([src['reference'] for src in s.pop('sources', [])], ru)
+            s['refs'] = [[r['ch'], r['title'], r['part'] or ''] for r in rows]
+            s['chapters'] = len({r['key'] for r in rows})
             s.pop('reference', None)
             s['period'] = period_label(s.get('period', ''), ru)
             if ru:
