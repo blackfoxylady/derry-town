@@ -118,14 +118,15 @@ class MapPayloadTermsTests(TestCase):
         site_en = next(s for s in en['sites'] if s['id'] == 12)
         site_ru = next(s for s in ru['sites'] if s['id'] == 12)
         self.assertNotIn('sources', site_en)
-        self.assertIn('Ch. 4 · Ben Hanscom Takes a Fall · §4', site_en['refs'])
-        self.assertTrue(all(r.startswith('Гл. ') or r.startswith('Дерри:') for r in site_ru['refs']))
+        self.assertIn(['Ch. 4', 'Ben Hanscom Takes a Fall', '4'], site_en['refs'])
+        self.assertEqual(site_en['chapters'], 3)
+        self.assertTrue(all(r[0].startswith('Гл. ') or r[0] == 'Интерлюдия' for r in site_ru['refs']))
         # The English map finds a place by its Russian name too.
         self.assertIn('Публичная библиотека Дерри', site_en['search_aliases'])
         for group in ('sites', 'unplaced'):
             for item in en[group] + ru[group]:
                 self.assertIsNone(re.search(r'\d-\d', item['period']), item['period'])
-                self.assertFalse(any(r.startswith('[') for r in item['refs']))
+                self.assertFalse(any(r[0].startswith('[') for r in item['refs']))
                 self.assertNotIn('reference', item)
         winter = next(s for s in ru['sites'] + ru['unplaced']
                       if 'зима' in s['period'] or 'июн' in s['period'])

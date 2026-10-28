@@ -1,0 +1,3 @@
+[
+  {"op": "update", "table": "settings", "key": "categories", "values": {"value": {"Homes": "#6a4c93", "Civic": "#1d6070", "Encounters": "#a8322a", "Historical": "#8a6a1f", "Barrens": "#3f7a3a", "Outlying": "#5e6b70"}}}
+]

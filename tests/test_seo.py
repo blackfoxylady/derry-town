@@ -269,13 +269,13 @@ class SeoTests(TestCase):
     def test_home_renders_a_linked_place_directory_without_javascript(self):
         response = self.client.get('/')
         self.assertContains(response, '<h2 id="all-places-title">All places in Derry</h2>')
-        self.assertContains(response, 'Browse all 2 places')
-        self.assertContains(response, '1 mapped · 1 unlocated')
+        self.assertContains(response, 'All 2 places as a list')
+        self.assertContains(response, '1 on the map · 1 unlocated · about the map')
         self.assertContains(response, 'href="/places/12-derry-public-library/"')
         self.assertContains(response, 'href="/places/u3-tracker-brothers/"')
-        self.assertContains(response, 'class="directory-copy"', count=2)
+        self.assertContains(response, 'class="dir-item__copy"', count=2)
         body = response.content.decode()
-        self.assertLess(body.index('>Civic<'), body.index('>Unlocated<'))
+        self.assertLess(body.index('id="group-civic"'), body.index('id="group-unlocated"'))
 
         response = self.client.get('/ru/')
         self.assertContains(response, '<h2 id="all-places-title">Все места Дерри</h2>')
@@ -286,7 +286,7 @@ class SeoTests(TestCase):
     def test_home_and_places_add_context_without_competing_with_primary_ui(self):
         home = self.client.get('/').content.decode()
         self.assertIn('A map of Derry from Stephen King’s <i>IT</i>', home)
-        self.assertGreater(home.index('class="map-context"'), home.index('class="workspace"'))
+        self.assertGreater(home.index('class="map-context"'), home.index('class="app"'))
         self.assertLess(home.index('class="map-context"'), home.index('class="place-directory"'))
         self.assertLess(home.index('class="place-directory"'), home.index('class="site-footer"'))
         places = self.client.get('/places/')

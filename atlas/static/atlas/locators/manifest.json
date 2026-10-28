@@ -1,5 +1,5 @@
 {
- "digest": "f63391d6a6209a42d1bc634704ecb00fe052c2438096c82ec2093ae22b6686a5",
+ "digest": "fdc5aa5687969f5df4a47f0f30c0a9d684dc900d1ead4121b25896194f4f5a13",
  "files": [
   "1-card-ru.webp",
   "1-card.webp",
@@ -880,7 +880,7 @@
    160
   ]
  },
- "revision": 11,
+ "revision": 13,
  "town": {
   "cx": -1245.0,
   "cy": 750.0,

@@ -21,45 +21,16 @@ msgstr "км"
 msgid "m"
 msgstr "м"
 
-msgid "place"
-msgid_plural "places"
-msgstr[0] "место"
-msgstr[1] "места"
-msgstr[2] "мест"
-
-msgid "mapped"
-msgstr "на карте"
-
 msgid "No matching places. Try a shorter name or enable more categories."
 msgstr ""
 "Подходящих мест нет. Попробуйте более короткое название или включите "
 "больше категорий."
 
-msgid "Place %s"
-msgstr "Место %s"
-
 msgid "Close place"
 msgstr "Закрыть место"
 
-msgid "Sources & evidence"
-msgstr "Источники и свидетельства"
-
-msgid "All photographs of this place"
-msgstr "Все фотографии этого места"
-
-msgid "Place page"
-msgstr "Страница места"
-
 msgid "Photographs"
 msgstr "Фотографии"
-
-msgid "straight line in this reconstruction"
-msgstr "прямая линия в этой реконструкции"
-
-msgid "Select two points to measure. Drag to pan. Escape clears."
-msgstr ""
-"Выберите две точки для измерения. Перетаскивайте, чтобы двигать карту. "
-"Escape сбрасывает."
 
 msgid "Homes"
 msgstr "Дома"
@@ -79,78 +50,30 @@ msgstr "Окраины"
 msgid "Barrens"
 msgstr "Пустошь"
 
-msgid "Home"
-msgstr "Дом"
+#: atlas/static/atlas/map.js (redesign pass 15): marker labels for screen readers
+msgctxt "kind short"
+msgid "Homes"
+msgstr "Дома"
 
-msgid "Church"
-msgstr "Церковь"
+msgctxt "kind short"
+msgid "Civic"
+msgstr "Город"
 
-msgid "School"
-msgstr "Школа"
+msgctxt "kind short"
+msgid "Barrens"
+msgstr "Пустошь"
 
-msgid "Library"
-msgstr "Библиотека"
+msgctxt "kind short"
+msgid "Encounters"
+msgstr "Встречи"
 
-msgid "Hospital"
-msgstr "Больница"
+msgctxt "kind short"
+msgid "Historical"
+msgstr "Историческое"
 
-msgid "Cemetery"
-msgstr "Кладбище"
-
-msgid "Station / depot"
-msgstr "Станция / депо"
-
-msgid "Bridge"
-msgstr "Мост"
-
-msgid "Dam"
-msgstr "Плотина"
-
-msgid "Camp / clubhouse"
-msgstr "Лагерь / штаб"
-
-msgid "Park / woods"
-msgstr "Парк / лес"
-
-msgid "Café / bar"
-msgstr "Кафе / бар"
-
-msgid "Theater / hotel"
-msgstr "Театр / отель"
-
-msgid "Memorial"
-msgstr "Памятник"
-
-msgid "Shop / service"
-msgstr "Магазин / сервис"
-
-msgid "Civic building"
-msgstr "Городское здание"
-
-msgid "Industry"
-msgstr "Производство"
-
-msgid "Drain / pipe"
-msgstr "Труба / дренаж"
-
-msgid "Historical event"
-msgstr "Историческое событие"
-
-msgid "Encounter"
-msgstr "Встреча"
-
-#: atlas/static/atlas/map.js (redesign pass 3)
-msgid "Named in the novel"
-msgstr "Названо в романе"
-
-msgid "Inferred"
-msgstr "Выведено"
-
-msgid "Proposed"
-msgstr "Предположено"
-
-msgid "No location"
-msgstr "Без координат"
+msgctxt "kind short"
+msgid "Outlying"
+msgstr "Окраины"
 
 msgid "named in the novel"
 msgstr "названо в романе"
@@ -163,3 +86,151 @@ msgstr "предположено"
 
 msgid "no location"
 msgstr "без координат"
+
+#: atlas/static/atlas/map-ui.js (block 09: list and place card)
+msgid "%s place"
+msgid_plural "%s places"
+msgstr[0] "%s место"
+msgstr[1] "%s места"
+msgstr[2] "%s мест"
+
+msgid "All places"
+msgstr "Все места"
+
+msgid "Back to results"
+msgstr "К результатам"
+
+msgid "Previous place"
+msgstr "Предыдущее место"
+
+msgid "Next place"
+msgstr "Следующее место"
+
+msgid "Place %s:"
+msgstr "Место %s:"
+
+msgid "All photos of this place"
+msgstr "Все фотографии этого места"
+
+msgid "In the novel"
+msgstr "В романе"
+
+msgid "%s chapter"
+msgid_plural "%s chapters"
+msgstr[0] "%s глава"
+msgstr[1] "%s главы"
+msgstr[2] "%s глав"
+
+msgid "Open place page"
+msgstr "Страница места"
+
+msgid "%s has no point on the map: the novel doesn’t say where it stands"
+msgstr "У места «%s» нет точки на карте: роман не говорит, где оно находится"
+
+msgid "No point on the map: the novel doesn’t say where it stands."
+msgstr "Точки на карте нет: роман не говорит, где это место."
+
+msgid "Close"
+msgstr "Закрыть"
+
+#: atlas/static/atlas/map-ui.js (block 10: search and sort)
+msgid "%s place matches"
+msgid_plural "%s places match"
+msgstr[0] "Найдено %s место"
+msgstr[1] "Найдено %s места"
+msgstr[2] "Найдено %s мест"
+
+msgid "Zoom to the place"
+msgstr "Приблизить к месту"
+
+msgid "Zoom to %s place"
+msgid_plural "Zoom to %s places"
+msgstr[0] "Приблизить к %s месту"
+msgstr[1] "Приблизить к %s местам"
+msgstr[2] "Приблизить к %s местам"
+
+msgid "%s more hidden by filters"
+msgid_plural "%s more hidden by filters"
+msgstr[0] "Ещё %s скрыто фильтрами"
+msgstr[1] "Ещё %s скрыто фильтрами"
+msgstr[2] "Ещё %s скрыто фильтрами"
+
+msgid "Show them"
+msgstr "Показать"
+
+msgid "Nothing in Derry matches “%s”"
+msgstr "В Дерри нет «%s»."
+
+msgid "Try a different search."
+msgstr "Попробуйте изменить поисковую фразу."
+
+msgid "Clear search"
+msgstr "Очистить поиск"
+
+msgid "%(n)s result for “%(q)s”"
+msgid_plural "%(n)s results for “%(q)s”"
+msgstr[0] "Найдено %(n)s по запросу «%(q)s»"
+msgstr[1] "Найдено %(n)s по запросу «%(q)s»"
+msgstr[2] "Найдено %(n)s по запросу «%(q)s»"
+
+msgid "Showing %(n)s result for “%(q)s”"
+msgid_plural "Showing %(n)s results for “%(q)s”"
+msgstr[0] "Найдено %(n)s по запросу «%(q)s»"
+msgstr[1] "Найдено %(n)s по запросу «%(q)s»"
+msgstr[2] "Найдено %(n)s по запросу «%(q)s»"
+
+msgid "No results for “%s”"
+msgstr "Ничего не найдено по запросу «%s»"
+
+msgid "Clear search: show all places"
+msgstr "Сбросить поиск: показать все места"
+
+msgid "Sort places: by map number"
+msgstr "Сортировка: по номеру на карте"
+
+msgid "Sort places: by name"
+msgstr "Сортировка: по названию"
+
+msgid "Sort places: by confidence"
+msgstr "Сортировка: по достоверности"
+
+#: atlas/static/atlas/map-ui.js (block 10: filters and key)
+msgid "%(n)s of %(total)s"
+msgstr "%(n)s из %(total)s"
+
+msgid "Show %s place"
+msgid_plural "Show %s places"
+msgstr[0] "Показать %s место"
+msgstr[1] "Показать %s места"
+msgstr[2] "Показать %s мест"
+
+msgid "No location: show the %s place without a point in the list"
+msgid_plural "No location: show the %s places without a point in the list"
+msgstr[0] "Без координат: показать в списке %s место без точки"
+msgstr[1] "Без координат: показать в списке %s места без точки"
+msgstr[2] "Без координат: показать в списке %s мест без точки"
+
+msgid "Press to hide these pins."
+msgstr "Нажмите, чтобы скрыть эти точки."
+
+msgid "Press to show these pins."
+msgstr "Нажмите, чтобы показать эти точки."
+
+msgid "All marks are hidden."
+msgstr "Все отметки скрыты."
+
+msgid "Show all"
+msgstr "Показать все"
+
+#: atlas/static/atlas/map.js (block 11: measure)
+msgid "≈ %(m)s · %(ft)s · in the reconstruction"
+msgstr "≈ %(m)s · %(ft)s · по реконструкции"
+
+msgid "%s ft"
+msgid_plural "%s ft"
+msgstr[0] "%s фут"
+msgstr[1] "%s фута"
+msgstr[2] "%s футов"
+
+msgid "(opens in a new tab)"
+msgstr "(откроется в новой вкладке)"

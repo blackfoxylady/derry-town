@@ -25,12 +25,12 @@ from .locators import EXAMPLES as LOCATOR_EXAMPLES
 from .rendering import current_payload, RENDER_VERSION
 from .terms import (CONFIDENCE_EXPLANATIONS, CONFIDENCE_LABELS, CONFIDENCE_META,
                     chapter_short, confidence_label, confidence_levels, kind_label,
-                    novel_reference_rows, novel_references, parse_reference, period_label,
+                    novel_reference_rows, parse_reference, period_label,
                     same_chapters_heading)
 
 
 HUB_LASTMOD = date(2026, 9, 29)
-RU_MAP_PAYLOAD_VERSION = '3'
+RU_MAP_PAYLOAD_VERSION = '4'
 HUB_PAGES = {
     'real': {
         'template': 'atlas/derry_real.html',
@@ -260,7 +260,7 @@ def _ru_plural(number, one, few, many):
 @require_safe
 def index(request):
     features = list(Feature.objects.filter(object_type__in=('site', 'unplaced')).only(
-        'key', 'object_type', 'name', 'kind', 'period'))
+        'key', 'object_type', 'name', 'kind', 'period', 'confidence'))
     mapped_count = sum(feature.object_type == 'site' for feature in features)
     unlocated_count = len(features) - mapped_count
 
@@ -273,11 +273,8 @@ def index(request):
         kind = 'Unlocated' if feature.object_type == 'unplaced' else feature.kind
         buckets.setdefault(kind or 'Other', []).append(feature)
 
-    labels = {
-        'Homes': _('Homes'), 'Civic': _('Civic'), 'Barrens': _('Barrens'),
-        'Encounters': _('Encounters'), 'Historical': _('Historical'),
-        'Outlying': _('Outlying'), 'Unlocated': _('Unlocated'), 'Other': _('Other'),
-    }
+    labels = {kind: kind_label(kind) for kind in kind_order}
+    labels.update({'Unlocated': CONFIDENCE_LABELS['U'], 'Other': _('Other')})
 
     def feature_sort(feature):
         return (0, int(feature.key)) if feature.key.isdigit() else (1, feature.key)
@@ -299,14 +296,21 @@ def index(request):
             })
         place_groups.append({
             'slug': slugify(kind), 'title': labels.get(kind, kind), 'items': items,
+            'kind': kind if kind in kind_order else '',
         })
 
     place_count = len(features)
     directory_jump = ngettext(
-        'Browse all %(count)s place', 'Browse all %(count)s places', place_count
+        'All %(count)s place as a list', 'All %(count)s places as a list', place_count
     ) % {'count': place_count}
-    directory_stats = _('%(mapped)s mapped · %(unlocated)s unlocated') % {
+    directory_stats = _('%(mapped)s on the map · %(unlocated)s unlocated · about the map') % {
         'mapped': mapped_count, 'unlocated': unlocated_count}
+    # Confidence terms for the place card in map-ui.js: one wording with the place pages.
+    map_terms = {
+        'levels': {level['letter']: {'label': str(level['label']), 'explanation': str(level['explanation'])}
+                   for level in confidence_levels()},
+        'how': str(_('How pins work →')), 'method': reverse('method') + '#how-sure',
+    }
     page_title = _('Map of Derry, Maine — Stephen King’s IT Literary Atlas')
     if _is_ru():
         mapped_noun = _ru_plural(mapped_count, 'место', 'места', 'мест')
@@ -326,6 +330,7 @@ def index(request):
         'mapped_count': mapped_count, 'unlocated_count': unlocated_count,
         'place_count': place_count, 'place_groups': place_groups,
         'directory_jump': directory_jump, 'directory_stats': directory_stats,
+        'map_terms': map_terms, 'levels': confidence_levels(),
     }
     context['jsonld'] = schema.index(request, page_title, meta_description)
     response = render(request, 'atlas/index.html', context)
@@ -419,8 +424,8 @@ def map_data(request):
 
 def _presented_payload(payload, ru):
     """Payload карты для показа. Канонические данные английские; здесь
-    ссылки на роман становятся подписями глав (`refs`, позиции в тексте
-    отброшены), у периодов — короткое тире. На RU поверх идут имена, подписи,
+    ссылки на роман становятся строками «In the novel» (`refs`: [гл., название, §],
+    позиции в тексте отброшены; `chapters` — число разных глав), у периодов — короткое тире. На RU поверх идут имена, подписи,
     заметки и переводы периодов и глав; на EN — русские имена как алиасы поиска."""
     if ru:
         payload = localize_map_payload(payload)
@@ -428,7 +433,9 @@ def _presented_payload(payload, ru):
                 if (data := _feature_ru(f))}
     for group in ('sites', 'unplaced'):
         for s in payload['data'][group]:
-            s['refs'] = novel_references([src['reference'] for src in s.pop('sources', [])], ru)
+            rows = novel_reference_rows([src['reference'] for src in s.pop('sources', [])], ru)
+            s['refs'] = [[r['ch'], r['title'], r['part'] or ''] for r in rows]
+            s['chapters'] = len({r['key'] for r in rows})
             s.pop('reference', None)
             s['period'] = period_label(s.get('period', ''), ru)
             if ru:
@@ -1270,9 +1277,9 @@ def place_page(request, slug):
         'covers': covers, 'cards': shown, 'photo_total': photo_total,
         'more_desktop': photo_total - len(shown) if photo_total > PLACE_PHOTOS_DESKTOP else 0,
         'more_phone': photo_total - phone_limit if photo_total > PLACE_PHOTOS_PHONE else 0,
-        # Кнопка U ведёт на список мест без точки. До фильтра карты (П20) — указатель.
+        # Кнопка U ведёт на карту со списком мест без точки (ключ «No location →»).
         'unlocated_count': Feature.objects.filter(object_type='unplaced').count(),
-        'unlocated_url': reverse('places') + '?sure=u',
+        'unlocated_url': reverse('index') + '?list=unlocated',
         # Превью для соцсетей: заглавное фото, иначе первое фото места;
         # совсем без фото шаблон подставит общую карту.
         'og_photo': cover_og['large'] if cover_og else _media_urls(photos[0])['medium'] if photos else '',

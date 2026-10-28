@@ -38,12 +38,12 @@ class I18nRoutingTests(TestCase):
         self.assertContains(response, 'href="/ru/photos/"')
 
     def test_russian_ui_strings_render(self):
-        self.assertContains(self.client.get('/ru/'), 'РЕКОНСТРУКЦИЯ ПО РОМАНУ')
+        self.assertContains(self.client.get('/ru/'), 'Карта Дерри, штат Мэн: литературный атлас романа Стивена Кинга «Оно»')
         self.assertContains(self.client.get('/ru/photos/'), 'Фотографии')
         self.assertContains(self.client.get('/ru/method/'), 'Построено по роману')
         # Каталог для map.js содержит наши msgid (кириллица в нём \u-экранирована).
         response = self.client.get('/ru/jsi18n/')
-        self.assertContains(response, 'Place page')
+        self.assertContains(response, 'Open place page')
         self.assertContains(response, '\\u0421\\u0442\\u0440\\u0430\\u043d\\u0438\\u0446\\u0430')
         # Английская версия остаётся английской.
-        self.assertContains(self.client.get('/'), 'NOVEL-BASED RECONSTRUCTION')
+        self.assertContains(self.client.get('/'), 'Map of Derry, Maine: a literary atlas of Stephen King’s IT')
