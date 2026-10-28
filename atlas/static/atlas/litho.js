@@ -9,6 +9,15 @@ const NS='http://www.w3.org/2000/svg';
 function el(t,a,p){const n=document.createElementNS(NS,t);for(const k in a){const v=a[k];if(v!=null&&v!==false)n.setAttribute(k,v)}if(p)p.appendChild(n);return n}
 const r1=v=>Math.round(v*10)/10;
 function pd(p,z){let s='M'+r1(p[0][0])+' '+r1(p[0][1]);for(let i=1;i<p.length;i++)s+='L'+r1(p[i][0])+' '+r1(p[i][1]);return z?s+'Z':s}
+// Smoothed line: Catmull-Rom → cubic Béziers through every point (the survey look for
+// water, roads, woods and contours; part of the style, not decoration).
+function sd(pts,z){
+ if(pts.length<3)return pd(pts,z);
+ const P=z?pts.concat([pts[0],pts[1],pts[2]]):pts,n=z?pts.length:P.length-1;let s='M'+r1(P[0][0])+' '+r1(P[0][1]);
+ for(let i=0;i<n;i++){const p0=P[i-1]||(z?pts[pts.length-1]:P[i]),p1=P[i],p2=P[i+1],p3=P[i+2]||p2;
+  s+='C'+r1(p1[0]+(p2[0]-p0[0])/6)+' '+r1(p1[1]+(p2[1]-p0[1])/6)+' '+r1(p2[0]-(p3[0]-p1[0])/6)+' '+r1(p2[1]-(p3[1]-p1[1])/6)+' '+r1(p2[0])+' '+r1(p2[1])}
+ return z?s+'Z':s;
+}
 // u(n): stroke width pinned to n screen px at any zoom (map.js sets --u = 1/k px).
 // mx(w,n): world width w, but never thinner than n screen px.
 const u=n=>`stroke-width:calc(var(--u)*${n})`;
@@ -140,18 +149,18 @@ function chunks(p,n){
 function dirAt(p,st){const a=st?p[0]:p[p.length-1],b=st?p[1]:p[p.length-2];return[a,Math.atan2(a[1]-b[1],a[0]-b[0])]}
 
 // Valley floor: a wide soft band under the stream, world width from the data.
-function drawValley(g,D){for(const v of D.valley)el('path',{d:pd(v.p),class:'m-valley',style:`stroke-width:${v.w}px`},g)}
+function drawValley(g,D){for(const v of D.valley)el('path',{d:sd(v.p),class:'m-valley',style:`stroke-width:${v.w}px`},g)}
 // --- Water: one bank stroke under the fills; brooks taper from the spring; canal and
 // outlet have butt ends; near zoom adds a broken current line and the canal lock.
 function drawWater(g,D){
  const flows=D.water.filter(w=>w.id!=='trib'),cut=w=>w.id.indexOf('canal')===0||w.id==='outlet'?' is-canal':'';
- for(const w of flows)el('path',{d:pd(w.p),class:'m-water-edge'+cut(w),style:`stroke-width:calc(${w.w}px + var(--u)*2.4)`},g);
+ for(const w of flows)el('path',{d:sd(w.p),class:'m-water-edge'+cut(w),style:`stroke-width:calc(${w.w}px + var(--u)*2.4)`},g);
  // Brooks in 6 runs, from a fifth of the width at the spring to full width at the mouth.
  const runs=D.water.filter(w=>w.id==='trib').flatMap(w=>chunks(w.p,6).map((c,i)=>[c,w.w*(.2+.8*(i+1)/6),(i+1)/6]));
  for(const[c,w,f]of runs)el('path',{d:pd(c),class:'m-water-edge',style:`stroke-width:calc(${r1(w)}px + var(--u)*${r1(.8+1.6*f)})`},g);
  for(const[c,w,f]of runs)el('path',{d:pd(c),class:'m-water',style:mx(r1(w),r1(.3+.9*f))},g);
- for(const w of flows)el('path',{d:pd(w.p),class:'m-water'+cut(w),style:mx(w.w,2)},g);
- for(const w of D.water)if(w.w>=20&&w.id!=='canal')el('path',{d:pd(w.p),class:'m-ripple lod-near',style:u(1)+';'+dash(14,10)},g);
+ for(const w of flows)el('path',{d:sd(w.p),class:'m-water'+cut(w),style:mx(w.w,2)},g);
+ for(const w of D.water)if(w.w>=20&&w.id!=='canal')el('path',{d:sd(w.p),class:'m-ripple lod-near',style:u(1)+';'+dash(14,10)},g);
  // Canal lock at the intake (double bar), single-bar portals at the other ends.
  const bar=(a,ang,len,off)=>{const c=Math.cos(ang),s_=Math.sin(ang),x=a[0]+c*off,y=a[1]+s_*off,nx=-s_*len/2,ny=c*len/2;el('path',{d:`M${r1(x+nx)} ${r1(y+ny)}L${r1(x-nx)} ${r1(y-ny)}`,class:'m-lock lod-near',style:mx(6,2)},g)};
  for(const w of D.water)if(w.id==='canal'&&!w.edge)for(const[a,ang]of[dirAt(w.p,1),dirAt(w.p,0)]){if(Math.hypot(a[0]+850,a[1]-280)<5){bar(a,ang,46,-14);bar(a,ang,46,-40)}else bar(a,ang,64,-3)}
@@ -162,11 +171,11 @@ const ROADS={track:[6,1],trackdash:[6,1],lane:[6,1],secondary:[13,1.6],primary:[
 function drawRoads(g,D){
  const order=Object.keys(ROADS);
  for(const c of order)if(!MINOR.has(c))for(const r of D.roads)if(r.c===c){const[w,m]=ROADS[c];
-  el('path',{d:pd(r.p),class:'m-road-cas',style:`stroke-width:max(calc(var(--u)*${m+1.6}),calc(${w}px + var(--u)*1.6))`},g)}
+  el('path',{d:sd(r.p),class:'m-road-cas',style:`stroke-width:max(calc(var(--u)*${m+1.6}),calc(${w}px + var(--u)*1.6))`},g)}
  for(const c of order)for(const r of D.roads)if(r.c===c){const[w,m]=ROADS[c];
-  el('path',{d:pd(r.p),class:'m-road m-road--'+c,style:MINOR.has(c)?u(1.1)+(c==='lane'?'':';'+dash(5,3)):mx(w,m)},g)}
+  el('path',{d:sd(r.p),class:'m-road m-road--'+c,style:MINOR.has(c)?u(1.1)+(c==='lane'?'':';'+dash(5,3)):mx(w,m)},g)}
  for(const f of D.fades)el('path',{d:pd(f.p),class:'m-road-fade',style:mx((ROADS[f.c]||ROADS.secondary)[0]*.5,1.4)+';'+dash(5,4)},g);
- for(const p of D.paths)el('path',{d:pd(p),class:'m-path lod-mid',style:u(1)+';'+dash(2,3)},g);
+ for(const p of D.paths)el('path',{d:sd(p),class:'m-path lod-mid',style:u(1)+';'+dash(2,3)},g);
 }
 function drawCovered(g,D){for(const c of D.covered)el('path',{d:pd(c.p),class:'m-covered',style:mx(c.w,2)+';'+dash(4,3)},g)}
 // Where roads cross open water at 40° or more: [x,y,roadAngle,waterWidth,roadClass,sinΔ].
@@ -202,7 +211,7 @@ function drawRail(g,D){
 // --- Relief: only the bold contour set (the other one duplicates it), thin and pale.
 function isClosed(p){return Math.hypot(p[0][0]-p[p.length-1][0],p[0][1]-p[p.length-1][1])<40}
 function drawRelief(g,D){
- for(const c of D.contours)if(c.i===1){const z=isClosed(c.p);el('path',{d:pd(c.p,z),class:'m-contour'+(z?' is-closed':''),style:u(.8)},g)}
+ for(const c of D.contours)if(c.i===1){const z=isClosed(c.p);el('path',{d:sd(c.p,z),class:'m-contour'+(z?' is-closed':''),style:u(.8)},g)}
 }
 // Hill spot heights for the overlay: innermost closed contours, heights are declaredly conceptual.
 function peaks(D){
@@ -237,7 +246,7 @@ function drawBuiltUp(g,D){
 
 // --- Woods: one patterned fill, tree crowns from near zoom, a 1px edge.
 function drawForest(g,D){
- const d=D.forest.map(f=>pd(f.p,1)).join('');
+ const d=D.forest.map(f=>sd(f.p,1)).join('');
  el('path',{d,class:'m-wood-area',fill:'url(#dm-wood)'},g);
  el('path',{d,class:'m-wood-crowns lod-near',fill:'url(#dm-crown)'},g);
  el('path',{d,class:'m-wood-edge',style:u(1)},g);
@@ -309,7 +318,7 @@ function roadLabel(g,lab,view,roads){
  return true;
 }
 
-window.DerryLitho={el,pd,u,mx,dash,FR,LOD,makePatterns,updatePatterns,paper,clip,grid,frame,gridRefs,roadLabel,
+window.DerryLitho={el,pd,sd,u,mx,dash,FR,LOD,makePatterns,updatePatterns,paper,clip,grid,frame,gridRefs,roadLabel,
  adapt,prep,makeSlots,drawAreas,drawValley,drawWater,drawCovered,drawRoads,drawBridges,drawRail,
  drawRelief,drawBuiltUp,drawForest,drawVeg,drawSymbols,drawBuildings,drawDots,drawMisc,peaks};
 })();
