@@ -19,6 +19,9 @@ body {
   font: var(--weight-regular) var(--text-m) / var(--leading-ui) var(--font-ui);
   -webkit-text-size-adjust: 100%;
 }
+a { color: var(--color-link); }
+button, input, select, textarea { font-family: inherit; }
+.page { margin: 0 auto; }
 
 :focus-visible { outline: var(--focus-width) solid var(--color-focus); outline-offset: var(--focus-offset); }
 
@@ -210,7 +213,8 @@ body {
 .crumbs ol { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; font-size: var(--text-xs); color: var(--color-ink-2); }
 .crumbs li + li::before { content: "/"; margin-right: 6px; color: var(--color-control); }
 .crumbs a { color: var(--color-ink-2); text-underline-offset: 0.2em; }
-.crumbs [aria-current="page"] { color: var(--color-ink); }
+.crumbs [aria-current="page"] { color: var(--color-ink); overflow-wrap: anywhere; }
+.crumbs li { display: flex; min-width: 0; align-items: baseline; }
 
 /* ---- Blue pencil: reconstruction ---------------------------------------- */
 .pencil { color: var(--color-pencil); font-family: var(--font-read); font-style: italic; }
@@ -236,8 +240,6 @@ body {
 .skip-link:focus { top: var(--space-3); }
 main:focus { outline: none; } /* the skip link's target, not a control */
 .shell main { scroll-margin-top: var(--header-h); } /* the sticky header must not cover it after the skip link */
-/* Old page CSS (gallery.css: .eyebrow, .place h2, .editorial h2) must not restyle shell parts */
-.explore .eyebrow, .panel__group .eyebrow, .page--editorial .eyebrow, .page--place .eyebrow { font: var(--weight-semibold) var(--text-xs) / 1.2 var(--font-display); letter-spacing: var(--tracking-caps); color: var(--color-ink-2); }
 .explore .explore__titles h2 { max-width: none; margin: 0; font: var(--weight-semibold) var(--h2) / 1.1 var(--font-display); }
 
 /* Page frame: short pages keep the footer at the bottom */
@@ -430,9 +432,6 @@ html.is-menu-open .cookie { display: none; } /* the notice must not sit over the
    Printable map and method pages (pass 6) share the hero, the map card and Keep reading.
    ========================================================================== */
 .page.page--editorial { max-width: var(--container); padding: var(--space-6) var(--gutter) var(--space-11); }
-body:has(> .page--editorial) { background: var(--color-paper); color: var(--color-ink); } /* beat gallery.css paper and ink */
-.article__text a { color: var(--color-link); } /* beat gallery.css a{} */
-.page--editorial .crumbs { margin: 0; } /* gallery.css adds 14px under the crumbs */
 .page--editorial .explore { margin-top: var(--space-9); }
 
 /* Hero: text on the left, the answer and the map card on the right */
@@ -554,7 +553,6 @@ body:has(> .page--editorial) { background: var(--color-paper); color: var(--colo
 
 /* Printable map: hero, sheet preview on a stack of sheets, PDF and SVG cards */
 .printable, .method-page { display: flex; flex-direction: column; gap: var(--space-4); }
-.printable__text a, .download-language a, .method-page__section a { color: var(--color-link); } /* beat gallery.css a{} in body text only */
 .printable__intro { display: flex; flex-direction: column; gap: 14px; }
 .printable__intro .t-lead { max-width: 760px; }
 .printable__grid { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: var(--space-8); align-items: start; margin-top: var(--space-6); }
@@ -770,9 +768,7 @@ button.place-meta__conf:hover .place-meta__info, button.place-meta__conf[aria-ex
 @media (prefers-reduced-motion: reduce) { .card-photo { transition: none; } }
 
 .page.page--place { max-width: var(--container); padding: var(--space-6) var(--gutter) var(--space-11); }
-body:has(> .page--place) { background: var(--color-paper); color: var(--color-ink); } /* beat gallery.css paper and ink */
 .page--place .crumbs { margin: 0; }
-.page--place .eyebrow--cat { color: var(--cat, var(--color-ink-2)); } /* after the gallery.css .eyebrow override */
 .page--place .explore { margin-top: var(--space-11); }
 .place-page { display: flex; flex-direction: column; gap: 72px; }
 .place-page__layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto 1fr; column-gap: 64px; row-gap: var(--space-9); align-items: start; }
@@ -877,7 +873,6 @@ body:has(> .page--place) { background: var(--color-paper); color: var(--color-in
    Without JS every tile is in the HTML and the filter controls stay hidden.
    ========================================================================== */
 .page.page--index { max-width: var(--container); padding: var(--space-6) var(--gutter) var(--space-11); }
-body:has(> .page--index) { background: var(--color-paper); color: var(--color-ink); } /* beat gallery.css paper and ink */
 .page--index .crumbs { margin: 0; }
 .page--index .eyebrow { font: var(--weight-semibold) var(--text-xs) / 1.2 var(--font-display); letter-spacing: var(--tracking-caps); color: var(--color-ink-2); }
 .page.page--index .explore { margin-top: var(--space-11); }
@@ -895,7 +890,7 @@ html:not(.js) .js-only { display: none !important; }
 .owner-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); margin-top: var(--space-6); padding: var(--space-3) var(--space-4); background: var(--color-pencil-tint); border: var(--border-1) dashed var(--color-pencil); border-radius: var(--radius-2); color: var(--color-pencil); font-size: var(--text-s); }
 .owner-bar__title { font-weight: var(--weight-semibold); }
 .owner-bar__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-/* gallery.css loads later and restyles .chip: restore the foundation chip here */
+/* The index filters use the pill chip */
 .page--index .chip { min-height: 36px; padding: 0 14px; border-radius: var(--radius-pill); background: var(--color-surface); font: var(--weight-medium) var(--text-s) / 1.1 var(--font-ui); color: var(--color-ink); }
 .page--index .chip--set { padding-right: 10px; }
 .page--index .chip:hover { background: var(--color-surface); border-color: var(--color-ink); }
@@ -1067,7 +1062,6 @@ a.locator:focus-visible { outline-offset: 2px; }
    uncropped grid in columns, empty state.
    ========================================================================== */
 .page.page--gallery { max-width: var(--container); padding: var(--space-6) var(--gutter) var(--space-11); }
-body:has(> .page--gallery) { background: var(--color-paper); color: var(--color-ink); } /* beat gallery.css paper and ink */
 .page--gallery .crumbs { margin: 0; }
 .page--gallery .eyebrow { font: var(--weight-semibold) var(--text-xs) / 1.2 var(--font-display); letter-spacing: var(--tracking-caps); color: var(--color-ink-2); }
 .page--gallery .explore { margin-top: var(--space-11); }

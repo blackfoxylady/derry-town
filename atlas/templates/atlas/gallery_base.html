@@ -9,7 +9,7 @@
 <link rel="canonical" href="{% canonical_url %}"><link rel="alternate" hreflang="en" href="{% alternate_url 'en' %}"><link rel="alternate" hreflang="ru" href="{% alternate_url 'ru' %}"><link rel="alternate" hreflang="x-default" href="{% alternate_url 'en' %}">
 <link rel="icon" href="{% static 'atlas/favicon.ico' %}" sizes="32x32"><link rel="icon" type="image/svg+xml" href="{% static 'atlas/favicon.svg' %}"><link rel="icon" type="image/png" sizes="512x512" href="{% static 'atlas/favicon.png' %}"><link rel="apple-touch-icon" sizes="180x180" href="{% static 'atlas/apple-touch-icon.png' %}">
 <link rel="preload" href="{% static 'atlas/fonts/IBMPlexSans-Regular.woff2' %}" as="font" type="font/woff2" crossorigin><link rel="preload" href="{% static 'atlas/fonts/IBMPlexSansCondensed-SemiBold.woff2' %}" as="font" type="font/woff2" crossorigin>
-{% jsonld jsonld %}<link rel="stylesheet" href="{% static 'atlas/fonts.css' %}"><link rel="stylesheet" href="{% static 'atlas/tokens.css' %}"><link rel="stylesheet" href="{% static 'atlas/components.css' %}"><link rel="stylesheet" href="{% static 'atlas/gallery.css' %}">{% block extra_head %}{% endblock %}</head><body class="{% block body_class %}shell{% endblock %}">
+{% jsonld jsonld %}<link rel="stylesheet" href="{% static 'atlas/fonts.css' %}"><link rel="stylesheet" href="{% static 'atlas/tokens.css' %}"><link rel="stylesheet" href="{% static 'atlas/components.css' %}">{% block extra_head %}{% endblock %}</head><body class="{% block body_class %}shell{% endblock %}">
 <a class="skip-link" href="#main">{% trans "Skip to content" %}</a>
 {% include 'atlas/cookie_notice.html' %}
 {% block header %}{% include 'atlas/site_header.html' %}{% endblock %}

@@ -224,7 +224,7 @@ function zoomToPlaces(places){const pts=places.filter(s=>typeof s.id==='number')
 function zoom(f,x=state.w/2,y=state.h/2){const [gx,gy]=geo(x,y);state.k=Math.min(MAX_K,Math.max(MIN_K,state.k*f));state.cx=gx-(x-state.w/2)/state.k;state.cy=gy+(y-state.h/2)/state.k;state.view='';render()}
 // Measuring (block 11): two points, a dashed line and "≈ 470 m · 1,540 ft · in the reconstruction".
 // The points are kept in map metres, so the line survives a pan; either end can be dragged.
-function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();q('#measureResult').textContent='';if(!state.measure.length)return;
+function drawMeasure(){const layer=q('#measureLayer'),said=q('#measureResult');layer.replaceChildren();if(!state.measure.length){said.textContent='';return}
  const pts=state.measure.map(p=>screen(...p));
  if(pts.length===2){const d=`M${pts[0]}L${pts[1]}`;el('path',{d,class:'ms-halo'},layer);el('path',{d,class:'ms-line'},layer)}
  pts.forEach((p,i)=>el('circle',{cx:p[0].toFixed(1),cy:p[1].toFixed(1),r:7,class:'ms-pt','data-pt':i},layer));
@@ -233,8 +233,8 @@ function drawMeasure(){const layer=q('#measureLayer');layer.replaceChildren();q(
  const text=_('≈ %(m)s · %(ft)s · in the reconstruction').replace('%(m)s',format(m)).replace('%(ft)s',n_('%s ft','%s ft',ft).replace('%s',ft.toLocaleString(LANG)));
  const g=el('g',{class:'ms-label',transform:`translate(${((pts[0][0]+pts[1][0])/2).toFixed(1)} ${((pts[0][1]+pts[1][1])/2).toFixed(1)})`},layer),bg=el('rect',{y:-14,height:28,rx:4},g);
  const t=el('text',{x:0,y:1,'text-anchor':'middle','dominant-baseline':'middle'},g);t.textContent=text;
- const w=t.getComputedTextLength()+20;bg.setAttribute('x',-w/2);bg.setAttribute('width',w);q('#measureResult').textContent=text}
-function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').setAttribute('aria-pressed',String(state.measuring));map.classList.toggle('measuring',state.measuring);q('#measureHint').hidden=!state.measuring;render()}
+ const w=t.getComputedTextLength()+20;bg.setAttribute('x',-w/2);bg.setAttribute('width',w);if(dragPt==null&&said.textContent!==text)said.textContent=text}
+function toggleMeasure(force){state.measuring=force===undefined?!state.measuring:force;state.measure=[];q('#measure').setAttribute('aria-pressed',String(state.measuring));map.classList.toggle('measuring',state.measuring);q('.stage').classList.toggle('is-measuring',state.measuring);q('#measureHint').hidden=!state.measuring;render()}
 // Category keys are canonical data; only the visible labels translate.
 // Editorial order, as in the directory below the map.
 const KIND_ORDER=['Homes','Civic','Barrens','Encounters','Historical','Outlying'];
@@ -262,16 +262,18 @@ document.addEventListener('click',e=>{if(!layersPop.hidden&&!layersPop.contains(
 const mapSheet=q('#mapSheet'),mapSheetBtn=q('#mapSheetBtn'),mapSheetScrim=q('#mapSheetScrim');
 function setMapSheet(open,refocus){mapSheet.hidden=!open;mapSheetScrim.hidden=!open;mapSheetBtn.setAttribute('aria-expanded',String(open));if(open)mapSheet.querySelector('[data-map-sheet-close]').focus();else if(refocus)mapSheetBtn.focus()}
 mapSheetBtn.onclick=()=>setMapSheet(true);mapSheet.querySelector('[data-map-sheet-close]').onclick=()=>setMapSheet(false,true);mapSheetScrim.onclick=()=>setMapSheet(false,true);
-mapSheet.querySelector('[data-measure-start]').onclick=()=>{setMapSheet(false);toggleMeasure(true)};
-mapSheet.addEventListener('click',e=>{if(e.target.closest('[data-view],[data-list]'))setMapSheet(false)});
+mapSheet.querySelector('[data-measure-start]').onclick=()=>{setMapSheet(false);toggleMeasure(true);q('[data-measure-done]').focus()};
+mapSheet.addEventListener('click',e=>{if(e.target.closest('[data-view]'))setMapSheet(false,true);else if(e.target.closest('[data-list]'))setMapSheet(false)});
 const mapGrab=mapSheet.querySelector('.map-sheet__grab');
-mapGrab.addEventListener('pointerdown',e=>{const y0=e.clientY;mapGrab.setPointerCapture(e.pointerId);const up=ev=>{mapGrab.removeEventListener('pointerup',up);if(ev.clientY-y0>60)setMapSheet(false,true)};mapGrab.addEventListener('pointerup',up)});
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#measure').onclick=()=>toggleMeasure();q('[data-measure-done]').onclick=()=>toggleMeasure(false);
+mapGrab.addEventListener('pointerdown',e=>{const y0=e.clientY;mapGrab.setPointerCapture(e.pointerId);
+ const up=ev=>{mapGrab.removeEventListener('pointerup',up);mapGrab.removeEventListener('pointercancel',up);if(ev.type==='pointerup'&&ev.clientY-y0>60)setMapSheet(false,true)};
+ mapGrab.addEventListener('pointerup',up);mapGrab.addEventListener('pointercancel',up)});
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>fit(b.dataset.view));q('#zoomIn').onclick=()=>zoom(1.4);q('#zoomOut').onclick=()=>zoom(1/1.4);q('#measure').onclick=()=>toggleMeasure();q('[data-measure-done]').onclick=()=>{toggleMeasure(false);(matchMedia('(max-width:63.99em)').matches?mapSheetBtn:q('#measure')).focus()};
 const pointers=new Map();let last=null,start=null,moved=false,lastPinch=0,hadPinch=false,dragPt=null;
 function local(e){const r=map.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top]}
 map.addEventListener('pointerdown',e=>{if(e.button!==0)return;const p=local(e);const end=state.measuring&&e.target.closest?.('.ms-pt');dragPt=end?Number(end.dataset.pt):null;pointers.set(e.pointerId,p);map.setPointerCapture(e.pointerId);start=p;last=p;moved=false;if(pointers.size>1){hadPinch=true;const v=[...pointers.values()];lastPinch=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1])}map.classList.add('dragging')});
 map.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const p=local(e);pointers.set(e.pointerId,p);if(dragPt!=null&&pointers.size===1){state.measure[dragPt]=geo(...p);moved=true;drawMeasure();return}if(pointers.size===2){const v=[...pointers.values()],d=Math.hypot(v[0][0]-v[1][0],v[0][1]-v[1][1]);if(lastPinch>0&&d>0)zoom(d/lastPinch,(v[0][0]+v[1][0])/2,(v[0][1]+v[1][1])/2);lastPinch=d;moved=true;return}if(last){const dx=p[0]-last[0],dy=p[1]-last[1];if(start&&Math.hypot(p[0]-start[0],p[1]-start[1])>4)moved=true;if(moved){state.cx-=dx/state.k;state.cy+=dy/state.k;state.view='';render()}}last=p});
-map.addEventListener('pointerup',e=>{const p=local(e),wasMoved=moved||hadPinch;pointers.delete(e.pointerId);if(!pointers.size){map.classList.remove('dragging');last=null;lastPinch=0;hadPinch=false}else last=[...pointers.values()][0];if(dragPt!=null){dragPt=null;return}if(state.measuring&&!wasMoved){if(state.measure.length===2)state.measure=[];state.measure.push(geo(...p));drawMeasure()}if(!state.measuring&&!wasMoved){const hit=document.elementFromPoint(e.clientX,e.clientY);const pol=hit?.closest('.ph');if(pol)openPhotoFeature(pol.dataset.key);else{const target=hit?.closest('.mk,.mk-hit');if(target)select(Number(target.dataset.id),{opener:{mk:target.dataset.id}})}}});
+map.addEventListener('pointerup',e=>{const p=local(e),wasMoved=moved||hadPinch;pointers.delete(e.pointerId);if(!pointers.size){map.classList.remove('dragging');last=null;lastPinch=0;hadPinch=false}else last=[...pointers.values()][0];if(dragPt!=null){dragPt=null;drawMeasure();return}if(state.measuring&&!wasMoved){if(state.measure.length===2)state.measure=[];state.measure.push(geo(...p));drawMeasure()}if(!state.measuring&&!wasMoved){const hit=document.elementFromPoint(e.clientX,e.clientY);const pol=hit?.closest('.ph');if(pol)openPhotoFeature(pol.dataset.key);else{const target=hit?.closest('.mk,.mk-hit');if(target)select(Number(target.dataset.id),{opener:{mk:target.dataset.id}})}}});
 map.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);last=null;map.classList.remove('dragging')});
 map.addEventListener('wheel',e=>{e.preventDefault();zoom(Math.exp(-Math.max(-120,Math.min(120,e.deltaY))*.003),...local(e))},{passive:false});map.addEventListener('dblclick',e=>{if(!state.measuring&&!e.target.closest('.mk,.mk-hit,.ph'))zoom(1.8,...local(e))});
 map.addEventListener('keydown',e=>{if(e.key==='+'||e.key==='='){e.preventDefault();zoom(1.4)}else if(e.key==='-'){e.preventDefault();zoom(1/1.4)}else if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();state.cx+=({'ArrowLeft':-80,'ArrowRight':80}[e.key]||0)/state.k;state.cy+=({'ArrowUp':80,'ArrowDown':-80}[e.key]||0)/state.k;state.view='';render()}});

@@ -145,6 +145,11 @@ svg#map.dragging{cursor:grabbing}svg#map.measuring{cursor:crosshair}
 .map-scale__labels{display:flex;justify-content:space-between;gap:8px}
 .map-scale__note{font:var(--text-2xs)/1.2 var(--font-ui);color:var(--color-ink-2)}
 .key{position:absolute;left:16px;bottom:16px;z-index:var(--z-map-controls)}
+/* While measuring, the hint takes the top line; the search pill and the U notice step down. */
+.stage.is-measuring .map-flags{top:120px}
+/* A narrower map (under ~1240 px): the key keeps glyph and count, the label stays for screen
+   readers and in the tooltip, so it never runs under the scale. */
+@media (max-width:77.49em){.key:not(.key--grid) .key__label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}.key:not(.key--grid) .key__item{padding-right:10px}}
 .key .key__tip{bottom:calc(100% + 10px)}
 .key .key__tip::after{content:"";position:absolute;left:24px;bottom:-6px;width:12px;height:12px;background:var(--color-ink);transform:rotate(45deg)}
 .key__tip[hidden]{display:none}
@@ -204,7 +209,6 @@ svg#map.dragging{cursor:grabbing}svg#map.measuring{cursor:crosshair}
  .cat-menu.is-sheet .menu__opt{min-height:48px}
  .cat-menu.is-sheet .menu__foot{padding:var(--space-2) var(--space-4)}
  .cat-menu.is-sheet .cat-menu__apply{margin-left:auto}
- .map-flags{top:114px;left:10px;right:10px}
  html:not([data-sheet="peek"]) .map-pill{display:none}
  .sort-menu{position:fixed;left:0;right:0;bottom:0;top:auto;border-radius:var(--radius-4) var(--radius-4) 0 0;box-shadow:var(--shadow-sheet);padding-bottom:var(--space-4)}
  .sort-menu .menu__opt{min-height:48px}
@@ -217,6 +221,7 @@ svg#map.dragging{cursor:grabbing}svg#map.measuring{cursor:crosshair}
  .cookie{bottom:calc(var(--sheet-h,140px) + 8px)}
  .map-tools{top:10px;right:10px}
  .map-flags{top:62px}
+ .stage.is-measuring .map-flags{top:114px}
  .map-sheet-scrim{display:block;position:fixed;inset:0;z-index:var(--z-dialog);background:var(--scrim)}
  .map-sheet{display:flex;flex-direction:column;gap:12px;position:fixed;left:0;right:0;bottom:0;z-index:calc(var(--z-dialog) + 1);max-height:90vh;max-height:90dvh;overflow-y:auto;overscroll-behavior:contain;padding:0 16px 20px;background:var(--color-surface);border-top:var(--border-2) solid var(--color-line-strong);border-radius:var(--radius-4) var(--radius-4) 0 0;box-shadow:var(--shadow-sheet)}
  .map-sheet[hidden],.map-sheet-scrim[hidden]{display:none}

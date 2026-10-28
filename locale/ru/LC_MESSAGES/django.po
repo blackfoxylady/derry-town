@@ -27,9 +27,6 @@ msgstr "Фотографии"
 msgid "Derry"
 msgstr "Дерри"
 
-msgid "NOVEL-BASED RECONSTRUCTION"
-msgstr "РЕКОНСТРУКЦИЯ ПО РОМАНУ"
-
 msgid "Map"
 msgstr "Карта"
 
@@ -157,9 +154,6 @@ msgstr "Использованные открытые источники"
 msgid "A literary atlas of Stephen King’s <i>IT</i>"
 msgstr "Литературный атлас романа Стивена Кинга <i>«Оно»</i>"
 
-msgid "Historical sites"
-msgstr "Исторические места"
-
 msgid "Places"
 msgstr "Места"
 
@@ -172,45 +166,17 @@ msgstr "Указатель мест"
 msgid "The places remembered"
 msgstr "Места, которые помнят"
 
-msgid "Close place index"
-msgstr "Закрыть указатель мест"
-
 msgid "Search a place, person or event…"
 msgstr "Поиск места, персонажа или события…"
 
-msgid "Search locations"
-msgstr "Поиск по местам"
-
 msgid "Clear search"
 msgstr "Очистить поиск"
-
-msgid "Filter locations"
-msgstr "Фильтр мест"
-
-msgid ""
-"<b>One town, several remembered times.</b> Former places remain on the same "
-"map as their later uses."
-msgstr ""
-"<b>Один город, несколько времён.</b> Прежние места остаются на той же "
-"карте, что и их позднейшие воплощения."
-
-msgid ""
-"Choose a numbered marker to see the book reference and the reasoning behind "
-"its position. Zoom in for smaller sites. Search also includes places that "
-"cannot be located."
-msgstr ""
-"Выберите нумерованный маркер, чтобы увидеть отсылку к книге и обоснование "
-"положения. Приближайте карту, чтобы находить небольшие места. Поиск "
-"включает и места, которые нельзя локализовать."
 
 msgid "Interactive map"
 msgstr "Интерактивная карта"
 
 msgid "Derry map. Use arrow keys to pan and plus or minus to zoom."
 msgstr "Карта Дерри. Стрелки — перемещение, плюс и минус — масштаб."
-
-msgid "Map regions"
-msgstr "Районы карты"
 
 msgid "Town"
 msgstr "Город"
@@ -230,20 +196,8 @@ msgstr "Приблизить"
 msgid "Zoom out"
 msgstr "Отдалить"
 
-msgid "Show all Derry"
-msgstr "Показать весь Дерри"
-
-msgid "Measure straight-line distance"
-msgstr "Измерить расстояние по прямой"
-
 msgid "Measure a straight-line distance"
 msgstr "Измерить расстояние по прямой"
-
-msgid "Reconstructed distances · metres / kilometres"
-msgstr "Реконструированные расстояния · метры / километры"
-
-msgid "Map key & layers"
-msgstr "Легенда и слои"
 
 msgid "Place names"
 msgstr "Названия мест"
@@ -253,20 +207,6 @@ msgstr "Условный рельеф"
 
 msgid "Illustrative buildings"
 msgstr "Условные здания"
-
-msgid ""
-"Green: woodland / park<br>Blue: surface water<br>Dashed blue: covered "
-"channel<br>Dashed brown: inferred footpath"
-msgstr ""
-"Зелёный: лес / парк<br>Синий: открытая вода<br>Синий пунктир: скрытый "
-"канал<br>Коричневый пунктир: предполагаемая тропа"
-
-msgid ""
-"Contours are not measured elevations. All coordinates and boundaries are "
-"reconstructed."
-msgstr ""
-"Горизонтали не являются измеренными высотами. Все координаты и границы "
-"реконструированы."
 
 #: server-rendered place directory
 msgid "Homes"
@@ -284,31 +224,11 @@ msgstr "Исторические места"
 msgid "Outlying"
 msgstr "Окраины"
 
-msgid "Unlocated"
-msgstr "Без координат"
-
 msgid "Other"
 msgstr "Прочее"
 
-msgid "Browse all %(count)s place"
-msgid_plural "Browse all %(count)s places"
-msgstr[0] "Смотреть %(count)s место"
-msgstr[1] "Смотреть все %(count)s места"
-msgstr[2] "Смотреть все %(count)s мест"
-
-msgid "%(mapped)s mapped · %(unlocated)s unlocated"
-msgstr "%(mapped)s на карте · %(unlocated)s без координат"
-
 msgid "All places in Derry"
 msgstr "Все места Дерри"
-
-msgid ""
-"Browse the locations reconstructed from Stephen King’s IT. Every name links "
-"to a standalone page with book evidence and an explanation of its position."
-msgstr ""
-"Просмотрите места, реконструированные по роману Стивена Кинга «Оно». Каждое "
-"название ведёт на отдельную страницу с книжными свидетельствами и "
-"обоснованием положения."
 
 msgid "Place categories"
 msgstr "Категории мест"

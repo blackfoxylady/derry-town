@@ -21,7 +21,7 @@ window.DerryMapUI = function (ctx) {
   name: (a, b) => a.name.localeCompare(b.name, document.documentElement.lang),
   confidence: (a, b) => 'ABCU'.indexOf(a.confidence) - 'ABCU'.indexOf(b.confidence) || rankOf(a) - rankOf(b),
  };
- const sorted = () => all.slice().sort(SORTS[state.sort] || SORTS.number);
+ const sorted = () => all.slice().sort(Object.hasOwn(SORTS, state.sort) ? SORTS[state.sort] : SORTS.number);
  // The list shows what passes the search and the filters, in the chosen order; the pager walks
  // the same list (all places when the selected one is filtered out).
  const shown = () => sorted().filter(hits);
@@ -41,6 +41,7 @@ window.DerryMapUI = function (ctx) {
  // around the match, cut at word boundaries.
  function result(s) {
   const qn = state.search, at = t => ctx.norm(t).indexOf(qn);
+  if (/^\d{1,2}$/.test(qn)) return {title: esc(s.name), snip: ''};
   if (at(s.name) >= 0) return {title: mark(s.name, at(s.name), qn.length), snip: ''};
   const src = [s.note, ...(s.search_aliases || [])].find(t => t && at(t) >= 0);
   if (!src) return {title: esc(s.name), snip: ''};
@@ -73,19 +74,19 @@ window.DerryMapUI = function (ctx) {
   peekText.textContent = state.search ? sub(n_('%s place', '%s places', n), {n}) : peekDefault;
   const note = hidden ? `<li class="list-note">${esc(sub(n_('%s more hidden by filters', '%s more hidden by filters', hidden), {n: hidden}))} · <button type="button" class="link" data-show-hidden>${esc(_('Show them'))}</button></li>` : '';
   // All three kinds switched off in the key: nothing to list, one way back.
-  if (state.hide.size === 3) { listEl.innerHTML = `<li class="list-empty"><p>${esc(_('All marks are hidden.'))}</p><button type="button" class="btn btn--secondary btn--compact" data-show-all>${esc(_('Show all'))}</button></li>`; return; }
+  if (state.hide.size === 3 && state.list !== 'unlocated') { count.textContent = sub(n_('%s place', '%s places', 0), {n: 0}); listEl.innerHTML = `<li class="list-empty"><p>${esc(_('All marks are hidden.'))}</p><button type="button" class="btn btn--secondary btn--compact" data-show-all>${esc(_('Show all'))}</button></li>`; return; }
   listEl.innerHTML = n ? result.map(row).join('') + note
    : state.search ? note || `<li class="list-empty"><h3>${esc(sub(_('Nothing in Derry matches “%s”'), {n: search.value.trim()}))}</h3><p>${esc(_('Check the spelling or try a shorter word.'))}</p><button type="button" class="btn btn--secondary btn--compact" data-clear-search>${esc(_('Clear search'))}</button></li>`
    : '<li class="empty">' + esc(_('No matching places. Try a shorter name or enable more categories.')) + '</li>';
  }
  // One pass after any change: the list, the map, the pill over it and the address.
- function apply() { list(); controls(); ctx.render(); pill(); syncURL(); }
+ function apply() { list(); controls(); ctx.render(); pill(); syncURL(); if (!card.hidden) cardNav(); }
  listEl.addEventListener('click', e => {
   const b = e.target.closest('.place-row');
   if (b) ctx.select(/^U/.test(b.dataset.place) ? b.dataset.place : Number(b.dataset.place), {zoom: true, opener: {row: b.dataset.place}});
-  else if (e.target.closest('[data-show-hidden]')) { ctx.resetFilters(); apply(); }
+  else if (e.target.closest('[data-show-hidden]')) { ctx.resetFilters(); apply(); search.focus(); }
   else if (e.target.closest('[data-clear-search]')) { clearSearch(); search.focus(); }
-  else if (e.target.closest('[data-show-all]')) { state.hide.clear(); apply(); }
+  else if (e.target.closest('[data-show-all]')) { state.hide.clear(); apply(); (listEl.querySelector('.place-row') || search).focus(); }
  });
  q('#listAll').addEventListener('click', () => { state.list = 'all'; listEl.scrollTop = 0; apply(); search.focus(); });
  // ↑/↓ move through the rows; ↑ from the first goes back to the search field.
@@ -144,7 +145,7 @@ window.DerryMapUI = function (ctx) {
   el.innerHTML = `<div class="map-notice__box"><span>${esc(text)}</span>` + (phone.matches
    ? `<button type="button" class="btn btn--icon btn--compact" aria-label="${esc(_('Clear search: show all places'))}">${icon('close')}</button>`
    : `<button type="button" class="btn btn--compact">${esc(_('Clear'))}</button>`) + '</div>';
-  el.querySelector('button').addEventListener('click', () => { clearSearch(); (phone.matches ? q('#map') : search).focus(); });
+  el.querySelector('button').addEventListener('click', () => { clearSearch(); (!card.hidden ? q('#place-title') : phone.matches ? q('#map') : search).focus(); });
  }
 
  // ---- Sort -----------------------------------------------------------------------------
@@ -234,15 +235,18 @@ window.DerryMapUI = function (ctx) {
   const i = catItems.indexOf(document.activeElement);
   if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && i >= 0) { e.preventDefault(); catItems[(i + (e.key === 'ArrowDown' ? 1 : catItems.length - 1)) % catItems.length].focus(); }
   else if (e.key === 'Escape') { e.preventDefault(); setCat(false, true); }
-  else if (e.key === 'Tab' && !draft) setCat(false);
  });
+ catMenu.addEventListener('focusout', e => { if (!draft && !catMenu.hidden && !catMenu.contains(e.relatedTarget) && e.relatedTarget !== catBtn) setCat(false); });
  document.addEventListener('click', e => { if (!catMenu.hidden && !draft && !q('.cat').contains(e.target)) setCat(false); });
  photosBtn.addEventListener('click', () => { state.withPhotos = !state.withPhotos; apply(); });
  // The key: A, B, C toggle those pins on the map and in the list; "No location →" lists the
  // places without a point (the map does not change).
  document.querySelectorAll('.key').forEach(k => k.addEventListener('click', e => {
   const b = e.target.closest('.key__item'); if (!b || b.disabled) return;
-  if (b.dataset.list) { state.list = 'unlocated'; listEl.scrollTop = 0; apply(); if (phone.matches) setSheet('full'); return; }
+  if (b.dataset.list) {
+   if (!card.hidden) { beforeCard = 'full'; ctx.close(); }
+   state.list = 'unlocated'; listEl.scrollTop = 0; apply(); if (phone.matches) setSheet('full'); return;
+  }
   const L = b.dataset.hide; if (state.hide.has(L)) state.hide.delete(L); else state.hide.add(L);
   apply(); if (k === key) tipText(b);
  }));
@@ -266,8 +270,11 @@ window.DerryMapUI = function (ctx) {
  // The address carries the view: ?q=library&kind=civic,homes&photos=1&hide=C&sort=name&place=12
  // &list=unlocated (defaults left out).
  const P = new URLSearchParams(location.search);
- if (SORTS[P.get('sort')]) state.sort = P.get('sort');
- if (P.has('kind')) { const want = P.get('kind').toLowerCase().split(','); state.active = new Set(ctx.kinds.filter(k => want.includes(k.toLowerCase()))); }
+ if (Object.hasOwn(SORTS, P.get('sort') || '')) state.sort = P.get('sort');
+ if (P.has('kind')) {
+  const want = P.get('kind').toLowerCase().split(','), kinds = ctx.kinds.filter(k => want.includes(k.toLowerCase()));
+  if (kinds.length || want.includes('none')) state.active = new Set(kinds);
+ }
  if (P.get('photos') === '1') state.withPhotos = true;
  if (P.get('hide')) state.hide = new Set(P.get('hide').toUpperCase().split(',').filter(L => ['A', 'B', 'C'].includes(L)));
  if (P.get('list') === 'unlocated') state.list = 'unlocated';
@@ -316,13 +323,7 @@ window.DerryMapUI = function (ctx) {
   if (!wasOpen || opts.opener) opener = opts.opener || null;
   body.innerHTML = cardBody(s);
   foot.innerHTML = `<a class="btn btn--primary" href="${esc(placeUrl(s))}">${esc(_('Open place page'))}</a>`;
-  card.querySelector('.place-card__back span').textContent = state.search ? _('Back to results') : _('All places');
-  const seq = pagerSeq(), i = seq.findIndex(p => p.id === s.id);
-  pos.textContent = `${i + 1} / ${seq.length}`;
-  const focused = document.activeElement;
-  steps[0].disabled = i === 0; steps[1].disabled = i === seq.length - 1;
-  // A pager arrow that just went disabled hands focus to the other one.
-  if (focused?.disabled) steps[focused === steps[0] ? 1 : 0].focus();
+  cardNav();
   body.scrollTop = 0;
   if (!wasOpen) beforeCard = sheet.dataset.sheet === 'card' ? 'peek' : sheet.dataset.sheet;
   browse.hidden = true; card.hidden = false; setSheet('card');
@@ -331,6 +332,17 @@ window.DerryMapUI = function (ctx) {
   markCurrent(); syncURL();
   if (opts.paging) card.querySelector('[data-live]').textContent = s.name;
   else if (opts.focus !== false) card.querySelector('#place-title').focus();
+ }
+
+ // The nav row: "← Back to results" after a search, the pager over the current list.
+ function cardNav() {
+  card.querySelector('.place-card__back span').textContent = state.search ? _('Back to results') : _('All places');
+  const seq = pagerSeq(), i = seq.findIndex(p => p.id === state.selected);
+  pos.textContent = `${i + 1} / ${seq.length}`;
+  const focused = document.activeElement;
+  steps[0].disabled = i <= 0; steps[1].disabled = i === seq.length - 1;
+  // A pager arrow that just went disabled hands focus to the other one.
+  if (focused?.disabled) steps[focused === steps[0] ? 1 : 0].focus();
  }
 
  function close() {

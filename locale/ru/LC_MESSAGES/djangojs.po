@@ -21,45 +21,16 @@ msgstr "км"
 msgid "m"
 msgstr "м"
 
-msgid "place"
-msgid_plural "places"
-msgstr[0] "место"
-msgstr[1] "места"
-msgstr[2] "мест"
-
-msgid "mapped"
-msgstr "на карте"
-
 msgid "No matching places. Try a shorter name or enable more categories."
 msgstr ""
 "Подходящих мест нет. Попробуйте более короткое название или включите "
 "больше категорий."
 
-msgid "Place %s"
-msgstr "Место %s"
-
 msgid "Close place"
 msgstr "Закрыть место"
 
-msgid "Sources & evidence"
-msgstr "Источники и свидетельства"
-
-msgid "All photographs of this place"
-msgstr "Все фотографии этого места"
-
-msgid "Place page"
-msgstr "Страница места"
-
 msgid "Photographs"
 msgstr "Фотографии"
-
-msgid "straight line in this reconstruction"
-msgstr "прямая линия в этой реконструкции"
-
-msgid "Select two points to measure. Drag to pan. Escape clears."
-msgstr ""
-"Выберите две точки для измерения. Перетаскивайте, чтобы двигать карту. "
-"Escape сбрасывает."
 
 msgid "Homes"
 msgstr "Дома"
@@ -103,19 +74,6 @@ msgstr "Историческое"
 msgctxt "kind short"
 msgid "Outlying"
 msgstr "Окраины"
-
-#: atlas/static/atlas/map.js (redesign pass 3)
-msgid "Named in the novel"
-msgstr "Названо в романе"
-
-msgid "Inferred"
-msgstr "Выведено"
-
-msgid "Proposed"
-msgstr "Предположено"
-
-msgid "No location"
-msgstr "Без координат"
 
 msgid "named in the novel"
 msgstr "названо в романе"
