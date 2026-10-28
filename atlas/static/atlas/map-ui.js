@@ -76,7 +76,7 @@ window.DerryMapUI = function (ctx) {
   // All three kinds switched off in the key: nothing to list, one way back.
   if (state.hide.size === 3 && state.list !== 'unlocated') { count.textContent = sub(n_('%s place', '%s places', 0), {n: 0}); listEl.innerHTML = `<li class="list-empty"><p>${esc(_('All marks are hidden.'))}</p><button type="button" class="btn btn--secondary btn--compact" data-show-all>${esc(_('Show all'))}</button></li>`; return; }
   listEl.innerHTML = n ? result.map(row).join('') + note
-   : state.search ? note || `<li class="list-empty"><h3>${esc(sub(_('Nothing in Derry matches “%s”'), {n: search.value.trim()}))}</h3><p>${esc(_('Check the spelling or try a shorter word.'))}</p><button type="button" class="btn btn--secondary btn--compact" data-clear-search>${esc(_('Clear search'))}</button></li>`
+   : state.search ? note || `<li class="list-empty"><h3>${esc(sub(_('Nothing in Derry matches “%s”'), {n: search.value.trim()}))}</h3><p>${esc(_('Try a different search.'))}</p><button type="button" class="btn btn--secondary btn--compact" data-clear-search>${esc(_('Clear search'))}</button></li>`
    : '<li class="empty">' + esc(_('No matching places. Try a shorter name or enable more categories.')) + '</li>';
  }
  // One pass after any change: the list, the map, the pill over it and the address.
@@ -322,7 +322,8 @@ window.DerryMapUI = function (ctx) {
   // paging keeps it.
   if (!wasOpen || opts.opener) opener = opts.opener || null;
   body.innerHTML = cardBody(s);
-  foot.innerHTML = `<a class="btn btn--primary" href="${esc(placeUrl(s))}">${esc(_('Open place page'))}</a>`;
+  // The place page opens in a new tab, so the map keeps its view and card (Dina, 28.10).
+  foot.innerHTML = `<a class="btn btn--primary" href="${esc(placeUrl(s))}" target="_blank" rel="noopener">${esc(_('Open place page'))}<span class="visually-hidden"> ${esc(_('(opens in a new tab)'))}</span></a>`;
   cardNav();
   body.scrollTop = 0;
   if (!wasOpen) beforeCard = sheet.dataset.sheet === 'card' ? 'peek' : sheet.dataset.sheet;

@@ -71,6 +71,15 @@ const path=require('node:path');
   await page.screenshot({path:path.join(out,name+'-town.png'),fullPage:true});
   // The list: 92 rows, the number in the marker style, meta "Kind · period · confidence".
   assert.equal(await page.locator('#list .place-row').count(),92);
+  // No matches: the final copy is concise, and its button resets the search.
+  await page.locator('#search').fill('lighthouse');
+  await page.waitForFunction(()=>DerryAtlas.view.search==='lighthouse');
+  assert.equal(await page.locator('#list .list-empty h3').innerText(),'Nothing in Derry matches “lighthouse”');
+  assert.equal(await page.locator('#list .list-empty p').innerText(),'Try a different search.');
+  assert.equal(await page.locator('#list [data-clear-search]').innerText(),'Clear search');
+  await page.locator('#list [data-clear-search]').click();
+  assert.equal(await page.locator('#search').inputValue(),'');
+  assert.equal(await page.locator('#list .place-row').count(),92);
   assert.match(await page.locator('#list .place-row[data-place="5"] .place-row__meta').innerText(),/^Civic · .+ · inferred$/);
   if(name==='mobile'){
    // Phone (block 09b): a bottom sheet over a full-screen map: peek → "List ↑" → full → "Show map".
@@ -279,10 +288,20 @@ const path=require('node:path');
   // The deep link centres the place (on the phone, in the map above the card sheet).
   assert.equal(await page.evaluate(()=>Math.round(DerryAtlas.view.cx)),-1510);
   if(name==='desktop')assert.equal(await page.evaluate(()=>Math.round(DerryAtlas.view.cy)),-540);
-  // The card links to the standalone place page (indexable, English slug), in the same tab.
-  const placeHref=await page.locator('#detail .place-card__foot a').getAttribute('href');
-  assert.equal(await page.locator('#detail .place-card__foot a').getAttribute('target'),null);
+  // The card links to the standalone place page (indexable, English slug), in a new tab.
+  const placeLink=page.locator('#detail .place-card__foot a');
+  const placeHref=await placeLink.getAttribute('href');
+  assert.equal(await placeLink.getAttribute('target'),'_blank');
+  assert.equal(await placeLink.getAttribute('rel'),'noopener');
+  assert.match(await placeLink.innerText(),/Open place page\s+\(opens in a new tab\)/);
   assert.match(placeHref,/^\/places\/12(-|\/)/);
+  const mapUrl=page.url(),popupPromise=page.waitForEvent('popup');
+  await placeLink.click();
+  const placePopup=await popupPromise;
+  await placePopup.waitForLoadState('networkidle');
+  assert.equal(page.url(),mapUrl);
+  assert.equal(placePopup.url(),url+placeHref);
+  await placePopup.close();
   await page.goto(url+placeHref,{waitUntil:'networkidle'});
   assert.match(await page.locator('.place-page h1').innerText(),/\S/);
   assert.equal(await page.locator('.crumbs li').count(),3);
@@ -294,6 +313,13 @@ const path=require('node:path');
   await page.goto(url+'/ru/',{waitUntil:'networkidle'});
   await page.waitForFunction(()=>window.DerryAtlas?.siteCount===84,null,{timeout:120000});
   assert.equal(await page.locator('html').getAttribute('lang'),'ru');
+  await page.locator('#search').fill('квакозябра');
+  await page.waitForFunction(()=>DerryAtlas.view.search==='квакозябра');
+  assert.equal(await page.locator('#list .list-empty h3').innerText(),'В Дерри нет «квакозябра».');
+  assert.equal(await page.locator('#list .list-empty p').innerText(),'Попробуйте изменить поисковую фразу.');
+  assert.equal(await page.locator('#list [data-clear-search]').innerText(),'Очистить поиск');
+  await page.locator('#list [data-clear-search]').click();
+  assert.equal(await page.locator('#search').inputValue(),'');
   await page.goto(url+'/photos/',{waitUntil:'networkidle'});
   assert.equal(await page.locator('.crumbs li').count(),2);
   assert.match(await page.locator('#galleryStatus').innerText(),/\d+ photographs?/);

@@ -159,13 +159,13 @@ msgid "Show them"
 msgstr "Показать"
 
 msgid "Nothing in Derry matches “%s”"
-msgstr "В Дерри нет ничего по запросу «%s»"
+msgstr "В Дерри нет «%s»."
 
-msgid "Check the spelling or try a shorter word."
-msgstr "Проверьте написание или попробуйте слово короче."
+msgid "Try a different search."
+msgstr "Попробуйте изменить поисковую фразу."
 
 msgid "Clear search"
-msgstr "Сбросить поиск"
+msgstr "Очистить поиск"
 
 msgid "%(n)s result for “%(q)s”"
 msgid_plural "%(n)s results for “%(q)s”"
@@ -231,3 +231,6 @@ msgid_plural "%s ft"
 msgstr[0] "%s фут"
 msgstr[1] "%s фута"
 msgstr[2] "%s футов"
+
+msgid "(opens in a new tab)"
+msgstr "(откроется в новой вкладке)"
