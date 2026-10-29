@@ -429,33 +429,36 @@
           else if (z === 'mid') {
             const pg = el('g', { class: 'ph-medal', transform: `translate(${r1(x + 17)} ${r1(y - 17)})` }, gm);
             const cid = 'ph-c-' + s.id;
+            if (ph.length > 2) el('circle', { r: 11, cx: -3, cy: 2, class: 'ph-medal__back' }, pg);
+            if (ph.length > 1) el('circle', { r: 11, cx: 3, cy: 2, class: 'ph-medal__back' }, pg);
             el('circle', { r: 11, class: 'ph-medal__ring' }, pg);
             el('clipPath', { id: cid }, pg).appendChild(el('circle', { r: 9 }));
             el('image', { href: photoBase + ph[0], x: -9, y: -9, width: 18, height: 18, preserveAspectRatio: 'xMidYMid slice', 'clip-path': `url(#${cid})` }, pg);
-            if (ph.length > 1) el('text', { class: 'ph-count', x: 9, y: -7 }, pg).textContent = '×' + ph.length;
             if (s.id === hover) pops.push([x + 17, y - 17, ph, s]);   // hover pops the polaroid out of the medallion
           } else prints.push([s, x, y, ph]);            // near: placed after all markers (below)
         }
       });
 
-      // Near-zoom polaroids (as in production map.js): a white print with a square photo and a
-      // handwritten-style caption, a fixed per-place tilt, pinned to the marker by a thin leader.
+      // Near-zoom polaroids (as in production map.js): a white print with a square photo,
+      // stacked backing cards for a set, and a fixed per-place tilt, pinned by a thin leader.
       // Positions are tried in a ring round the marker, after all markers, so a print never
       // covers one. The shadow is an offset translucent card, not a filter (cheap on phones).
-      const PW = 50, PH = 62, PI = 42;
+      const PW = 50, PH = 54, PI = 42;
       // One print: used for the near-zoom polaroids and for the hover pop-up (straight, scaled, on top).
       function print(parent, cx, cy, ph, s, tilt, scale, cls) {
         const pg = el('g', { class: 'ph-print' + (cls ? ' ' + cls : ''), transform: `translate(${r1(cx)} ${r1(cy)}) rotate(${tilt})${scale !== 1 ? ` scale(${scale})` : ''}`, tabindex: 0, role: 'button', 'aria-label': `Photographs · ${s.n}` }, parent);
+        if (ph.length > 2) el('rect', { class: 'ph-print__back', x: -PW / 2, y: -PH / 2, width: PW, height: PH, transform: 'translate(-4 3) rotate(-4)' }, pg);
+        if (ph.length > 1) el('rect', { class: 'ph-print__back', x: -PW / 2, y: -PH / 2, width: PW, height: PH, transform: 'translate(4 2) rotate(4)' }, pg);
         el('rect', { class: 'ph-print__shadow', x: -PW / 2 + 1, y: -PH / 2 + 2, width: PW, height: PH }, pg);
         el('rect', { class: 'ph-print__card', x: -PW / 2, y: -PH / 2, width: PW, height: PH }, pg);
         el('image', { href: photoBase + ph[0], x: -PI / 2, y: -PH / 2 + 4, width: PI, height: PI, preserveAspectRatio: 'xMidYMid slice' }, pg);
-        el('text', { class: 'ph-print__cap', x: 0, y: PH / 2 - 5, 'text-anchor': 'middle' }, pg).textContent = '1958' + (ph.length > 1 ? ' · ×' + ph.length : '');
         return pg;
       }
       const hoverPrints = [];
       prints.forEach(([s, x, y, ph]) => {
         const offs = [[0, -60], [44, -44], [-44, -44], [54, 0], [-54, 0], [0, 60], [44, 46], [-44, 46]];
-        const box = ([dx, dy]) => [x + dx - PW / 2 - 2, y + dy - PH / 2 - 2, x + dx + PW / 2 + 2, y + dy + PH / 2 + 2];
+        const pad = ph.length > 1 ? 7 : 2;
+        const box = ([dx, dy]) => [x + dx - PW / 2 - pad, y + dy - PH / 2 - pad, x + dx + PW / 2 + pad, y + dy + PH / 2 + pad];
         let off = offs.find((o) => !hit(box(o)));
         if (!off && s.id === selected) off = offs[0];
         if (!off) return;

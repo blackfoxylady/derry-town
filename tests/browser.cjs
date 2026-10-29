@@ -252,6 +252,7 @@ const path=require('node:path');
    assert(await page.locator('#markers .ph-dot').count()>0);
    assert.equal(await page.locator('#photoLayer .ph').count(),0);
    await page.evaluate(()=>DerryAtlas.setView(-1510,-540,.3));
+   assert.equal(await page.locator('#photoLayer .ph-count').count(),0);
    const med=page.locator('#photoLayer .ph-medal[data-key="12"]');
    if(await med.count()){
     assert.match(await med.getAttribute('aria-label'),/^Photographs · Derry Public Library/);
@@ -260,8 +261,10 @@ const path=require('node:path');
    }
    await page.evaluate(()=>DerryAtlas.setView(-1510,-540,.9));
    assert(await page.locator('#photoLayer .ph-near').count()>0);
+   assert.equal(await page.locator('#photoLayer .ph-print__cap').count(),0);
    const pol=page.locator('#photoLayer .ph-near[data-key="12"]');
    if(await pol.count()){
+    assert.equal(await pol.locator('.ph-print__back').count(),1);
     await pol.click();
     assert.match(await page.locator('#detail').innerText(),/Library/);
     assert(await page.locator('#detail .card-photo').count()>0);

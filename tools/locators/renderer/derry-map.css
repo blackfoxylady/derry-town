@@ -124,11 +124,10 @@
 
 /* ---- Overlay: photo layer ---- */
 .dm .ph-dot { fill: #8A6A3E; stroke: #FFFFFF; stroke-width: 1; }
+.dm .ph-medal__back { fill: #FFFEF7; stroke: #C9C0A4; stroke-width: 0.7; }
 .dm .ph-medal__ring { fill: #FFFFFF; stroke: var(--color-ink); stroke-width: 1.2; }
-.dm .ph-count { font: 700 10px var(--font-display); fill: var(--color-ink); paint-order: stroke; stroke: #FFFFFF; stroke-width: 3px; }
 .dm .ph-print { cursor: pointer; }
-.dm .ph-print__card { fill: #FFFEF7; stroke: #C9C0A4; stroke-width: 0.7; }
+.dm .ph-print__card, .dm .ph-print__back { fill: #FFFEF7; stroke: #C9C0A4; stroke-width: 0.7; }
 .dm .ph-print__shadow { fill: rgb(31 48 41 / 0.22); }
 .dm .ph-leader { fill: none; stroke: #8A7A5C; stroke-width: 0.8; }
-.dm .ph-print__cap { font: italic 8px var(--font-read); fill: #6B5D49; }
 .dm .ph-print.is-hover .ph-print__shadow { fill: rgb(31 48 41 / 0.32); transform: translate(1px, 3px); }

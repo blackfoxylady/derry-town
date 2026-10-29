@@ -30,8 +30,9 @@ const world=q('#world'),map=q('#map'),markers=q('#markers'),labels=q('#landLabel
 const state={cx:0,cy:0,k:.1,w:1000,h:700,selected:null,view:'city',active:new Set(Object.keys(PAYLOAD.colors)),search:'',sort:'number',withPhotos:false,hide:new Set(),list:'all',names:true,relief:true,buildings:true,photos:true,measuring:false,measure:[]};
 // The photo layer follows the map LOD (block 13): far — sepia dots by the markers, mid —
 // medallions at the marker's shoulder (hover or keyboard focus pops the polaroid out), near —
-// polaroids on a leader. Card 50 × 62 with a 42 px photo.
-const PW=50,PH=62,PI=42;
+// polaroids on a leader. With the caption removed the 50 × 54 card keeps a compact
+// polaroid foot below its 42 px photo; extra cards behind it signal a photo set.
+const PW=50,PH=54,PI=42;
 // The zoom cap: 20 m ≈ 45 px. The minimum fits the whole sheet on a 390 px phone.
 const MIN_K=.012,MAX_K=2.2;
 // Litho world data (post extension) and hill spot heights, built once in scene().
@@ -152,14 +153,16 @@ function drawPhotos(occupied,off,z){
   // Far: places carry their dot on the marker; a street's photo sits as a dot on its anchor.
   if(z==='far'){if(!site)el('circle',{class:'ph-dot',cx:ax,cy:ay,r:2.6},photoLayer);continue}
   if(z==='mid'){const g=photoButton(key,f,site?ax+17:ax,site?ay-17:ay,'ph-medal');
+   if(f.photos.length>2)el('circle',{class:'ph-medal__back ph-medal__back--left',r:11,cx:-3,cy:2},g);
+   if(f.photos.length>1)el('circle',{class:'ph-medal__back ph-medal__back--right',r:11,cx:3,cy:2},g);
    el('circle',{class:'ph-focus',r:14},g);el('circle',{class:'ph-medal__ring',r:11},g);
    el('image',{href:f.photos[0].thumb,x:-9,y:-9,width:18,height:18,preserveAspectRatio:'xMidYMid slice','clip-path':'url(#photoClip)'},g);
-   if(f.photos.length>1)el('text',{class:'ph-count',x:9,y:-7},g).textContent='×'+f.photos.length;
    photoPrint(g,f,'translate(0 -58) scale(1.9)','ph-pop');continue}
   near.push([key,f,ax,ay,site]);
  }
  for(const [key,f,ax,ay,site] of near){
-  const box=([dx,dy])=>[ax+dx-PW/2-2,ay+dy-PH/2-2,ax+dx+PW/2+2,ay+dy+PH/2+2];
+  const pad=f.photos.length>1?7:2;
+  const box=([dx,dy])=>[ax+dx-PW/2-pad,ay+dy-PH/2-pad,ax+dx+PW/2+pad,ay+dy+PH/2+pad];
   let o=PRINT_OFFS.find(o=>!occupied.some(b=>intersects(box(o),b,0)));
   if(!o&&site&&Number(key)===state.selected)o=PRINT_OFFS[0];if(!o)continue;occupied.push(box(o));
   // The leader starts at the marker edge; a street's at its anchor point.
@@ -171,12 +174,10 @@ function drawPhotos(occupied,off,z){
   photoPrint(photoButton(key,f,px,py,'ph-near'),f,'',null,h%7-3);
  }
 }
-// The caption a real polaroid would carry: the first photo's year and the count.
-function photoCaption(f){return [f.photos[0].year,f.photos.length>1?'×'+f.photos.length:''].filter(Boolean).join(' · ')}
 // A medallion or a print: one focusable button per place. Mouse hover and keyboard focus
 // raise it ('is-up': mid pops the polaroid, near straightens and grows); touch just opens.
-function photoButton(key,f,x,y,cls){const cap=photoCaption(f);
- const g=el('g',{class:'ph '+cls,transform:`translate(${x.toFixed(1)} ${y.toFixed(1)})`,tabindex:'0',role:'button','data-key':key,'aria-label':_('Photographs')+' · '+f.name+(cap?' · '+cap:'')},photoLayer);
+function photoButton(key,f,x,y,cls){
+ const g=el('g',{class:'ph '+cls,transform:`translate(${x.toFixed(1)} ${y.toFixed(1)})`,tabindex:'0',role:'button','data-key':key,'aria-label':_('Photographs')+' · '+f.name},photoLayer);
  g.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;g.classList.add('is-up');if(g!==photoLayer.lastElementChild)photoLayer.appendChild(g)});
  g.addEventListener('pointerleave',()=>g.classList.remove('is-up'));
  // Moving a focused node would drop focus and the Tab order, so focus draws a raised copy on top.
@@ -186,13 +187,14 @@ function photoButton(key,f,x,y,cls){const cap=photoCaption(f);
  g.addEventListener('click',e=>{e.stopPropagation();if(!state.measuring)openPhotoFeature(key)});
  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPhotoFeature(key)}});
  return g}
-function photoPrint(parent,f,transform,cls,tilt=0){const cap=photoCaption(f);
+function photoPrint(parent,f,transform,cls,tilt=0){
  const p=el('g',{class:'ph-print'+(cls?' '+cls:''),transform:transform||null},parent),t=el('g',{class:'ph-print__body',style:'--tilt:'+tilt+'deg'},p);
  if(!cls)el('rect',{class:'ph-focus',x:-PW/2-3,y:-PH/2-3,width:PW+6,height:PH+6},t);
+ if(f.photos.length>2)el('rect',{class:'ph-print__back',x:-PW/2,y:-PH/2,width:PW,height:PH,transform:'translate(-4 3) rotate(-4)'},t);
+ if(f.photos.length>1)el('rect',{class:'ph-print__back',x:-PW/2,y:-PH/2,width:PW,height:PH,transform:'translate(4 2) rotate(4)'},t);
  el('rect',{class:'ph-print__shadow',x:-PW/2+1,y:-PH/2+2,width:PW,height:PH},t);
  el('rect',{class:'ph-print__card',x:-PW/2,y:-PH/2,width:PW,height:PH},t);
- el('image',{href:f.photos[0].thumb,x:-PI/2,y:-PH/2+4,width:PI,height:PI,preserveAspectRatio:'xMidYMid slice'},t);
- if(cap)el('text',{class:'ph-print__cap',x:0,y:PH/2-5,'text-anchor':'middle'},t).textContent=cap}
+ el('image',{href:f.photos[0].thumb,x:-PI/2,y:-PH/2+4,width:PI,height:PI,preserveAspectRatio:'xMidYMid slice'},t)}
 // A polaroid opens the place card when the place has one; roads and other outlines go to the gallery.
 function openPhotoFeature(key){const f=PHOTOS[key];if(!f)return;if(f.object_type==='site')select(Number(key));else if(f.object_type==='unplaced')select(key);else location.href=f.gallery||URLS.gallery+'?place='+key}
 // Confidence terms (shared with the place pages): full label with the letter, lowercase for meta lines.
