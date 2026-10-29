@@ -149,8 +149,26 @@ const path=require('node:path');
   assert.equal(await page.locator('#search').inputValue(),'');
   assert.equal(await page.evaluate(()=>{const v=DerryAtlas.view;return [v.cx,v.cy,v.k].join()}),before);
   assert.equal(await page.locator('#list .place-row').count(),92);
-  // Sort: Name A–Z through the listbox; the order lands in the address.
+  // Sort: Name A–Z through the listbox; the order lands in the address. On the phone
+  // the same control is a modal bottom sheet rather than a popover inside the list.
   if(name==='desktop'){
+   await page.locator('#sortBtn').click();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
+   assert.match(page.url(),/sort=name/);
+   assert.equal(await page.locator('#list .place-row__title').first().innerText(),'127 Lower Main Street');
+   await page.locator('#sortBtn').click();await page.keyboard.press('ArrowUp');await page.keyboard.press('Enter');
+   assert.doesNotMatch(page.url(),/sort=/);
+  }else{
+   await page.locator('[data-sheet-to="full"]').click();
+   await page.locator('#sortBtn').click();
+   assert.equal(await page.locator('#sortBtn').getAttribute('aria-haspopup'),'dialog');
+   assert.equal(await page.locator('#sortMenu').getAttribute('role'),'dialog');
+   assert.equal(await page.locator('#sortMenu').getAttribute('aria-modal'),'true');
+   assert.equal(await page.locator('#menuScrim').isVisible(),true);
+   const menuBox=await page.locator('#sortMenu').boundingBox();
+   assert(menuBox&&Math.abs(menuBox.y+menuBox.height-size.height)<1);
+   await page.locator('[data-sort-close]').click();
+   assert.equal(await page.locator('#sortMenu').isVisible(),false);
+   assert.equal(await page.evaluate(()=>document.activeElement.id),'sortBtn');
    await page.locator('#sortBtn').click();await page.keyboard.press('ArrowDown');await page.keyboard.press('Enter');
    assert.match(page.url(),/sort=name/);
    assert.equal(await page.locator('#list .place-row__title').first().innerText(),'127 Lower Main Street');

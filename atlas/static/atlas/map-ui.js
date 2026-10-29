@@ -158,10 +158,21 @@ window.DerryMapUI = function (ctx) {
   sortBtn.setAttribute('aria-label', SORT_ARIA[state.sort]);
  }
  function setSortMenu(open, refocus) {
+  const asSheet = open && phone.matches;
   sortMenu.hidden = !open; sortBtn.setAttribute('aria-expanded', String(open));
+  sortBtn.setAttribute('aria-haspopup', asSheet ? 'dialog' : 'listbox');
+  sortMenu.classList.toggle('is-sheet', asSheet);
+  if (asSheet) {
+   sortMenu.setAttribute('role', 'dialog'); sortMenu.setAttribute('aria-modal', 'true'); sortMenu.setAttribute('aria-labelledby', 'sortMenuTitle');
+   scrim.hidden = false;
+  } else {
+   sortMenu.removeAttribute('role'); sortMenu.removeAttribute('aria-modal'); sortMenu.removeAttribute('aria-labelledby');
+   if (catMenu.hidden) scrim.hidden = true;
+  }
   if (open) sortOpts.find(o => o.dataset.sort === state.sort).focus(); else if (refocus) sortBtn.focus();
  }
  sortBtn.addEventListener('click', () => setSortMenu(sortMenu.hidden));
+ sortMenu.querySelector('[data-sort-close]').addEventListener('click', () => setSortMenu(false, true));
  sortMenu.addEventListener('click', e => {
   const o = e.target.closest('[data-sort]'); if (!o) return;
   state.sort = o.dataset.sort; showSort(); setSortMenu(false, true); listEl.scrollTop = 0; apply();
@@ -170,7 +181,11 @@ window.DerryMapUI = function (ctx) {
   const i = sortOpts.indexOf(document.activeElement);
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); sortOpts[(i + (e.key === 'ArrowDown' ? 1 : sortOpts.length - 1)) % sortOpts.length].focus(); }
   else if (e.key === 'Escape') { e.preventDefault(); setSortMenu(false, true); }
-  else if (e.key === 'Tab') setSortMenu(false);
+  else if (e.key === 'Tab' && phone.matches) {
+   e.preventDefault();
+   const close = sortMenu.querySelector('[data-sort-close]');
+   (document.activeElement === close ? sortOpts.find(o => o.dataset.sort === state.sort) : close).focus();
+  } else if (e.key === 'Tab') setSortMenu(false);
  });
  document.addEventListener('click', e => { if (!sortMenu.hidden && !q('#sort').contains(e.target)) setSortMenu(false); });
 
@@ -232,7 +247,10 @@ window.DerryMapUI = function (ctx) {
  catMenu.querySelector('[data-cat-none]').addEventListener('click', () => { chosen().clear(); changed(); });
  catMenu.querySelector('[data-cat-apply]').addEventListener('click', () => { state.active = draft; setCat(false, true); apply(); });
  catMenu.querySelector('[data-cat-close]').addEventListener('click', () => setCat(false, true));
- scrim.addEventListener('click', () => setCat(false, true));
+ scrim.addEventListener('click', () => {
+  if (!sortMenu.hidden) setSortMenu(false, true);
+  if (!catMenu.hidden) setCat(false, true);
+ });
  catMenu.addEventListener('keydown', e => {
   const i = catItems.indexOf(document.activeElement);
   if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && i >= 0) { e.preventDefault(); catItems[(i + (e.key === 'ArrowDown' ? 1 : catItems.length - 1)) % catItems.length].focus(); }
