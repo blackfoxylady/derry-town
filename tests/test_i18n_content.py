@@ -146,7 +146,7 @@ class RuContentTests(TestCase):
     def test_published_photo_caption_registry_is_complete_and_fully_russian(self):
         captions = json.loads(
             (settings.BASE_DIR / 'data/photo_captions_ru.json').read_text(encoding='utf-8'))
-        self.assertEqual(len(captions), 18)
+        self.assertEqual(len(captions), 23)
         for sha256, caption in captions.items():
             self.assertEqual(len(sha256), 64)
             int(sha256, 16)
@@ -178,15 +178,19 @@ class RuContentTests(TestCase):
             'laundromat': 'Прачечная',
             'losers-club': 'Клуб Неудачников',
             'main-street-bridge': 'Мост на Главной улице',
+            'music': 'Музыка',
             'night': 'Ночь',
             'paul-bunyan': 'Пол Баньян',
             'photo-album': 'Фотоальбом',
             'police': 'Полиция',
             'pov': 'Точка зрения',
+            'rain': 'Дождь',
+            'reunion': 'Встреча',
             'school': 'Школа',
             'summer': 'Лето',
             'summer-vacation': 'Летние каникулы',
             'supernatural': 'Сверхъестественное',
+            'taxi': 'Такси',
             'vacation': 'Каникулы',
             'winter': 'Зима',
         }
